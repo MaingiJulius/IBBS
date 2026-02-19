@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+  ===================================================================
+  LOGIN PAGE
+  ===================================================================
+  This page allows existing users to log in.
+  
+  ===================================================================
+  -->
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wema Travellers - Login</title>
+
+  <!-- 
+      REMOVED: Google Font (Inter) 
+     
+    -->
+
+  <!-- CSS Links -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/entry-page.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- Include Header and Footer Scripts -->
+  <script src="js/header1.js"></script>
+  <script src="js/footer.js"></script>
+
+
+  <div class="row height-full">
+    <!-- 
+      LEFT SIDE: FORM
+      Contains email and password fields for login.
+      -->
+    <div class="left-column flex flex-column height-full justify-center items-center">
+      <h1 class="welcoming-title">Welcome back</h1>
+
+      <!-- Form submits to account2.php for authentication -->
+      <form class="form" action="account2.php" method="POST" autocomplete="off">
+
+        <label for="email" class="label">Email</label>
+        <input type="text" name="email" id="email" class="input" />
+
+        <label for="password" class="label">Password</label>
+        <input type="password" name="password" id="password" class="input" required />
+
+        <button type="submit" name="login" class="button regular-button pink-background cta-btn">
+          Log in
+        </button>
+      </form>
+
+      <p class="sign-up-prompt">
+        Don’t have an account?
+        <a href="./signup.html" class="sign-up-link">Sign up</a>
+      </p>
+    </div>
+
+    <!-- 
+      RIGHT SIDE: IMAGE
+      Displays the Wema Travellers bus image.
+      -->
+    <div class="right-column"></div>
+  </div>
+</body>
+
+</html>

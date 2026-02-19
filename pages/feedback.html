@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback - Wema Transport Company</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="Feedback.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navbar placeholder -->
+  <div id="navbar-placeholder"></div>
+
+  <div class="container">
+    <div class="text">
+      Dear esteemed customer, kindly rate us
+    </div>
+
+    <div class="post">
+      <div class="text">Thanks for rating us!</div>
+      <div class="edit">EDIT</div>
+    </div>
+
+    <div class="star-widget">
+      <!-- Star Rating Inputs -->
+      <input type="radio" name="rating" id="rate-5" value="5">
+      <label for="rate-5" class="fas fa-star"></label>
+
+      <input type="radio" name="rating" id="rate-4" value="4">
+      <label for="rate-4" class="fas fa-star"></label>
+
+      <input type="radio" name="rating" id="rate-3" value="3">
+      <label for="rate-3" class="fas fa-star"></label>
+
+      <input type="radio" name="rating" id="rate-2" value="2">
+      <label for="rate-2" class="fas fa-star"></label>
+
+      <input type="radio" name="rating" id="rate-1" value="1">
+      <label for="rate-1" class="fas fa-star"></label>
+
+      <!-- Feedback Form -->
+      <form action="feedback.php" method="post">
+        <header></header>
+
+        <!-- Hidden input to store rating from JS -->
+        <input type="hidden" name="rating" id="rating-value" value="">
+
+        <!-- Optional Bus ID input -->
+        <input type="number" name="bus_id" placeholder="Enter Bus ID (optional)" min="1" style="margin: 10px 0; padding: 8px; width: 100%;">
+
+        <!-- Comment textarea -->
+        <div class="textarea">
+          <textarea cols="30" name="comment" placeholder="Describe your experience..." required></textarea>
+        </div>
+
+        <!-- Submit button -->
+        <div class="btn">
+          <button type="submit">Post</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer placeholder -->
+  <div id="footer-placeholder"></div>
+
+  <!-- Scripts -->
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+
+  <!-- Rating logic -->
+  <script>
+    const btn = document.querySelector("button");
+    const post = document.querySelector(".post");
+    const widget = document.querySelector(".star-widget");
+    const editBtn = document.querySelector(".edit");
+
+    btn.onclick = () => {
+      const ratingInputs = document.querySelectorAll('input[name="rating"]');
+      let ratingValue = "";
+      ratingInputs.forEach(input => {
+        if (input.checked) {
+          ratingValue = input.value;
+        }
+      });
+      document.getElementById('rating-value').value = ratingValue;
+
+      widget.style.display = "none";
+      post.style.display = "block";
+
+      editBtn.onclick = () => {
+        widget.style.display = "block";
+        post.style.display = "none";
+      };
+
+      return true;
+    };
+  </script>
+
+</body>
+</html>

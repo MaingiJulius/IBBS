@@ -1,0 +1,82 @@
+/* ========================================================================== */
+/* ENTRY PAGE STYLES (entry-page.css) */
+/* =========================================================================== */
+/* Specific layout for Login/Signup pages. */
+/* ========================================================================== */
+
+/* --- CONTAINER --- */
+/* The main wrapper that holds both sides */
+.row {
+    display: flex;
+    flex: 1;
+    /* Take up all available vertical space */
+    margin: 0 !important;
+    overflow: hidden;
+}
+
+.height-full {
+    height: 100%;
+}
+
+/* --- LEFT COLUMN (Form) --- */
+.left-column {
+    flex: 1;
+    /* Take up 50% space */
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Center form horizontally */
+    background-color: var(--body-bg);
+    /* Ensure pink background */
+    overflow-y: auto;
+}
+
+/* Title "Welcome Back" / "Create Account" */
+.welcoming-title {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+/* Form Wrapper */
+.form {
+    width: 100%;
+    max-width: 400px;
+    /* Limit width */
+}
+
+/* Links to switch between Login/Signup */
+.sign-up-prompt,
+.login-prompt {
+    margin-top: 20px;
+    font-size: 1rem;
+}
+
+.sign-up-link,
+.log-in-link {
+    color: var(--text-color);
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* --- RIGHT COLUMN (Image) --- */
+.right-column {
+    flex: 1;
+    /* Take up 50% space */
+    background-image: url("../img/wema_bus_sunset.png");
+    background-size: cover;
+    background-position: center;
+    border-left: 5px solid white;
+    /* Visual separator */
+    display: none;
+    /* Hidden on mobile */
+}
+
+/* Show image on larger screens */
+@media (min-width: 768px) {
+    .right-column {
+        display: block;
+    }
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskHive - Tasks</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Placeholder for Navigation Bar -->
+  <div id="navbar-placeholder"></div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <h2>Your Tasks</h2>
+
+    <!-- Filter Section -->
+    <div id="filter-section">
+      <label for="filter-date">Filter by Due Date:</label>
+      <input type="date" id="filter-date">
+      <label for="filter-status">Filter by Status:</label>
+      <select id="filter-status">
+        <option value="all">All</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+        <option value="overdue">Overdue</option>
+      </select>
+      <button onclick="filterTasks()">Apply Filter</button>
+    </div>
+
+    <!-- Task Table -->
+    <table id="task-table">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Description</th>
+          <th>Due Date</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Tasks will be dynamically added here -->
+      </tbody>
+    </table>
+
+    <!-- Add New Task Form -->
+    <h3>Add New Task</h3>
+    <form id="add-task-form" action="add_task.php" method="POST">
+      <label for="new-task">Task:</label>
+      <input type="text" id="new-task" name="new-task" required>
+
+      <label for="task-description">Description:</label>
+      <textarea id="task-description" name="task-description" required></textarea>
+
+      <label for="due-date">Due Date:</label>
+      <input type="date" id="due-date" name="due-date" required>
+
+      <label for="priority">Priority:</label>
+      <select id="priority" name="priority" required>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select>
+
+      <!-- Add Status Field -->
+      <label for="status">Status:</label>
+      <select id="status" name="status" required>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+        <option value="overdue">Overdue</option>
+      </select>
+
+      <button type="submit">Add Task</button>
+    </form>
+
+    <!-- Calendar Section -->
+    <h3>Calendar</h3>
+    <div id="calendar"></div>
+  </div>
+
+  <!-- Include Header and Footer Scripts -->
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
+
+</body>
+</html>

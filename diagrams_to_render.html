@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <h1>IBBS ERD</h1>
+    <div class="mermaid">
+        erDiagram
+        USERS ||--o{ BOOKINGS : makes
+        USERS ||--o{ FEEDBACK : gives
+        DRIVERS ||--o{ BUSES : drives
+        BUSES ||--o{ ROUTES : assigned_to
+        BUSES ||--o{ BOOKINGS : has
+        ROUTES ||--o{ BOOKINGS : includes
+        ROUTES ||--o{ FEEDBACK : relates_to
+        BUSES ||--o{ FEEDBACK : receives
+
+        USERS {
+        int user_id PK
+        string first_name
+        string last_name
+        string email
+        string phone_number
+        string password
+        enum role
+        }
+        DRIVERS {
+        int driver_id PK
+        string national_id
+        string full_name
+        string phone
+        string email
+        }
+        BUSES {
+        int bus_id PK
+        string reg_no
+        string bus_name
+        int max_passengers
+        string seat_layout
+        int driver_id FK
+        }
+        ROUTES {
+        int route_id PK
+        string from_location
+        string to_location
+        date departure_date
+        time departure_time
+        decimal cost
+        int bus_id FK
+        }
+        BOOKINGS {
+        int booking_id PK
+        datetime booking_time
+        string seat_number
+        enum booking_status
+        string qr_token
+        int user_id FK
+        int route_id FK
+        int bus_id FK
+        string passenger_name
+        int passenger_age
+        string passenger_id_number
+        }
+        FEEDBACK {
+        int feedback_id PK
+        int rating
+        text comments
+        date feedback_date
+        int user_id FK
+        int bus_id FK
+        int route_id FK
+        }
+    </div>
+
+    <h1>Use Case Diagram</h1>
+    <div class="mermaid">
+        graph LR
+        subgraph IBBS
+        UC1(Search Routes)
+        UC2(Select Seat)
+        UC3(Make Payment)
+        UC4(View E-Ticket/QR)
+        UC5(Manage Profile)
+        UC6(Verify Ticket)
+        UC7(Manage Routes/Buses)
+        UC8(View Reports)
+        UC9(Submit Feedback)
+        end
+
+        Passenger((Passenger)) --- UC1
+        Passenger --- UC2
+        Passenger --- UC3
+        Passenger --- UC4
+        Passenger --- UC5
+        Passenger --- UC9
+
+        Agent((Agent)) --- UC6
+        Agent --- UC1
+
+        Admin((Admin)) --- UC7
+        Admin --- UC8
+        Admin --- UC5
+    </div>
+
+    <h1>System Flowchart</h1>
+    <div class="mermaid">
+        flowchart TD
+        Start([Start]) --> Login{User Logged In?}
+        Login -- No --> Signup[Sign Up] --> Login
+        Login -- Yes --> Role{Role?}
+        Role -- Passenger --> DashP[Passenger Dashboard]
+        Role -- Admin --> DashA[Admin Dashboard]
+        Role -- Agent --> DashG[Agent Dashboard]
+
+        DashP --> Search[Search & Book] --> Pay[Payment Simulation] --> QR[Generate QR Token] --> End([End])
+        DashA --> Manage[Manage Routes/Buses/Users] --> End
+        DashG --> Verify[Verify QR Code] --> End
+    </div>
+
+    <h1>Process Flow (Booking)</h1>
+    <div class="mermaid">
+        sequenceDiagram
+        participant P as Passenger
+        participant S as System
+        participant DB as Database
+
+        P->>S: Search for Route
+        S->>DB: Query Routes & Seating
+        DB-->>S: Return Availability
+        S-->>P: Display Routes
+        P->>S: Select Route & Seat
+        S->>DB: Lock Seat Temporarily
+        P->>S: Provide Passenger Details
+        P->>S: Confirm & Pay
+        S->>DB: Create Booking Record
+        DB-->>S: Confirmation
+        S-->>P: Display QR Code & E-Ticket
+    </div>
+</body>
+
+</html>

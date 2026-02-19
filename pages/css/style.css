@@ -1,0 +1,66 @@
+/* ========================================================================== */
+/* SECONDARY STYLESHEET (style.css) */
+/* ========================================================================== */
+/* Theme customization. */
+/* ========================================================================== */
+
+/* --- GENERAL BODY OVERRIDES --- */
+body {
+  background-color: var(--body-bg);
+  /* Pink */
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- HEADER OVERRIDES --- */
+#banner {
+  background-color: var(--header-bg);
+  /* Medium Purple */
+}
+
+#nav-links {
+  background-color: var(--nav-bg);
+  /* Light Purple */
+}
+
+#nav-links a {
+  color: white !important;
+  /* Force white text */
+}
+
+/* --- CONTENT BOXES --- */
+/* Used for dashboard panels */
+.view-container,
+.profile-container,
+.ticket-container {
+  background: rgba(255, 255, 255, 0.5) !important;
+  /* Semi-transparent white */
+  border: 2px solid var(--header-bg);
+  border-radius: 15px;
+  margin-bottom: 40px;
+  /* Preserve space at the bottom for other pages */
+}
+
+/* --- TABLES --- */
+/* Force purple headers on all tables */
+th {
+  background-color: var(--header-bg) !important;
+  color: white !important;
+}
+
+/* --- FOOTER --- */
+footer,
+#footer {
+  background-color: #4a1a4a !important;
+  /* Dark Purple for better readability and theme consistency */
+  color: white !important;
+  text-align: center;
+  padding: 15px;
+  /* Removed fixed position to allow scrolling to the bottom */
+  margin-top: 0;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}

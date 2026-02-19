@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wema Travellers - Home</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    /* Hero Section */
+    .hero {
+      background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/wema_bus_sunset.png');
+      height: 60vh;
+      background-position: center;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero p {
+      font-size: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    /* Section Container */
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    h2.section-title {
+      text-align: center;
+      color: #333;
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+    }
+
+    h2.section-title::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background-color: var(--pink);
+      /* Using our brand pink */
+      margin: 10px auto 0;
+      border-radius: 2px;
+    }
+
+    /* Vision Mission Goals Grid */
+    .vmg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .vmg-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+      border-top: 5px solid var(--purple);
+    }
+
+    .vmg-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .vmg-card h3 {
+      color: var(--purple);
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+
+    .vmg-card p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* Countries Grid */
+    .countries-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      text-align: center;
+    }
+
+    .country-pill {
+      background-color: #f0f0f0;
+      padding: 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      color: #444;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* 
+    HOVER EFFECT FIX: 
+    Updated to match dark purple footer theme.
+    */
+    .country-pill:hover {
+      background-color: #4a1a4a !important;
+      border: 2px solid #4a1a4a !important;
+      color: white !important;
+      cursor: pointer;
+      transform: scale(1.05);
+      font-weight: bold;
+    }
+
+    /* Intro Text */
+    .intro-text {
+      text-align: center;
+      font-size: 1.2rem;
+      color: #555;
+      max-width: 900px;
+      margin: 0 auto 60px;
+      line-height: 1.8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Public Header -->
+  <script src="js/header1.js"></script>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="hero-content">
+      <h1>Welcome to Wema Travellers</h1>
+      <p>Your Premium International Bus Travel Partner</p>
+    </div>
+  </div>
+
+  <div class="section-container">
+
+    <!-- Introduction -->
+    <div class="intro-text">
+      <p>
+        Wema Travellers is a premier international transport company dedicated to connecting East and South Africa.
+        With a modern fleet of luxury buses and a commitment to punctuality, safety, and comfort, we bridge the gap
+        between nations.
+        Our seamless cross-border travel experience is designed for the modern traveler.
+      </p>
+    </div>
+
+    <!-- Vision, Mission, Goals -->
+    <div class="vmg-grid">
+      <div class="vmg-card">
+        <h3>Our Vision</h3>
+        <p>To be the absolute leader in safe, reliable, and comfortable international road transport across Africa,
+          connecting communities and business hubs with excellence.</p>
+      </div>
+      <div class="vmg-card">
+        <h3>Our Mission</h3>
+        <p>To provide affordable, high-quality, and safe transportation services while exceeding customer expectations
+          through innovation, professional staff, and a world-class fleet.</p>
+      </div>
+      <div class="vmg-card">
+        <h3>Our Promise</h3>
+        <p>We promise punctuality, hospitality, and a hassle-free border crossing experience. Your safety and comfort
+          are our top priorities on every mile of the journey.</p>
+      </div>
+    </div>
+
+    <!-- Countries Coverage -->
+    <h2 class="section-title">Destinations We Cover</h2>
+    <div class="countries-grid">
+      <div class="country-pill">Kenya</div>
+      <div class="country-pill">Uganda</div>
+      <div class="country-pill">Tanzania</div>
+      <div class="country-pill">Rwanda</div>
+      <div class="country-pill">South Africa</div>
+      <div class="country-pill">Ethiopia</div>
+      <div class="country-pill">Zambia</div>
+      <div class="country-pill">Malawi</div>
+      <div class="country-pill">Zimbabwe</div>
+      <div class="country-pill">Burundi</div>
+    </div>
+
+  </div>
+
+  <script src="js/footer.js"></script>
+
+</body>
+
+</html>

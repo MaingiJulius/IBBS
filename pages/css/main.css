@@ -1,0 +1,175 @@
+/* ========================================================================== */
+/* MAIN STYLESHEET (main.css) */
+/* ========================================================================== */
+/* CORES STYLES & VARIABLES */
+/* This file defines the global color palette and basic element shapes. */
+/* ========================================================================== */
+
+:root {
+  /* --- COLOR PALETTE (Based on Screenshots) --- */
+  --header-bg: #9a4d9a;
+  /* Medium Purple (Header Background) */
+  --nav-bg: #d06dd0;
+  /* Lighter Purple (Nav Bar Background) */
+  --body-bg: #ffccf9;
+  /* Light Pink (Main Background) */
+  --input-bg: #ffe6ff;
+  /* Very Light Pink (Input Fields) */
+  --text-color: #5a2a5a;
+  /* Dark Purple (Text) */
+  --button-color: #ff9999;
+  /* Peachy Pink (Buttons) */
+  --button-border: #000000;
+  /* Black Border for Buttons/Inputs */
+
+  /* --- BRAND COLORS (Used in new dashboard components) --- */
+  --purple: #9a4d9a;
+  --pink: #d06dd0;
+}
+
+/* --- GLOBAL RESET --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+  /* Playful font as seen in images */
+  background-color: var(--body-bg);
+  color: var(--text-color);
+}
+
+/* --- HEADER / BANNER --- */
+#banner {
+  background-color: var(--header-bg);
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+#banner h1 {
+  margin: 0;
+}
+
+/* --- NAVIGATION BAR --- */
+#nav-links {
+  background-color: var(--nav-bg);
+  padding: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  /* Center the links */
+  align-items: center;
+  position: relative;
+}
+
+#nav-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.2rem;
+  margin: 0 15px;
+  font-weight: bold;
+}
+
+#nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* --- INPUT FIELDS (Pill Shape) --- */
+input.input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 2px solid var(--button-border);
+  /* Bold black border */
+  border-radius: 25px;
+  /* Pill shape */
+  box-sizing: border-box;
+  background-color: var(--input-bg);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+/* --- BUTTONS (Pill Shape + Shadow) --- */
+.button,
+button {
+  background-color: var(--button-color);
+  color: black;
+  padding: 12px 20px;
+  margin: 10px 0;
+  border: 2px solid var(--button-border);
+  /* Black border */
+  border-radius: 25px;
+  /* Pill shape */
+  cursor: pointer;
+  width: 100%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
+  /* Hard shadow effect */
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.button:active,
+button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 1);
+}
+
+/* Specific Button Colors override */
+.cta-btn {
+  background-color: #ff9999 !important;
+  /* Force the peach color */
+}
+
+/* "View Ticket" Button specific style (Action Button) */
+.action-btn {
+  display: inline-block;
+  width: auto;
+  /* Don't stretch */
+  padding: 5px 15px;
+  font-size: 0.9rem;
+  color: white !important;
+  text-decoration: none;
+  border-radius: 5px;
+  box-shadow: none;
+  border: none;
+}
+
+.btn-view {
+  background-color: #9a4d9a;
+}
+
+/* Purple for view */
+.btn-delete {
+  background-color: #ff4d4d;
+}
+
+/* Red for delete */
+.btn-cancel {
+  background-color: #ba68c8;
+}
+
+/* Lighter purple/pink for cancel */
+
+/* --- LABELS --- */
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: var(--text-color);
+}
+
+/* --- LINKS --- */
+a {
+  color: var(--header-bg);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
