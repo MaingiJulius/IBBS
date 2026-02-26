@@ -130,8 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="css/main.css">  <!-- Core layout styles -->
     <link rel="stylesheet" href="Feedback.css"> <!-- Specific styles for this feedback form -->
     
-    <!-- Icons and Typography -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -167,23 +166,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="stars-container">
                     <!-- Rating 5: Love it -->
                     <input type="radio" name="rating_radio" id="rate-5" value="5">
-                    <label for="rate-5" class="fas fa-star" title="Love it!"></label>
+                    <label for="rate-5" title="Love it!">★</label>
 
                     <!-- Rating 4: Like it -->
                     <input type="radio" name="rating_radio" id="rate-4" value="4">
-                    <label for="rate-4" class="fas fa-star" title="Like it"></label>
+                    <label for="rate-4" title="Like it">★</label>
 
                     <!-- Rating 3: Awesome -->
                     <input type="radio" name="rating_radio" id="rate-3" value="3">
-                    <label for="rate-3" class="fas fa-star" title="Awesome"></label>
+                    <label for="rate-3" title="Awesome">★</label>
 
                     <!-- Rating 2: Not bad -->
                     <input type="radio" name="rating_radio" id="rate-2" value="2">
-                    <label for="rate-2" class="fas fa-star" title="Not bad"></label>
+                    <label for="rate-2" title="Not bad">★</label>
 
                     <!-- Rating 1: Hate it -->
                     <input type="radio" name="rating_radio" id="rate-1" value="1">
-                    <label for="rate-1" class="fas fa-star" title="Hate it"></label>
+                    <label for="rate-1" title="Hate it">★</label>
                 </div>
 
                 <!-- Text display that changes based on selected star (e.g. "It is awesome �") -->

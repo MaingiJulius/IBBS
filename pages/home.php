@@ -1,9 +1,12 @@
 <?php 
-// This is the starting point for everyone who visits the Wema Travellers website. 
-// It's like the front door of our project!
+/**
+ * HOME.PHP
+ * Purpose: This is the primary landing page (homepage) for registered users.
+ * It serves as a dashboard entry point and provides an overview of the company values.
+ */
 
-// We start the session so we can see if anyone is already logged in.
-// If they are, we can greet them by name.
+// session_start: Initializes the PHP session mechanism.
+// This allows the page to check if the user is authenticated and access their 'name' and 'role'.
 session_start(); 
 ?>
 <!DOCTYPE html>
@@ -188,7 +191,7 @@ session_start();
 
   <div class="section-container">
 
-    <!-- ABOUT SECTION: A brief introduction to our company -->
+    <!-- ABOUT SECTION: A brief introduction to our enterprise mission. -->
     <div class="intro-text">
       <p>
         Wema Travellers is a premier international transport company dedicated to connecting East and South Africa.
@@ -197,47 +200,47 @@ session_start();
       </p>
     </div>
 
-    <!-- CORE VALUES SECTION: Vision, Mission, and Promise -->
+    <!-- CORE VALUES SECTION: Vision, Mission, and Global Promise cards. -->
     <div class="vmg-grid">
-      <!-- Card 1: Vision -->
+      <!-- Card 1: Our long-term Vision -->
       <div class="vmg-card">
-        <h3>Our Vision</h3>
-        <p>To be the leading innovator in safe, comfortable, and sustainable road transport across the African continent.</p>
+        <h3>Our Vision</h3> <!-- Heading. -->
+        <p>To be the leading innovator in safe, comfortable, and sustainable road transport across the African continent.</p> <!-- Vision statement. -->
       </div>
-      <!-- Card 2: Mission -->
+      <!-- Card 2: Our everyday Mission -->
       <div class="vmg-card">
-        <h3>Our Mission</h3>
-        <p>To deliver world-class travel experiences by combining superior technology with well-trained, professional staff.</p>
+        <h3>Our Mission</h3> <!-- Heading. -->
+        <p>To deliver world-class travel experiences by combining superior technology with well-trained, professional staff.</p> <!-- Mission statement. -->
       </div>
-      <!-- Card 3: Promise -->
+      <!-- Card 3: Our Brand Promise -->
       <div class="vmg-card">
-        <h3>Our Promise</h3>
-        <p>Reliability. Comfort. Integrity. We promise a smooth journey from the moment you book until you reach your destination.</p>
+        <h3>Our Promise</h3> <!-- Heading. -->
+        <p>Reliability. Comfort. Integrity. We promise a smooth journey from the moment you book until you reach your destination.</p> <!-- Promise statement. -->
       </div>
-    </div>
+    </div> <!-- Closes the core values grid. -->
 
-    <!-- DESTINATIONS SECTION: Countries we travel to -->
-    <h2 class="section-title">Nations We Connect</h2>
-    <div class="countries-grid">
-      <!-- List of destination countries -->
-      <div class="country-pill">Kenya</div>
-      <div class="country-pill">Uganda</div>
-      <div class="country-pill">Tanzania</div>
-      <div class="country-pill">Rwanda</div>
-      <div class="country-pill">South Africa</div>
-      <div class="country-pill">Ethiopia</div>
-      <div class="country-pill">Zambia</div>
-      <div class="country-pill">Malawi</div>
-      <div class="country-pill">Zimbabwe</div>
-      <div class="country-pill">Burundi</div>
-    </div>
+    <!-- DESTINATIONS SECTION: Visual list of the nations serviced by Wema. -->
+    <h2 class="section-title">Nations We Connect</h2> <!-- Centered section title. -->
+    <div class="countries-grid"> <!-- Grid for displaying geographical scope. -->
+      <!-- Individual country capsules (Pills) -->
+      <div class="country-pill">Kenya</div> <!-- Country 1. -->
+      <div class="country-pill">Uganda</div> <!-- Country 2. -->
+      <div class="country-pill">Tanzania</div> <!-- Country 3. -->
+      <div class="country-pill">Rwanda</div> <!-- Country 4. -->
+      <div class="country-pill">South Africa</div> <!-- Country 5. -->
+      <div class="country-pill">Ethiopia</div> <!-- Country 6. -->
+      <div class="country-pill">Zambia</div> <!-- Country 7. -->
+      <div class="country-pill">Malawi</div> <!-- Country 8. -->
+      <div class="country-pill">Zimbabwe</div> <!-- Country 9. -->
+      <div class="country-pill">Burundi</div> <!-- Country 10. -->
+    </div> <!-- Closes countries grid. -->
 
-  </div>
+  </div> <!-- Closes main content container. -->
 
-  <!-- Space and Footer section -->
+  <!-- Layout spacer to ensure the footer doesn't touch the country grid. -->
   <div style="height: 50px;"></div>
+  <!-- Loads the consistent global footer via JavaScript. -->
   <script src="js/footer.js"></script>
 
-</body>
-
-</html>
+</body> <!-- Closes the visual document body. -->
+</html> <!-- Finishes the HTML source code. -->

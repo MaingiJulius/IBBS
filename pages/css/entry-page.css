@@ -1,49 +1,68 @@
 /* ========================================================================== */
 /* ENTRY PAGE STYLES (entry-page.css) */
+/* This stylesheet manages the specific layout for high-trafficked portal pages like Login and Signup. */
 /* =========================================================================== */
 /* Specific layout for Login/Signup pages. */
 /* ========================================================================== */
 
 /* --- CONTAINER --- */
-/* The main wrapper that holds both sides */
+/* The main wrapper that holds both the visual image side and the interactive form side. */
 .row {
     display: flex;
+    /* Flexbox is used to place the form and image side-by-side. */
     flex: 1;
+    /* Instructs the row to expand and take up all available horizontal space. */
     /* Take up all available vertical space */
     margin: 0 !important;
+    /* Overrides any external system margins to ensure the page touches the screen edges. */
     overflow: hidden;
+    /* Prevents scrollbars from appearing if content slightly overflows the viewport. */
 }
 
 .height-full {
     height: 100%;
+    /* Ensures the container occupies 100% of the vertical height of its parent. */
 }
 
 /* --- LEFT COLUMN (Form) --- */
 .left-column {
     flex: 1;
+    /* Tells the column to take up exactly half of the available space (50%). */
     /* Take up 50% space */
     padding: 40px;
+    /* Internal cushion to keep the form from touching the screen edges. */
     display: flex;
+    /* Activates Flexbox for internal alignment. */
     flex-direction: column;
+    /* Stacks children (title, form, prompts) vertically. */
     align-items: center;
+    /* Horizontally centers all content within the column. */
     /* Center form horizontally */
     background-color: var(--body-bg);
+    /* Applies the branding pink background. */
     /* Ensure pink background */
     overflow-y: auto;
+    /* Adds a scrollbar only if the form height exceeds the screen size. */
 }
 
 /* Title "Welcome Back" / "Create Account" */
 .welcoming-title {
     font-size: 2rem;
+    /* Sets a large, bold font size (2 times the base size). */
     color: var(--text-color);
+    /* Branding dark purple. */
     margin-bottom: 30px;
+    /* Adds significant space below the title. */
     font-weight: bold;
+    /* Bold text for a strong welcoming feel. */
 }
 
 /* Form Wrapper */
 .form {
     width: 100%;
+    /* Allows the form to be responsive. */
     max-width: 400px;
+    /* Limits the form width so it doesn't look too stretched on desktops. */
     /* Limit width */
 }
 
@@ -51,32 +70,46 @@
 .sign-up-prompt,
 .login-prompt {
     margin-top: 20px;
+    /* Adds space above the "Don't have an account?" prompt. */
     font-size: 1rem;
+    /* Standard text size. */
 }
 
 .sign-up-link,
 .log-in-link {
     color: var(--text-color);
+    /* Uses dark purple to match the rest of the text. */
     font-weight: bold;
+    /* Bolder text makes the links stand out. */
     text-decoration: underline;
+    /* Permanent underline to clearly signal these are clickable links. */
 }
 
-/* --- RIGHT COLUMN (Image) --- */
+/* --- RIGHT COLUMN (Image Decor) --- */
 .right-column {
     flex: 1;
+    /* Also takes up exactly 50% of the space. */
     /* Take up 50% space */
     background-image: url("../img/wema_bus_sunset.png");
+    /* Loads the premium bus branding image. */
     background-size: cover;
+    /* Ensures the image fills the entire column without distortion. */
     background-position: center;
+    /* Keeps the bus at the center of the view. */
     border-left: 5px solid white;
+    /* Adds a crisp white divider line between the form and the image. */
     /* Visual separator */
     display: none;
+    /* By default, this column is HIDDEN (Mobile First methodology). */
     /* Hidden on mobile */
 }
 
-/* Show image on larger screens */
+/* Responsive Media Query: Show image only on larger screens (Desktops/Tablets) */
 @media (min-width: 768px) {
+
+    /* Applies only when the screen width is at least 768 pixels. */
     .right-column {
         display: block;
+        /* Changes state from 'none' to 'block' to reveal the decorative image. */
     }
 }

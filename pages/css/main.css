@@ -1,175 +1,167 @@
 /* ========================================================================== */
 /* MAIN STYLESHEET (main.css) */
+/* This is the primary CSS file that defines the global look and feel of the application. */
 /* ========================================================================== */
-/* CORES STYLES & VARIABLES */
-/* This file defines the global color palette and basic element shapes. */
+/* CORE STYLES & VARIABLES */
+/* We define global design tokens here (colors, spacing) to ensure consistency across all pages. */
 /* ========================================================================== */
 
-:root {
-  /* --- COLOR PALETTE (Based on Screenshots) --- */
-  --header-bg: #9a4d9a;
+:root { /* The :root pseudo-class represents the <html> element and is used to store global CSS variables. */
+  /* --- COLOR PALETTE (Based on Branding requirements) --- */
+  --header-bg: #9a4d9a; /* Defines a Medium Purple color for the top header section. */
   /* Medium Purple (Header Background) */
-  --nav-bg: #d06dd0;
+  --nav-bg: #d06dd0; /* Defines a Lighter Purple for the navigation link area. */
   /* Lighter Purple (Nav Bar Background) */
-  --body-bg: #ffccf9;
+  --body-bg: #ffccf9; /* Defines a soft Light Pink for the main page background. */
   /* Light Pink (Main Background) */
-  --input-bg: #ffe6ff;
+  --input-bg: #ffe6ff; /* Defines an even lighter pink/white tint for the backgrounds of input boxes. */
   /* Very Light Pink (Input Fields) */
-  --text-color: #5a2a5a;
+  --text-color: #5a2a5a; /* Defines a high-contrast Dark Purple specifically for text readability. */
   /* Dark Purple (Text) */
-  --button-color: #ff9999;
+  --button-color: #ff9999; /* Defines a 'Peachy Pink' shade used for primary interaction buttons. */
   /* Peachy Pink (Buttons) */
-  --button-border: #000000;
+  --button-border: #000000; /* Defines Solid Black for borders to give a bold, defined look. */
   /* Black Border for Buttons/Inputs */
 
   /* --- BRAND COLORS (Used in new dashboard components) --- */
-  --purple: #9a4d9a;
-  --pink: #d06dd0;
+  --purple: #9a4d9a; /* Re-declaring branding purple for specific component usage. */
+  --pink: #d06dd0; /* Re-declaring branding pink for specific component usage. */
 }
 
 /* --- GLOBAL RESET --- */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
-  /* Playful font as seen in images */
-  background-color: var(--body-bg);
-  color: var(--text-color);
+body { /* Targeted styles for the entire page body. */
+  margin: 0; /* Removes default browser margin (white space around the edges). */
+  padding: 0; /* Removes default browser padding. */
+  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Sets a playful, rounded typography style. */
+  /* Comic Sans MS is the primary choice; Chalkboard SE is the Mac fallback; sans-serif is the generic system fallback. */
+  background-color: var(--body-bg); /* Applies the global pink background defined in the :root variables. */
+  color: var(--text-color); /* Applies the global dark purple text color for all content. */
 }
 
 /* --- HEADER / BANNER --- */
-#banner {
-  background-color: var(--header-bg);
-  color: white;
-  text-align: center;
-  padding: 15px;
-  font-size: 1.5rem;
-  font-weight: bold;
-  font-style: italic;
+#banner { /* Styles for the unique element with ID 'banner' (usually at the very top). */
+  background-color: var(--header-bg); /* Sets background to the branding purple. */
+  color: white; /* Forces text inside the banner to be pure white. */
+  text-align: center; /* Centers any text or child elements horizontally. */
+  padding: 15px; /* Adds 15 pixels of internal cushion space. */
+  font-size: 1.5rem; /* Makes the banner text 50% larger than the base font (1.5x size). */
+  font-weight: bold; /* Makes the text thick/heavy. */
+  font-style: italic; /* Slants the text to the right for a stylized look. */
+  /* text-shadow: Adds a drop shadow. 1px(right) 1px(down) 2px(blur) rgba(black at 20% opacity). */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-#banner h1 {
-  margin: 0;
+#banner h1 { /* Targeted styles for any <h1> tag nested inside the banner. */
+  margin: 0; /* Removes default heading margins to keep the banner height compact and predictable. */
 }
 
 /* --- NAVIGATION BAR --- */
-#nav-links {
-  background-color: var(--nav-bg);
-  padding: 10px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  /* Center the links */
-  align-items: center;
-  position: relative;
+#nav-links { /* Container for the site's primary menu links. */
+  background-color: var(--nav-bg); /* Sets the lighter purple background. */
+  padding: 10px; /* Internal cushion. */
+  text-align: center; /* Centers content for browsers that don't support flexbox. */
+  display: flex; /* Activates Flexbox layout mode. */
+  justify-content: center; /* Centers the menu links horizontally. */
+  align-items: center; /* Aligns the links vertically within the 10px padding. */
+  position: relative; /* Allows child elements to be positioned relative to this bar if needed. */
 }
 
-#nav-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.2rem;
-  margin: 0 15px;
-  font-weight: bold;
+#nav-links a { /* Styles for the links (anchors) inside the navigation bar. */
+  color: white; /* Forces links to be white. */
+  text-decoration: none; /* Removes the default blue underline from links. */
+  font-size: 1.2rem; /* Sets a clear, readable size. */
+  margin: 0 15px; /* Adds 15px gap on the left and right of EACH link to separate them. */
+  font-weight: bold; /* Makes the menu items stand out. */
 }
 
-#nav-links a:hover {
-  text-decoration: underline;
+#nav-links a:hover { /* Visual feedback when the user's mouse is over a link. */
+  text-decoration: underline; /* Briefly adds an underline to signal that the item is clickable. */
 }
 
 /* --- INPUT FIELDS (Pill Shape) --- */
-input.input {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 2px solid var(--button-border);
-  /* Bold black border */
-  border-radius: 25px;
-  /* Pill shape */
-  box-sizing: border-box;
-  background-color: var(--input-bg);
-  font-family: inherit;
-  font-size: 1rem;
+input.input { /* Styles for <input> elements with the class 'input'. */
+  width: 100%; /* Forces the field to stretch to the full width of its container. */
+  padding: 12px 20px; /* 12px top/bottom and 20px left/right for comfortable typing space. */
+  margin: 8px 0; /* adds vertical spacing to separate fields. */
+  display: inline-block; /* Allows the element to respect width/padding while staying in the flow. */
+  border: 2px solid var(--button-border); /* Applies a solid 2px black border. */
+  border-radius: 25px; /* Curves the edges significantly to create a smooth 'pill' shape. */
+  box-sizing: border-box; /* Ensures padding and border are included in the 100% width calculation. */
+  background-color: var(--input-bg); /* Applies the light pink background color. */
+  font-family: inherit; /* Inherits the playful 'Comic Sans' font from the body. */
+  font-size: 1rem; /* Standard text size for inputs. */
 }
 
 /* --- BUTTONS (Pill Shape + Shadow) --- */
 .button,
-button {
-  background-color: var(--button-color);
-  color: black;
-  padding: 12px 20px;
-  margin: 10px 0;
-  border: 2px solid var(--button-border);
-  /* Black border */
-  border-radius: 25px;
-  /* Pill shape */
-  cursor: pointer;
-  width: 100%;
-  font-size: 1.1rem;
-  font-weight: bold;
+button { /* Shared styles for links styled as buttons (.button) and actual <button> elements. */
+  background-color: var(--button-color); /* The signature peach color. */
+  color: black; /* Dark text for high contrast. */
+  padding: 12px 20px; /* Comfortable clicking area. */
+  margin: 10px 0; /* Vertical spacing. */
+  border: 2px solid var(--button-border); /* Strong black border. */
+  border-radius: 25px; /* Pill shape matching the inputs. */
+  cursor: pointer; /* Mandatory visual cue: changes cursor to pointer (hand). */
+  width: 100%; /* Full-width buttons for a bold mobile-friendly UI. */
+  font-size: 1.1rem; /* Slightly larger text for calls to action. */
+  font-weight: bold; /* Bold text for importance. */
+  /* box-shadow: Creates a 'retro' hard shadow. 3px(right) 3px(down) 0px(no blur) Black at 100% opacity. */
   box-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
-  /* Hard shadow effect */
-  transition: transform 0.1s, box-shadow 0.1s;
+  transition: transform 0.1s, box-shadow 0.1s; /* Enables quick 0.1s animation when clicked. */
 }
 
 .button:active,
-button:active {
-  transform: translate(2px, 2px);
+button:active { /* State triggered while the button is being held down by the user's mouse/finger. */
+  transform: translate(2px, 2px); /* Physically shifts the button 2px right and 2px down. */
+  /* Shrinks the shadow to 1px to simulate the button being 'pressed' into the page. */
   box-shadow: 1px 1px 0px rgba(0, 0, 0, 1);
 }
 
 /* Specific Button Colors override */
-.cta-btn {
-  background-color: #ff9999 !important;
-  /* Force the peach color */
+.cta-btn { /* 'Call To Action' specific class. */
+  background-color: #ff9999 !important; /* !important ensures the peachy peach color is always used regardless of other cascade rules. */
 }
 
-/* "View Ticket" Button specific style (Action Button) */
+/* "Action Buttons" - Smaller buttons used inside table rows or detail views. */
 .action-btn {
-  display: inline-block;
-  width: auto;
-  /* Don't stretch */
-  padding: 5px 15px;
-  font-size: 0.9rem;
-  color: white !important;
-  text-decoration: none;
-  border-radius: 5px;
-  box-shadow: none;
-  border: none;
+  display: inline-block; /* Allows buttons to sit side-by-side. */
+  width: auto; /* Does not stretch to 100%. */
+  padding: 5px 15px; /* Slimmer padding for a compact look. */
+  font-size: 0.9rem; /* Smaller text for secondary actions. */
+  color: white !important; /* Forces text to white. */
+  text-decoration: none; /* Removes underlines. */
+  border-radius: 5px; /* Soft rectangular corners instead of pill shape. */
+  box-shadow: none; /* Removes the heavy hard shadow for a cleaner look in tables. */
+  border: none; /* Removes the heavy border. */
 }
 
-.btn-view {
-  background-color: #9a4d9a;
+.btn-view { /* Stylized specifically for viewing records. */
+  background-color: #9a4d9a; /* Deep purple background. */
 }
 
-/* Purple for view */
-.btn-delete {
-  background-color: #ff4d4d;
+.btn-delete { /* Color-coding specifically for destructive/permanent actions. */
+  background-color: #ff4d4d; /* Bright red signals 'Danger' or 'Delete'. */
 }
 
-/* Red for delete */
-.btn-cancel {
-  background-color: #ba68c8;
+.btn-cancel { /* Color-coding for non-destructive removals (cancellations). */
+  background-color: #ba68c8; /* Soft purple/lavender. */
 }
-
-/* Lighter purple/pink for cancel */
 
 /* --- LABELS --- */
-label {
-  font-weight: bold;
-  display: block;
-  margin-top: 10px;
-  margin-bottom: 5px;
-  color: var(--text-color);
+label { /* Styles for the text descriptive tags above input fields. */
+  font-weight: bold; /* Bold labels for clarity and professional structure. */
+  display: block; /* Moves the label to its own line so the input field follows below it. */
+  margin-top: 10px; /* Gap above the label. */
+  margin-bottom: 5px; /* Gap between the label and its input field. */
+  color: var(--text-color); /* Uses branding dark purple. */
 }
 
 /* --- LINKS --- */
-a {
-  color: var(--header-bg);
-  text-decoration: none;
+a { /* Global styles for hyperlink tags. */
+  color: var(--header-bg); /* Sets links to branding purple by default. */
+  text-decoration: none; /* Removes underlines to keep the UI clean. */
 }
 
-a:hover {
-  text-decoration: underline;
+a:hover { /* Visual feedback. */
+  text-decoration: underline; /* Re-adds underline to show interaction. */
 }

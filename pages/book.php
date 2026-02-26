@@ -13,38 +13,43 @@
  * =================================================================
  */
 
-// 1. DATA BRIDGE: Connect to the MySQL database.
+// 1. DATA BRIDGE: Connect to the MySQL database by including the header file.
 require_once 'db_connection.php';
 
-// 2. IDENTITY: Start session to track the current logged-in user.
+// 2. IDENTITY: Start the PHP session mechanism to track the current logged-in user's state.
 session_start();
 
 /**
  * --- SECURITY ACCESS CONTROL ---
- * Booking is a privileged action. Anonymous users are blocked.
+ * Booking is a privileged action. We check if the user is logged in.
+ * If the 'user_id' index is missing from the $_SESSION array, they are blocked.
  */
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.html");
-    exit();
+    header("Location: login.html"); // Force redirect to the login portal.
+    exit(); // Prevent any further HTML from loading.
 }
 
 /**
  * --- USER CONTEXT ---
- * We determine who is using the page to customize the experience.
- * Staff (ADMIN/AGENT) get special controls to book on behalf of others.
+ * Retrieve the specific identity and role of the person accessing the page.
+ * We use this to toggle between "Passenger Mode" and "Staff/Agent Mode".
  */
-$user_id = $_SESSION['user_id'];
-$role    = $_SESSION['role'];
+$user_id = $_SESSION['user_id']; // The unique database ID of the user.
+$role    = $_SESSION['role'];    // The designation (PASSENGER, AGENT, or ADMIN).
+// $is_staff: A boolean (True/False) that checks if the role matches internal staff types.
 $is_staff = ($role === 'ADMIN' || $role === 'AGENT');
 
 
 /**
  * --- QUERY: AVAILABLE TRIPS ---
+ * We write a complex SQL query to find all valid journeys.
  * Logic:
- * - Fetch routes where departure is TODAY or FUTURE.
- * - Join with 'buses' to know the seat limit (max_passengers).
- * - Use a correlated subquery to count active (non-cancelled) bookings.
- * - Filter: Don't show routes this user has ALREADY booked (prevent duplicates).
+ * - Select all columns (*) from the 'routes' table (r).
+ * - JOIN with 'buses' (b) to retrieve seat capacity (max_passengers).
+ * - Use a correlated subquery to dynamically COUNT active bookings for each route.
+ * - FILTER: Only show trips that haven't happened yet (>= CURDATE()).
+ * - FILTER: Hide trips that this specific user has already booked to avoid double-booking.
+ * - SORT: Kenya routes first, then Tanzania, then others, then by date.
  */
 $sql_available = "
     SELECT r.*, b.bus_name, b.max_passengers, 
@@ -63,17 +68,20 @@ $sql_available = "
         END ASC,
         r.departure_date ASC
 ";
+// $result_available: Executes the query and stores the rows in memory.
 $result_available = $conn->query($sql_available);
 
 
 /**
  * --- DATA: PASSENGER REGISTRY (Staff Only) ---
- * If the user is an Agent, we provide a list of existing customers 
- * to speed up the office booking process.
+ * If an AGENT is booking, they need to select WHICH customer they are booking for.
+ * We fetch all users who have the 'PASSENGER' role.
  */
-$passengers = [];
+$passengers = []; // Initialize an empty container.
 if ($is_staff) {
+    // Run a query to get names and emails for the dropdown.
     $pass_res = $conn->query("SELECT user_id, first_name, last_name, email FROM users WHERE role = 'PASSENGER' ORDER BY first_name");
+    // Loop through results and store them in the $passengers array.
     while($p = $pass_res->fetch_assoc()) $passengers[] = $p;
 }
 ?>
@@ -280,19 +288,19 @@ if ($is_staff) {
     <!-- Buffer for the sticky header -->
     <div style="height: 100px;"></div>
 
-    <div class="booking-container">
-        <h2 style="color: var(--purple); margin-bottom: 30px; font-weight: 800;">🎫 Trip Reservation Engine</h2>
+    <div class="booking-container"> <!-- Main visual wrapper for the booking software. -->
+        <h2 style="color: var(--purple); margin-bottom: 30px; font-weight: 800;">🎫 Trip Reservation Engine</h2> <!-- Main Page Title. -->
 
-        <!-- STAFF CONTROLS -->
+        <!-- STAFF CONTROLS (Only visible if the logged-in user is an ADMIN or AGENT) -->
         <?php if ($is_staff): ?>
-        <div class="staff-panel">
-            <label for="target_user_id">Booking Representative Control</label>
-            <select id="target_user_id" class="passenger-select">
-                <!-- Fallback: Book as Agent/self -->
+        <div class="staff-panel"> <!-- Styles this area with a light blue background. -->
+            <label for="target_user_id">Booking Representative Control</label> <!-- Label for instructions. -->
+            <select id="target_user_id" class="passenger-select"> <!-- Dropdown to pick the customer. -->
+                <!-- Default option: The Agent books for themselves. -->
                 <option value="<?= $user_id ?>">Agent Action: (<?= htmlspecialchars($_SESSION['name']) ?>)</option>
-                <!-- Searchable context for passengers -->
+                <!-- Grouped list of all registered passengers in the system. -->
                 <optgroup label="Select Authorized Passenger">
-                    <?php foreach($passengers as $p): ?>
+                    <?php foreach($passengers as $p): ?> <!-- Loop through the $passengers array created in PHP above. -->
                         <option value="<?= $p['user_id'] ?>">
                             <?= htmlspecialchars($p['first_name'] . ' ' . $p['last_name']) ?> | <?= htmlspecialchars($p['email']) ?>
                         </option>
@@ -300,68 +308,75 @@ if ($is_staff) {
                 </optgroup>
             </select>
             <p style="margin-top: 15px; font-size: 0.85em; color: #475569;">
+                <!-- Link to manual registration if the customer isn't in the list yet. -->
                 Need a new account? <a href="view_users_sorted.php" style="color:var(--purple); font-weight:700;">Create Passenger Profile →</a>
             </p>
         </div>
         <?php else: ?>
-            <!-- Regular Passenger: Fixed to their own ID -->
+            <!-- Regular Passenger Logic: We hide the selection and force the user_id to be their own. -->
             <input type="hidden" id="target_user_id" value="<?= $user_id ?>">
         <?php endif; ?>
 
-        <!-- ACTIVE ROUTES: The schedule list -->
+        <!-- ACTIVE ROUTES: The visual table schedule -->
         <div class="table-container">
-            <table class="crud-table">
+            <table class="crud-table"> <!-- Uses the standardized project table styles. -->
                 <thead>
                     <tr>
-                        <th>Destination</th>
-                        <th>Departure Schedule</th>
-                        <th>Assigned Vehicle</th>
-                        <th>Cost (KES)</th>
-                        <th>Availability</th>
-                        <th>Action</th>
+                        <th>Destination</th> <!-- Origin and Destination cities. -->
+                        <th>Departure Schedule</th> <!-- Date and Time. -->
+                        <th>Assigned Vehicle</th> <!-- The bus name. -->
+                        <th>Cost (KES)</th> <!-- Ticket price. -->
+                        <th>Availability</th> <!-- Seats free. -->
+                        <th>Action</th> <!-- The 'Reserve' button. -->
                     </tr>
                 </thead>
                 <tbody>
                     <?php 
-                    // Render each active route row
-                    $result_available->data_seek(0);
-                    while ($row = $result_available->fetch_assoc()): 
+                    // Render each active route row from the $result_available database object.
+                    $result_available->data_seek(0); // Reset pointer to the start of the results.
+                    while ($row = $result_available->fetch_assoc()): // Fetch one row at a time.
+                        // Calculate remaining seats by subtracting bookings from max capacity.
                         $remaining = $row['max_passengers'] - $row['booked_seats'];
+                        // $is_full: Boolean check to see if the bus is sold out.
                         $is_full = ($remaining <= 0);
                     ?>
                     <tr>
                         <!-- Location Pair -->
                         <td>
-                            <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['from_location']) ?></div>
-                            <div style="font-size: 0.85em; color: #64748b;">to <?= htmlspecialchars($row['to_location']) ?></div>
+                            <div style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['from_location']) ?></div> <!-- Origin city. -->
+                            <div style="font-size: 0.85em; color: #64748b;">to <?= htmlspecialchars($row['to_location']) ?></div> <!-- Destination city. -->
                         </td>
                         <!-- Time Tracking -->
                         <td>
-                            <div style="font-weight: 600;"><?= $row['departure_date'] ?></div>
-                            <div style="font-size: 0.85em; font-family: monospace; color: var(--purple);"><?= $row['departure_time'] ?></div>
+                            <div style="font-weight: 600;"><?= $row['departure_date'] ?></div> <!-- Calendar date. -->
+                            <div style="font-size: 0.85em; font-family: monospace; color: var(--purple);"><?= $row['departure_time'] ?></div> <!-- Clock time. -->
                         </td>
                         <!-- Bus Identity -->
-                        <td><?= htmlspecialchars($row['bus_name']) ?></td>
+                        <td><?= htmlspecialchars($row['bus_name']) ?></td> <!-- Name of the bus vehicle. -->
                         <!-- Fare Calculation -->
-                        <td style="font-weight: 700; color: #1e293b;"><?= number_format($row['cost'], 2) ?></td>
+                        <td style="font-weight: 700; color: #1e293b;"><?= number_format($row['cost'], 2) ?></td> <!-- Price formatted for currency. -->
                         <!-- Stock Status -->
                         <td>
                             <?php if ($is_full): ?>
+                                <!-- Red pill showing the bus is full. -->
                                 <span style="background: #fee2e2; color: #b91c1c; padding: 6px 12px; border-radius: 99px; font-size: 0.75em; font-weight: 800;">BUS FULL</span>
                             <?php else: ?>
+                                <!-- Green pill showing available seats count. -->
                                 <span style="background: #f0fdf4; color: #166534; padding: 6px 12px; border-radius: 99px; font-size: 0.75em; font-weight: 800;"><?= $remaining ?> SEATS OPEN</span>
                             <?php endif; ?>
                         </td>
                         <!-- Entry Button -->
                         <td>
                             <?php if (!$is_full): ?>
+                                <!-- Active button that triggers the JS Seat Map logic. -->
                                 <button type="button" class="button regular-button pink-background" onclick="openSeatMap(<?= $row['route_id'] ?>, <?= $row['max_passengers'] ?>)">Reserve Seats</button>
                             <?php else: ?>
+                                <!-- Faded button if no seats are available. -->
                                 <button disabled class="button regular-button" style="opacity:0.3; cursor:not-allowed;">Sold Out</button>
                             <?php endif; ?>
                         </td>
                     </tr>
-                    <?php endwhile; ?>
+                    <?php endwhile; ?> <!-- End of trip loop. -->
                 </tbody>
             </table>
         </div>

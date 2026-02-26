@@ -41,15 +41,22 @@
     <div class="left-column flex flex-column height-full justify-center items-center">
       <h1 class="welcoming-title">Welcome back</h1>
 
-      <!-- Form submits to account2.php for authentication -->
+      <!-- login.html Form: Sends credentials to the backend for verification. -->
+      <!-- action="account2.php": Points to the central login/signup processing script. -->
+      <!-- method="POST": Hides user passwords from the URL log. -->
       <form class="form" action="account2.php" method="POST" autocomplete="off">
 
-        <label for="email" class="label">Email</label>
-        <input type="text" name="email" id="email" class="input" />
+        <!-- EMAIL INPUT -->
+        <label for="email" class="label">Email</label> <!-- Instructional label. -->
+        <input type="text" name="email" id="email" class="input" required /> <!-- The unique user email address. -->
 
-        <label for="password" class="label">Password</label>
+        <!-- PASSWORD INPUT -->
+        <label for="password" class="label">Password</label> <!-- Instructional label. -->
         <input type="password" name="password" id="password" class="input" required />
+        <!-- Masked password field for privacy. -->
 
+        <!-- LOGIN ACTION -->
+        <!-- name="login": Tells the PHP code to perform the 'Authentication' check instead of 'Registration'. -->
         <button type="submit" name="login" class="button regular-button pink-background cta-btn">
           Log in
         </button>

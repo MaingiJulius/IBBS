@@ -1,66 +1,82 @@
 <?php
-// This page allows Staff (Admins/Agents) to edit an existing user's details.
+/**
+ * USER EDIT INTERFACE (edit_user.php)
+ * Purpose: This page allows Staff (Admins and Agents) to modify existing system profiles.
+ * It handles profile updates, role elevation/demotion, and password resets.
+ */
 
-// Include DB connection
+// 1. DATA BRIDGE: Include the database configuration file.
 require_once 'db_connection.php';
+
+// 2. IDENTITY: Start session to identify the current operative.
 session_start();
 
-// SECURITY CHECK: staff only
+// --- SECURITY CHECK: STAFF AUTHORIZATION ---
+// We restrict access to this sensitive management tool to 'ADMIN' or 'AGENT' roles only.
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) {
     die("Access Denied: Staff Only Area.");
 }
 
-// Check if an ID is provided
+// --- ID VALIDATION ---
+// We check if a 'user_id' was passed in the URL (GET parameter).
 if (!isset($_GET['user_id'])) {
-    die("Error: No user ID specified.");
+    die("Error: No user ID specified for modification.");
 }
 
+// Store the target user's ID in a variable.
 $target_id = $_GET['user_id'];
-$msg = "";
-$err = "";
+$err = ""; // Placeholder for any database error messages.
 
-// --- FETCH USER DATA ---
+// --- STEP 1: FETCH CURRENT DATA ---
+// We need to pull the current profile data to pre-fill the form fields.
 $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $target_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
+$stmt->bind_param("i", $target_id); // Bind the ID as integer.
+$stmt->execute(); // Execute the search.
+$result = $stmt->get_result(); // Get the single row returned.
+$user = $result->fetch_assoc(); // Associate the data into an array.
+$stmt->close(); // Close the statement.
 
+// If the ID doesn't exist in our table, stop.
 if (!$user) {
-    die("Error: User not found.");
+    die("Error: The requested user profile was not found in our records.");
 }
 
-// --- HANDLE FORM SUBMISSION ---
+// --- STEP 2: HANDLE UPDATE SUBMISSION ---
+// This block runs if the form is submitted via POST.
 if (isset($_POST['update_user'])) {
+    // Capture the modified input values.
     $fname = $_POST['first_name'];
     $lname = $_POST['last_name'];
     $email = $_POST['email'];
     $phone = $_POST['phone_number'];
     $role = $_POST['role'];
     
-    // Optional password update
+    // Capturing the 'optional' password field.
     $new_pass = $_POST['password'];
     
+    // LOGIC: Conditional Update
+    // We only update the password field if the staff member typed something in that box.
     if (!empty($new_pass)) {
-        // Update WITH password
-        $hashed = password_hash($new_pass, PASSWORD_DEFAULT);
+        // SCENE A: Update WITH a new password hash.
+        $hashed = password_hash($new_pass, PASSWORD_DEFAULT); // Secure the new password.
         $sql = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=?, password=? WHERE user_id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssi", $fname, $lname, $email, $phone, $role, $hashed, $target_id);
+        $stmt_upd = $conn->prepare($sql);
+        $stmt_upd->bind_param("ssssssi", $fname, $lname, $email, $phone, $role, $hashed, $target_id);
     } else {
-        // Update WITHOUT password
+        // SCENE B: Update everything EXCEPT the password.
         $sql = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=? WHERE user_id=?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssyi", $fname, $lname, $email, $phone, $role, $target_id);
+        $stmt_upd = $conn->prepare($sql);
+        $stmt_upd->bind_param("sssssi", $fname, $lname, $email, $phone, $role, $target_id);
     }
     
-    if ($stmt->execute()) {
-        // Redirect back to the list with success message
-        header("Location: view_users_sorted.php?msg=User details updated successfully.");
-        exit();
+    // EXECUTE: Try to save the changes to the database.
+    if ($stmt_upd->execute()) {
+        // If successful, redirect the staff member back to the main sorted user list.
+        header("Location: view_users_sorted.php?msg=System: User profile updated successfully.");
+        exit(); // Stop PHP processing.
     } else {
-        $err = "Database Error: " . $conn->error;
+        // If it failed (e.g. duplicate email), capture the technical error.
+        $err = "Critical Database Failure: " . $conn->error;
     }
 }
 ?>

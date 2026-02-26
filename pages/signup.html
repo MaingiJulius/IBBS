@@ -41,28 +41,41 @@
     <div class="left-column flex flex-column height-full justify-center items-center">
       <h1 class="welcoming-title">Create Account</h1>
 
-      <!-- Form submits to account2.php for processing -->
+      <!-- signup.html Form: This collects user data and sends it to the server for permanent storage. -->
+      <!-- action="account2.php": Tells the browser to send data to the account processing script. -->
+      <!-- method="POST": Sends data securely in the background (hidden from the URL bar). -->
       <form class="form" action="account2.php" method="POST" autocomplete="off">
 
-        <label for="first_name" class="label">First Name</label>
+        <!-- FIRST NAME -->
+        <label for="first_name" class="label">First Name</label> <!-- UI Label. -->
         <input type="text" name="first_name" id="first_name" class="input" required />
+        <!-- Text input for personal name. -->
 
-        <label for="last_name" class="label">Last Name</label>
+        <!-- LAST NAME -->
+        <label for="last_name" class="label">Last Name</label> <!-- UI Label. -->
         <input type="text" name="last_name" id="last_name" class="input" required />
+        <!-- Text input for family name. -->
 
-        <label for="email" class="label">Email</label>
-        <input type="text" name="email" id="email" class="input" />
+        <!-- EMAIL ADDRESS -->
+        <label for="email" class="label">Email</label> <!-- UI Label. -->
+        <input type="text" name="email" id="email" class="input" /> <!-- User's unique identification email. -->
 
-        <!-- ADDED: Phone number field as per requirement -->
-        <label for="phone_number" class="label">Phone Number</label>
+        <!-- PHONE NUMBER (Added for SMS notifications/contact) -->
+        <label for="phone_number" class="label">Phone Number</label> <!-- UI Label. -->
         <input type="text" name="phone_number" id="phone_number" class="input" placeholder="e.g. 0712345678" required />
+        <!-- Contact phone. -->
 
-        <label for="password" class="label">Password</label>
+        <!-- PASSWORD -->
+        <label for="password" class="label">Password</label> <!-- UI Label. -->
         <input type="password" name="password" id="password" class="input" required />
+        <!-- Secure password field (dots appear). -->
+        <!-- Security hint text to improve user account strength. -->
         <p style="font-size: 0.85rem; color: gray; margin-bottom: 1rem;">
           Must be at least 8 characters with uppercase, lowercase, number & symbol.
         </p>
 
+        <!-- SUBMIT BUTTON -->
+        <!-- name="save": This specific name tells the PHP script that we want to CREATE a new account. -->
         <button type="submit" name="save" class="button regular-button pink-background cta-btn">
           Sign up
         </button>

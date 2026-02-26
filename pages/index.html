@@ -1,155 +1,233 @@
-<!DOCTYPE html>
+<!DOCTYPE html> <!-- Declares this document as an HTML5 document, the modern standard for web pages. -->
 <html lang="en">
+<!-- The root element of the HTML page, specifying "en" (English) as the primary language for SEO and accessibility. -->
 
 <head>
+  <!-- Container for metadata: information about the page that isn't displayed directly to the user but is used by the browser and search engines. -->
   <meta charset="UTF-8">
+  <!-- Sets the character encoding to UTF-8, which supports almost all characters and symbols across all languages. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Ensures the page is responsive, setting the initial zoom level to 100% and matching the device's width. -->
   <title>Wema Travellers - Home</title>
+  <!-- The text shown in the browser tab and search engine results for this page. -->
   <link rel="stylesheet" href="css/style.css">
+  <!-- Links an external CSS file for theme variables and common styles across multiple pages. -->
   <link rel="stylesheet" href="css/main.css">
+  <!-- Links an external CSS file for structural and layout-specific styles. -->
   <style>
-    /* Hero Section */
+    /* Opens an internal stylesheet block to define styles specific only to this home page. */
+    /* Hero Section - The large, visually striking header at the top of the page. */
     .hero {
+      /* background-image: Applies a visual layer. linear-gradient creates a dark overlay for text readability. */
+      /* rgba(0, 0, 0, 0.5): r=red(0), g=green(0), b=blue(0), a=alpha/transparency(0.5 or 50%). It creates a semi-transparent black. */
+      /* url('img/wema_bus_sunset.png'): The actual background image path. */
       background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('img/wema_bus_sunset.png');
       height: 60vh;
+      /* Sets the height to 60% of the viewport height (the user's screen height). */
       background-position: center;
+      /* Ensures the focal point of the background image stays in the center of the box. */
       background-size: cover;
+      /* Commands the image to stretch or shrink to fill the entire container without losing its aspect ratio. */
       display: flex;
+      /* Enables Flexbox, an advanced layout tool for aligning child elements. */
       justify-content: center;
+      /* Horizontally centers all content within this flex container. */
       align-items: center;
+      /* Vertically centers all content within this flex container. */
       text-align: center;
+      /* Centers any wrapped or inline text inside this container. */
       color: white;
+      /* Sets the default text color to white for high contrast against the dark background. */
       margin-bottom: 40px;
+      /* Adds 40 pixels of empty space below the hero section to separate it from the content. */
     }
 
     .hero h1 {
       font-size: 3rem;
+      /* Sets a large font size relative to the default (typically 3 times the standard size). */
       margin-bottom: 20px;
+      /* Adds space below the main heading. */
+      /* text-shadow: Adds a subtle shadow behind the text for better readability on complex backgrounds. */
+      /* 2px(horizontal offset) 2px(vertical offset) 4px(blur radius) rgba(0,0,0,0.5)(black at 50% opacity). */
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
 
     .hero p {
       font-size: 1.5rem;
+      /* Sets a slightly smaller but still significant font size for the sub-heading. */
       max-width: 800px;
+      /* Limits the text width to 800 pixels so it stays readable on wide monitors. */
       margin: 0 auto;
+      /* Centers the paragraph element itself horizontally within its parent. */
     }
 
-    /* Section Container */
+    /* Section Container - Standardizes the width and padding for content blocks on the page. */
     .section-container {
       max-width: 1200px;
+      /* Prevents the content from stretching too wide on large screens, maintaining a focus center. */
       margin: 0 auto;
+      /* Centers the container block horizontally. */
       padding: 40px 20px;
+      /* Adds 40px padding to the top/bottom and 20px to the left/right. */
     }
 
     h2.section-title {
       text-align: center;
+      /* Centers the heading text. */
       color: #333;
+      /* Sets a dark grey color (#333) for a professional look. */
       font-size: 2.5rem;
+      /* Sets a large, prominent font size. */
       margin-bottom: 40px;
+      /* Adds space below the title. */
     }
 
     h2.section-title::after {
       content: '';
+      /* Required property for pseudo-elements (::after); creates a blank virtual box. */
       display: block;
+      /* Makes the box occupy its own line, allowing us to size it like an underline. */
       width: 80px;
+      /* Determines the length of the underline. */
       height: 4px;
+      /* Determines the thickness of the underline. */
       background-color: var(--pink);
-      /* Using our brand pink */
+      /* Applies the brand's primary pink color using a CSS variable. */
       margin: 10px auto 0;
+      /* Adds 10px top margin and uses 'auto' flags to center the box. */
       border-radius: 2px;
+      /* Curves the edges of the underline for a softer, more modern look. */
     }
 
-    /* Vision Mission Goals Grid */
+    /* Vision Mission Goals Grid - Arrangement for internal company value cards. */
     .vmg-grid {
       display: grid;
+      /* Enables CSS Grid, the most powerful system for 2-dimensional layouts (rows and columns). */
+      /* repeat(auto-fit...): Automatically adds as many columns as fit the screen, with a minimum of 300px width. */
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 30px;
+      /* Adds a 30-pixel gap between each card in the grid. */
       margin-bottom: 60px;
+      /* Adds significant space below the grid section. */
     }
 
     .vmg-card {
       background: white;
+      /* Ensures the card has a solid white backdrop. */
       padding: 30px;
+      /* Adds internal space between the card's edge and its content. */
       border-radius: 12px;
+      /* Rounds the corners of the card. */
+      /* box-shadow: Creates a soft elevation effect. 0(x) 4px(y) 15px(blur) rgba(black at 10% transparency). */
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       text-align: center;
+      /* Centers all text content inside the card. */
       transition: transform 0.3s ease;
+      /* Prepares a 0.3-second smooth animation for the 'hover' transform below. */
       border-top: 5px solid var(--purple);
+      /* Adds a thick purple border at the top for branding and visual interest. */
     }
 
     .vmg-card:hover {
       transform: translateY(-10px);
+      /* Lifts the card upwards by 10 pixels when the mouse cursor is over it. */
     }
 
     .vmg-card h3 {
       color: var(--purple);
+      /* Applies branding purple to the card title. */
       font-size: 1.8rem;
+      /* Sets a mid-range font size for headings in cards. */
       margin-bottom: 15px;
+      /* Adds space between the title and the paragraph below. */
     }
 
     .vmg-card p {
       color: #666;
+      /* Uses a softer grey for the body text to reduce eye strain. */
       line-height: 1.6;
+      /* Increases vertical space between lines of text for better readability. */
     }
 
-    /* Countries Grid */
+    /* Countries Grid - Layout for the destination list labels. */
     .countries-grid {
       display: grid;
+      /* Activates grid layout mode. */
+      /* auto-fill: Similar to auto-fit, it populates the row dynamically. Each pill is min 150px wide. */
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 20px;
+      /* Spacing between the country pills. */
       text-align: center;
+      /* Centers text within the pills. */
     }
 
     .country-pill {
       background-color: #f0f0f0;
+      /* Sets a very light grey background for the pills. */
       padding: 15px;
+      /* Internal spacing for the pill shape. */
       border-radius: 50px;
+      /* Fully rounds the sides to create a 'pill' or 'button' shape. */
       font-weight: 600;
+      /* Makes the text semi-bold. */
       color: #444;
+      /* Dark grey text. */
       transition: background 0.3s, color 0.3s;
+      /* Smoothly fades the background and text color on interaction. */
     }
 
     /* 
-    HOVER EFFECT FIX: 
-    Updated to match dark purple footer theme.
+    HOVER EFFECT: Enhances the pill appearance when hovered.
     */
     .country-pill:hover {
       background-color: #4a1a4a !important;
+      /* Forces a dark purple background on hover. */
       border: 2px solid #4a1a4a !important;
+      /* Adds a matching border. */
       color: white !important;
+      /* Flips text to white for clarity against the dark purple. */
       cursor: pointer;
+      /* Changes mouse to the hand 'clicking' icon. */
       transform: scale(1.05);
+      /* Slightly grows the button size by 5%. */
       font-weight: bold;
+      /* Makes the text even bolder. */
     }
 
-    /* Intro Text */
+    /* Intro Text - The welcoming blurb below the hero section. */
     .intro-text {
       text-align: center;
+      /* Centers the introduction paragraph. */
       font-size: 1.2rem;
+      /* Sets a slightly larger than normal size for emphasis. */
       color: #555;
+      /* Medium grey text color. */
       max-width: 900px;
+      /* Prevents the lines from becoming too long and tiring to read. */
       margin: 0 auto 60px;
+      /* Centers the block and adds 60px space below it. */
       line-height: 1.8;
+      /* Generous spacing between text lines for a clean, open feel. */
     }
-  </style>
+  </style> <!-- Closes the internal style block. -->
 </head>
 
-<body>
+<body> <!-- The visible content of the page starts here. -->
 
-  <!-- Public Header -->
+  <!-- Public Header - Dynamically injects the standard navigation bar for visitors. -->
   <script src="js/header1.js"></script>
 
-  <!-- Hero Section -->
-  <div class="hero">
-    <div class="hero-content">
-      <h1>Welcome to Wema Travellers</h1>
-      <p>Your Premium International Bus Travel Partner</p>
+  <!-- Hero Section - Visual branding area. -->
+  <div class="hero"> <!-- Background container. -->
+    <div class="hero-content"> <!-- Inner container for text centering. -->
+      <h1>Welcome to Wema Travellers</h1> <!-- Main tagline. -->
+      <p>Your Premium International Bus Travel Partner</p> <!-- Mission summary. -->
     </div>
   </div>
 
-  <div class="section-container">
+  <div class="section-container"> <!-- Main content wrapper for standard alignment. -->
 
-    <!-- Introduction -->
+    <!-- Introduction Paragraph -->
     <div class="intro-text">
       <p>
         Wema Travellers is a premier international transport company dedicated to connecting East and South Africa.
@@ -159,29 +237,29 @@
       </p>
     </div>
 
-    <!-- Vision, Mission, Goals -->
-    <div class="vmg-grid">
-      <div class="vmg-card">
-        <h3>Our Vision</h3>
+    <!-- Vision, Mission, and Promises (Value Cards) -->
+    <div class="vmg-grid"> <!-- Grid wrapper. -->
+      <div class="vmg-card"> <!-- Individual value card. -->
+        <h3>Our Vision</h3> <!-- Card Title. -->
         <p>To be the absolute leader in safe, reliable, and comfortable international road transport across Africa,
-          connecting communities and business hubs with excellence.</p>
+          connecting communities and business hubs with excellence.</p> <!-- Vision description. -->
       </div>
-      <div class="vmg-card">
-        <h3>Our Mission</h3>
+      <div class="vmg-card"> <!-- Individual value card. -->
+        <h3>Our Mission</h3> <!-- Card Title. -->
         <p>To provide affordable, high-quality, and safe transportation services while exceeding customer expectations
-          through innovation, professional staff, and a world-class fleet.</p>
+          through innovation, professional staff, and a world-class fleet.</p> <!-- Mission description. -->
       </div>
-      <div class="vmg-card">
-        <h3>Our Promise</h3>
+      <div class="vmg-card"> <!-- Individual value card. -->
+        <h3>Our Promise</h3> <!-- Card Title. -->
         <p>We promise punctuality, hospitality, and a hassle-free border crossing experience. Your safety and comfort
-          are our top priorities on every mile of the journey.</p>
+          are our top priorities on every mile of the journey.</p> <!-- Promise description. -->
       </div>
     </div>
 
-    <!-- Countries Coverage -->
-    <h2 class="section-title">Destinations We Cover</h2>
-    <div class="countries-grid">
-      <div class="country-pill">Kenya</div>
+    <!-- Countries Coverage (Visual List) -->
+    <h2 class="section-title">Destinations We Cover</h2> <!-- Section heading with custom underline. -->
+    <div class="countries-grid"> <!-- Grid of country labels. -->
+      <div class="country-pill">Kenya</div> <!-- Individual country label. -->
       <div class="country-pill">Uganda</div>
       <div class="country-pill">Tanzania</div>
       <div class="country-pill">Rwanda</div>
@@ -193,10 +271,11 @@
       <div class="country-pill">Burundi</div>
     </div>
 
-  </div>
+  </div> <!-- Closes the section-container. -->
 
+  <!-- Footer - Dynamically injects the standard bottom bar (copyright, etc.). -->
   <script src="js/footer.js"></script>
 
-</body>
+</body> <!-- End of the page container. -->
 
-</html>
+</html> <!-- End of the HTML document. -->

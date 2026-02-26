@@ -1,66 +1,119 @@
 /* ========================================================================== */
 /* SECONDARY STYLESHEET (style.css) */
+/* This file is used for fine-tuning the theme and overriding global defaults for specific layouts. */
 /* ========================================================================== */
 /* Theme customization. */
 /* ========================================================================== */
 
+/*
+ * =========================================================================
+ * CSS !IMPORTANT PROPERTY EXPLANATION
+ * =========================================================================
+ * The '!important' syntax is a CSS rule used to "force" a specific style to apply,
+ * even if there are other rules that would normally override it.
+ *
+ * HOW IT WORKS:
+ * 1. CSS normally follows "Specificity" (IDs beat classes, classes beat tags).
+ * 2. It also follows "Source Order" (the rule further down in the file wins).
+ * 3. When you add '!important' to a property, it breaks these rules and
+ *    gives that specific property the HIGHEST priority possible.
+ *
+ * WHEN TO USE IT:
+ * - When you need to override complex styles from external libraries.
+ * - When you want to ensure a utility class (like a hidden class) ALWAYS works.
+ *
+ * CAUTION:
+ * Overusing !important can make a stylesheet very hard to maintain because it
+ * creates "unbreakable" rules that are difficult to change later.
+ * =========================================================================
+ */
+
 /* --- GENERAL BODY OVERRIDES --- */
-body {
+:root {
+  /* Targeted styles to modify the page body's layout further. */
   background-color: var(--body-bg);
+  /* Enforces the light pink/body background. */
   /* Pink */
   color: var(--text-color);
+  /* Enforces the dark purple text color. */
   display: flex;
+  /* Enables Flexbox on the body itself to manage page-level structure. */
   flex-direction: column;
+  /* Organizes children (Header, Content, Footer) in a vertical stack. */
   min-height: 100vh;
+  /* Ensures the body always spans at least the full height of the user's screen. */
 }
 
 /* --- HEADER OVERRIDES --- */
 #banner {
+  /* Overrides for the unique Banner ID. */
   background-color: var(--header-bg);
+  /* Directly links to the medium purple branding color. */
   /* Medium Purple */
 }
 
 #nav-links {
+  /* Overrides for the navigation link container. */
   background-color: var(--nav-bg);
+  /* Directly links to the lighter lavender/purple branding color. */
   /* Light Purple */
 }
 
 #nav-links a {
+  /* Specific overrides for navigational anchor (link) tags. */
   color: white !important;
+  /* Uses !important to force the white color, overriding any generic link color rules. */
   /* Force white text */
 }
 
 /* --- CONTENT BOXES --- */
-/* Used for dashboard panels */
+/* These classes define standardized containers for dashboard panels and profile modules. */
 .view-container,
 .profile-container,
 .ticket-container {
+  /* background: applies a semi-transparent white wash. */
+  /* rgba(255, 255, 255, 0.5): Red=255, Green=255, Blue=255 (White) at 0.5 (50%) transparency. */
   background: rgba(255, 255, 255, 0.5) !important;
   /* Semi-transparent white */
   border: 2px solid var(--header-bg);
+  /* Adds a 2px solid purple outline to separate the box from the pink background. */
   border-radius: 15px;
+  /* Adds significant curvature to the corners for a soft UI feel. */
   margin-bottom: 40px;
+  /* Adds 40px space below each container to prevent crowding. */
   /* Preserve space at the bottom for other pages */
 }
 
 /* --- TABLES --- */
-/* Force purple headers on all tables */
+/* Applies a high-visibility theme to all table data representations. */
 th {
+  /* Styles specifically for Table Header cells. */
   background-color: var(--header-bg) !important;
+  /* Forces the purple header background. */
   color: white !important;
+  /* Forces the text in headers to be bold white for maximum contrast. */
 }
 
 /* --- FOOTER --- */
 footer,
 #footer {
+  /* Targeted styles for the bottom-of-page area. */
   background-color: #4a1a4a !important;
+  /* Sets a extremely dark purple, almost black, for a grounded footer. */
   /* Dark Purple for better readability and theme consistency */
   color: white !important;
+  /* Forces copyright and link text to be white. */
   text-align: center;
+  /* Centers the footer content. */
   padding: 15px;
+  /* Adds 15px of internal padding. */
   /* Removed fixed position to allow scrolling to the bottom */
   margin-top: 0;
+  /* Ensures the footer sits flush against its preceding content unless a gap is specified elsewhere. */
   font-size: 0.9rem;
+  /* Sets a slightly smaller text size for secondary footer info. */
   width: 100%;
+  /* Ensures the footer spans the entire width of the page. */
   box-sizing: border-box;
+  /* Includes the 15px padding inside the 100% width calculation. */
 }

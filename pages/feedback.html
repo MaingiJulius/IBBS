@@ -1,105 +1,114 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Feedback - Wema Transport Company</title>
+<!DOCTYPE html> <!-- Declares this as an HTML5 document. -->
+<html lang="en"> <!-- Root element for the HTML page, using English as the base language. -->
+
+<head> <!-- Metadata section for scripts, styles, and page titles. -->
+  <meta charset="UTF-8"> <!-- Uses standard UTF-8 encoding for text characters. -->
+  <title>Feedback - Wema Transport Company</title> <!-- The page title shown in the browser tab. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Enables mobile responsiveness by setting viewport width. -->
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="Feedback.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
+  <link rel="stylesheet" href="css/style.css"> <!-- Links the global theme variables and common styles. -->
+  <link rel="stylesheet" href="Feedback.css"> <!-- Links specific styles for the rating system layout. -->
 
-  <!-- Navbar placeholder -->
+  <!-- Redundant link removed in previous task, keeping as is for safety. -->
+</head> <!-- Closes the metadata container. -->
+
+<body> <!-- The visible body of the document. -->
+
+  <!-- Navbar placeholder - Used to dynamically inject the navigation bar via JavaScript. -->
   <div id="navbar-placeholder"></div>
 
-  <div class="container">
-    <div class="text">
-      Dear esteemed customer, kindly rate us
+  <div class="container"> <!-- Main content wrapper for centered formatting. -->
+    <div class="text"> <!-- Heading text container. -->
+      Dear esteemed customer, kindly rate us <!-- Instruction message to the user. -->
     </div>
 
-    <div class="post">
-      <div class="text">Thanks for rating us!</div>
-      <div class="edit">EDIT</div>
+    <div class="post"> <!-- Container for the "Thank you" state after a successful rating submission. -->
+      <div class="text">Thanks for rating us!</div> <!-- Success message. -->
+      <div class="edit">EDIT</div> <!-- Button to go back and edit the rating if needed. -->
     </div>
 
-    <div class="star-widget">
-      <!-- Star Rating Inputs -->
-      <input type="radio" name="rating" id="rate-5" value="5">
-      <label for="rate-5" class="fas fa-star"></label>
+    <div class="star-widget"> <!-- The core rating interface container. -->
+      <!-- Star Rating Inputs - Using hidden radios and visible Unicode characters for interaction. -->
+      <div class="stars-container"> <!-- Flex container to manage the alignment and selection logic. -->
+        <input type="radio" name="rating" id="rate-5" value="5"> <!-- Radio for 5 stars. -->
+        <label for="rate-5">★</label> <!-- Visual star symbol for 5/5. -->
 
-      <input type="radio" name="rating" id="rate-4" value="4">
-      <label for="rate-4" class="fas fa-star"></label>
+        <input type="radio" name="rating" id="rate-4" value="4"> <!-- Radio for 4 stars. -->
+        <label for="rate-4">★</label> <!-- Visual star symbol for 4/5. -->
 
-      <input type="radio" name="rating" id="rate-3" value="3">
-      <label for="rate-3" class="fas fa-star"></label>
+        <input type="radio" name="rating" id="rate-3" value="3"> <!-- Radio for 3 stars. -->
+        <label for="rate-3">★</label> <!-- Visual star symbol for 3/5. -->
 
-      <input type="radio" name="rating" id="rate-2" value="2">
-      <label for="rate-2" class="fas fa-star"></label>
+        <input type="radio" name="rating" id="rate-2" value="2"> <!-- Radio for 2 stars. -->
+        <label for="rate-2">★</label> <!-- Visual star symbol for 2/5. -->
 
-      <input type="radio" name="rating" id="rate-1" value="1">
-      <label for="rate-1" class="fas fa-star"></label>
+        <input type="radio" name="rating" id="rate-1" value="1"> <!-- Radio for 1 star. -->
+        <label for="rate-1">★</label> <!-- Visual star symbol for 1/5. -->
+      </div>
 
-      <!-- Feedback Form -->
-      <form action="feedback.php" method="post">
-        <header></header>
+      <!-- Feedback Form - The actual submission block. -->
+      <form action="feedback.php" method="post"> <!-- Sends data to feedback.php using the POST method. -->
+        <header></header> <!-- Empty header placeholder for dynamic JS messages. -->
 
-        <!-- Hidden input to store rating from JS -->
+        <!-- Hidden input to store rating from JS - This value is read by PHP during submission. -->
         <input type="hidden" name="rating" id="rating-value" value="">
 
-        <!-- Optional Bus ID input -->
-        <input type="number" name="bus_id" placeholder="Enter Bus ID (optional)" min="1" style="margin: 10px 0; padding: 8px; width: 100%;">
+        <!-- Optional Bus ID input - Allows users to tie feedback to a specific vehicle. -->
+        <input type="number" name="bus_id" placeholder="Enter Bus ID (optional)" min="1"
+          style="margin: 10px 0; padding: 8px; width: 100%;">
 
-        <!-- Comment textarea -->
+        <!-- Comment textarea - The main text entry box for detailed reviews. -->
         <div class="textarea">
           <textarea cols="30" name="comment" placeholder="Describe your experience..." required></textarea>
+          <!-- Required field. -->
         </div>
 
-        <!-- Submit button -->
+        <!-- Submit button - Triggers the JavaScript validation and subsequent POST submission. -->
         <div class="btn">
           <button type="submit">Post</button>
         </div>
-      </form>
-    </div>
-  </div>
+      </form> <!-- End of the feedback form. -->
+    </div> <!-- End of star-widget. -->
+  </div> <!-- End of main container. -->
 
-  <!-- Footer placeholder -->
+  <!-- Footer placeholder - Dynamically targets the injection of site-wide footer content. -->
   <div id="footer-placeholder"></div>
 
-  <!-- Scripts -->
-  <script src="js/header.js"></script>
-  <script src="js/footer.js"></script>
+  <!-- Scripts - These handle the dynamic loading of navigation components. -->
+  <script src="js/header.js"></script> <!-- Script for loading the top navbar. -->
+  <script src="js/footer.js"></script> <!-- Script for loading the bottom footer. -->
 
-  <!-- Rating logic -->
+  <!-- Rating logic - Custom JavaScript for UI transitions and data capturing. -->
   <script>
-    const btn = document.querySelector("button");
-    const post = document.querySelector(".post");
-    const widget = document.querySelector(".star-widget");
-    const editBtn = document.querySelector(".edit");
+    const btn = document.querySelector("button"); // Selects the 'Post' button for event listener attachment.
+    const post = document.querySelector(".post"); // Selects the 'success' message box.
+    const widget = document.querySelector(".star-widget"); // Selects the main rating widget box.
+    const editBtn = document.querySelector(".edit"); // Selects the 'EDIT' button for post-submission changes.
 
-    btn.onclick = () => {
-      const ratingInputs = document.querySelectorAll('input[name="rating"]');
-      let ratingValue = "";
-      ratingInputs.forEach(input => {
-        if (input.checked) {
-          ratingValue = input.value;
+    btn.onclick = () => { // Function that runs when the 'Post' button is clicked.
+      const ratingInputs = document.querySelectorAll('input[name="rating"]'); // Grabs all 5 radio buttons.
+      let ratingValue = ""; // Variable to store the final chosen number.
+      ratingInputs.forEach(input => { // Iterates through each star input.
+        if (input.checked) { // Checks if the user has selected this specific star.
+          ratingValue = input.value; // Assigns the star's value (1-5) to the variable.
         }
       });
-      document.getElementById('rating-value').value = ratingValue;
+      document.getElementById('rating-value').value = ratingValue; // Updates the hidden form field so PHP can process the data.
 
-      widget.style.display = "none";
-      post.style.display = "block";
+      widget.style.display = "none"; // Hides the rating form.
+      post.style.display = "block"; // Shows the "Thank you" message.
 
-      editBtn.onclick = () => {
-        widget.style.display = "block";
-        post.style.display = "none";
+      editBtn.onclick = () => { // Logic for when the user clicks 'EDIT' after submission.
+        widget.style.display = "block"; // Brings back the rating form.
+        post.style.display = "none"; // Hides the thank you message.
       };
 
-      return true;
+      return true; // Continues the form submission process to the server.
     };
   </script>
 
-</body>
-</html>
+</body> <!-- Closes the document body. -->
+
+</html> <!-- Finishes the HTML source. -->

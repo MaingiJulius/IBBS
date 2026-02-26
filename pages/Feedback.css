@@ -1,243 +1,340 @@
 /* =========================================================================
    FEEDBACK.CSS - Premium Light Theme for Wema Travellers
-   Purpose: Defines the visual layout and animations for the rating system.
+   Purpose: Defines the visual layout, animations, and interactive logic for the rating system.
    ========================================================================= */
 
 /* --- ROOT VARIABLES ---
-   Centralized color palette for easy theme updates.
-   Using HSL/Hex variations for a harmonious 'Wema' look.
+   Centralized color palette for easy theme updates across the feedback component.
+   Using HSL/Hex variations for a harmonious 'Wema' branding look.
 */
 :root {
+  /* Global variable scope for internal access points. */
   --primary-bg: #f9f0f9;
+  /* Soft lavender/pink tint for the main page background. */
   /* Soft lavender/pink tint for the main page background */
   --card-bg: #fff;
+  /* Pure white for the interactive form card. */
   /* Pure white for the interactive form card */
   --text-dark: #333;
+  /* Dark grey specifically for high-contrast readability. */
   /* Dark grey for better readability (high contrast) */
   --purple: #8e44ad;
+  /* Branding purple (Amethyst shade). */
   /* Deep branding purple (Amethyst) */
   --purple-light: #9b59b6;
+  /* Lighter purple used for hover effects and transitions. */
   /* Soft purple for hover states/transitions */
   --star-yellow: #f1c40f;
+  /* Bright gold specifically for active/selected star icons. */
   /* Bright gold for the star rating system */
   --star-grey: #ddd;
+  /* Muted grey for unselected or 'empty' star states. */
   /* Muted grey for 'empty' or unselected stars */
   --grey-border: #ccc;
+  /* Neutral grey for form input borders. */
   /* Neutral border color for inputs */
   --btn-dark: #222;
+  /* Bold dark grey for primary buttons. */
   /* Bold dark color for the primary call-to-action button */
 }
 
 /* --- RESET & GLOBAL DEFAULTS --- */
 * {
+  /* Applies styles to every single element on the page for absolute consistency. */
   margin: 0;
+  /* Clears all default browser margins. */
   /* Kill browser default margins */
   padding: 0;
+  /* Clears all default browser padding. */
   /* Kill browser default padding */
   box-sizing: border-box;
+  /* Ensures padding and border are included in the element's width calculation. */
   /* Ensure padding doesn't affect the element's mathematical width */
   font-family: 'Poppins', sans-serif;
+  /* Sets modern, clean Poppins typography as the default. */
   /* Use the Poppins font for a modern, clean look */
 }
 
 body {
+  /* Target the root visible element. */
   background-color: var(--primary-bg);
+  /* Applies the themed lavender background. */
   /* Apply the soft theme background */
   min-height: 100vh;
+  /* Forces the body to occupy at least 100% of the screen height. */
   /* Ensure the page always covers the full screen height */
 }
 
 /* --- FORM CARD LAYOUT --- */
 .feedback-card {
+  /* The main white container for the feedback questionnaire. */
   max-width: 500px;
+  /* Limits the card width for readability and mobile-friendliness. */
   /* Max width for a focused, mobile-friendly layout */
   background: var(--card-bg);
+  /* Forces a pure white background inside the card. */
   /* Contrast against the lavender background */
   margin: 50px auto;
+  /* Adds 50px top/bottom space and centers the card horizontally. */
   /* Center card and give it some top/bottom breathing room */
   padding: 40px 30px;
+  /* Internal cushion (40px top/bottom, 30px left/right). */
   /* Internal spacing inside the card */
   border-radius: 20px;
+  /* Smoothly rounds the corners of the card for a premium feel. */
   /* Large rounded corners for a premium 'soft' look */
+  /* box-shadow: Creates a subtle elevation. 0(x) 10px(y) 30px(blur) Black at 5% transparency. */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   /* Very light shadow for a floating effect */
   text-align: center;
+  /* Centers all content, stars, and buttons within the card. */
   /* Center-align all text and child elements (stars, buttons) */
 }
 
 /* Title text inside the card */
 .feedback-card .header-text {
+  /* Targeted styles for the introduction text within the card. */
   font-size: 24px;
+  /* Large, Prominent font size. */
   font-weight: 700;
+  /* Extra bold for clear structural hierarchy. */
   /* Bold weight for emphasis */
   color: var(--text-dark);
+  /* Uses high-contrast greyish-black. */
   margin-bottom: 30px;
+  /* Gap between the text and the stars below it. */
   /* Gap before the rating widget starts */
   line-height: 1.3;
+  /* Sets a tight but readable vertical spacing for headings. */
 }
 
 /* --- STAR RATING WIDGET --- */
 .star-widget {
+  /* The main container wrapper for the individual star interaction logic. */
   display: flex;
+  /* Activates Flexbox. */
   flex-direction: column;
+  /* Stacks the stars and the dynamic labels in one column. */
   /* Stack the stars and the dynamic label vertically */
   align-items: center;
+  /* Centers the stars horizontally within the card. */
   /* Center stars horizontally within their container */
   margin-bottom: 20px;
+  /* Space between the widget and the following form. */
 }
 
-/* Container for the FontAwesome star icons */
+/* Container for the FontAwesome star icons (Now native Unicode stars) */
 .stars-container {
+  /* Sub-container specifically for managing the layout of the stars themselves. */
   display: flex;
+  /* Flexbox. */
   flex-direction: row-reverse;
+  /* CRITICAL: Flips the layout so the code-first star is visually right-most. */
   /* CRITICAL: Allows us to use the '~' CSS selector to color stars to the left */
   justify-content: center;
+  /* Alignment. */
 }
 
-/* Hidden Inputs: We hide the actual radio buttons and use the star labels for interaction */
+/* Hidden Inputs: We hide the physical radio buttons and use the star labels for all user interaction. */
 .star-widget input {
   display: none;
+  /* Removes the radios from the screen while keeping them functional for the browser. */
 }
 
-/* Star Label (The visible FontAwesome icon) */
+/* Star Label (The visible Unicode character ★) */
 .star-widget label {
   font-size: 40px;
+  /* Large, accessible icons for easy finger/mouse interaction. */
   /* Large touch-friendly icons */
   color: var(--star-grey);
+  /* Sets the unselected color to neutral grey. */
   /* Default state: Unselected */
   padding: 0 5px;
+  /* Adds 5px horizontal breathing room between sibling stars. */
   /* Breathing room between individual stars */
   cursor: pointer;
+  /* Mandatory cue: mouse changes to hand icon. */
   /* Change mouse to hand icon on hover */
   transition: all 0.2s ease;
+  /* Enables smooth 0.2s color fade for hover and click states. */
   /* Smooth color fade on hover/click */
 }
 
 /* --- STAR HOVER & CLICK LOGIC --- */
-/* Hover Logic: 
-   When a star is hovered, highlight it AND all stars to its visual left.
-   (Works due to row-reverse + sibling selector)
+/* Hover Logic (Using ~ the general sibling selector): 
+   When a star label is hovered, we color IT and ALL labels following it in HTML (visual left).
+   This only works because the container is in 'row-reverse' mode.
 */
 .star-widget input:not(:checked)~label:hover,
 .star-widget input:not(:checked)~label:hover~label {
   color: var(--star-yellow);
+  /* Changes icons to gold/yellow on hover. */
 }
 
 /* Active State:
-   When an input is checked (clicked), permanently highlight it and its predecessors gold.
+   Once an invisible input is 'checked' (selected), we permanently color its target label and visual predecessors gold.
 */
 .star-widget input:checked~label,
 .star-widget input:checked~label~label {
   color: var(--star-yellow);
+  /* Locks color to gold after selection. */
 }
 
 /* --- DYNAMIC RATING LABEL --- */
-/* The element that shows text like "I just love it 😍" */
+/* Styles for the textual feedback (e.g., "It is awesome 😄") that appears below the stars. */
 #rating-label {
   width: 100%;
+  /* Spans the card width. */
   font-size: 26px;
+  /* High-impact text size. */
   color: var(--purple);
+  /* Themed branding purple. */
   /* Use branding purple for the emoji text */
   font-weight: 600;
+  /* Semi-bold weight. */
   margin: 10px 0 20px 0;
+  /* Vertical spacing. */
   min-height: 40px;
+  /* Fixes the box height to prevent the rest of the form from 'jumping' when text loads. */
   /* Prevents layout 'jump' when text appears */
   text-align: center;
+  /* Centering. */
 }
 
 /* --- FORM FIELD STYLING --- */
 
-/* Wrapper for the dropdown select box */
+/* Wrapper specifically for the drop-down menu selection. */
 .dropdown-container {
   margin-bottom: 20px;
+  /* Separates the dropdown from the star widget and comment box. */
 }
 
-/* The actual Trip Select dropdown */
+/* The style for the trip selection dropdown box. */
 .dropdown-container select {
   width: 100%;
+  /* Stretches to fill the container row. */
   padding: 12px 15px;
+  /* Comfortable clicking distance inside the box. */
   border: 1px solid var(--grey-border);
+  /* Subtle 1px grey outline. */
   border-radius: 8px;
+  /* Slightly rounded corners matching the dashboard theme. */
   /* Matches card's soft aesthetic */
   font-size: 15px;
+  /* Clean, professional standard text size. */
   color: #555;
+  /* Mid-grey text for user inputs. */
   outline: none;
+  /* Disables the default browser blue ring on click. */
   /* Kill default browser ring */
   background: #fff;
+  /* Pure white background inside the selector. */
   transition: border-color 0.3s;
+  /* Enables a smooth 0.3s fade for focus states. */
   /* Smooth glow on focus */
 }
 
-/* Visual cue when the user clicks/focuses the dropdown */
+/* Visual cue specifically when the user clicks inside the dropdown. */
 .dropdown-container select:focus {
   border-color: var(--purple);
+  /* Glows purple to signal active interaction. */
 }
 
-/* Wrapper for the text feedback area */
+/* Wrapper for the text feedback area (Comment Box). */
 .textarea {
   width: 100%;
+  /* Stretches to the card's width. */
   margin-bottom: 20px;
+  /* Space between the text box and the 'Post' button. */
 }
 
-/* The Comment box */
+/* Styles for the multi-line feedback input area. */
 .textarea textarea {
   width: 100%;
+  /* Width matches card container. */
   height: 120px;
+  /* Fixed height to provide ample space for comments. */
   /* Fixed height for comments */
   padding: 15px;
+  /* Large internal cushion for text padding. */
   border: 1px solid var(--grey-border);
+  /* Subtle neutral outline. */
   border-radius: 10px;
+  /* Slightly rounded corners. */
   font-size: 16px;
+  /* Large enough for high readability during typing. */
   color: #444;
+  /* Dark grey input text. */
   resize: none;
+  /* Locked height ensures the premium card layout is never broken by the user. */
   /* Disable resizing to maintain the premium card shape */
   outline: none;
+  /* Removes default browser focus ring. */
   transition: border-color 0.3s;
+  /* Smooth 0.3s glow effect. */
 }
 
-/* Focus state for the comment box */
+/* Focus state specifically for the multi-line comment box. */
 .textarea textarea:focus {
   border-color: var(--purple);
+  /* Highlights in purple when active. */
 }
 
-/* --- THE 'POST' BUTTON --- */
+/* --- THE 'POST' SUBMISSION BUTTON --- */
 
 .btn {
+  /* Wrapper for the whole-width CTA button. */
   width: 100%;
 }
 
 .btn button {
+  /* Targeted styles for the button itself. */
   width: 100%;
+  /* Stretches button across the card. */
   padding: 15px;
+  /* High-cushion surface for easy clicking on mobile. */
   background: var(--btn-dark);
+  /* Bold dark grey/black background. */
   /* Contrast against the purple theme */
   color: white;
+  /* Contrast text. */
   border: none;
+  /* Removes browser default borders. */
   border-radius: 12px;
+  /* Smooth rounded corners. */
   font-size: 18px;
+  /* Impactful font size for primary action. */
   font-weight: 700;
+  /* Ultra-bold text. */
   letter-spacing: 1px;
+  /* Slightly increases gap between letters for a premium look. */
   cursor: pointer;
+  /* Interaction hint. */
 
-  /* Transition for 3D bounce effects */
+  /* transition: handles changes for transform(moving), background(fade), and box-shadow(depth). */
   transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
 
-  /* Subtle 3D 'Bottom border' shadow */
+  /* box-shadow: Creates a 'retro 3D' effect. 0(x) 4px(y) 0(blur) Solid Black. */
   box-shadow: 0 4px 0 #000;
 }
 
-/* Button Hover State: Slightly lifts the button up */
+/* Button Hover State: Creates a visual lift effect when hovered. */
 .btn button:hover {
   background: #000;
+  /* Darkens background to pure black. */
   transform: translateY(-2px);
+  /* Lifts the button upwards by 2 pixels. */
   box-shadow: 0 6px 0 #000;
+  /* Enlarges the shadow to 6px as the button is 'higher'. */
   /* Shadow grows as button lifts */
 }
 
-/* Button Active (Click) State: Pushes the button down into the page */
+/* Button Active (Click) State: Visual feedback that the button is successfully pressed. */
 .btn button:active {
   transform: translateY(2px);
+  /* Pushes the button 2px down towards the page surface. */
   box-shadow: 0 2px 0 #000;
+  /* Shrinks the shadow to 2px to simulate the press. */
   /* Shadow shrinks as button is 'pressed' */
 }
 
