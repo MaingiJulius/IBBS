@@ -1,199 +1,92 @@
-<?php
-// =================================================================
-// BOOKING PROCESSING ENGINE (process_booking.php)
-// =================================================================
-// This script runs in the background (via AJAX fetch) to handle ticket bookings.
-// It receives data from 'book.php', validates it, and saves it to the database.
-// It returns a JSON response indicating success or failure.
-// =================================================================
+<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
+ob_start();                                                          // [1.1] Start output buffering IMMEDIATELY to catch any stray output.
+try {                                                                // [1.2] Wrap entire script in a try block for complete error coverage.
+    require_once 'db_connection.php';                                    // [12] Import the database bridge object ($conn) for MySQL communication.
+    session_start();                                                    // [13] Initialize or resume the user session to identify the requester.
 
-// Include the database connection so we can talk to MySQL.
-require_once 'db_connection.php';
+    header('Content-Type: application/json');                           // [14] Set the HTTP response header to JSON for the fetch API requester.
 
-// Start the session to identify the currently logged-in user.
-session_start();
+    /* --- [4] AUTHENTICATION GATE --- */                               // [15] Marker for the primary security access control check.
+    if (!isset($_SESSION['user_id'])) {                                  // [16] verify if the 'user_id' index exists in the active session.
+        ob_get_clean();
+        echo json_encode(['success' => false, 'message' => 'Unauthorized Access: Please login.']); // [17] Package and emit a JSON error for the UI.
+        exit();                                                          // [18] Halt all further execution to prevent unauthorized data writes.
+    }                                                                    // [19] Close the security validation boundary.
 
-// Tell the browser that the output of this script is strictly JSON data.
-// This ensures the JavaScript on the frontend parses the response correctly.
-header('Content-Type: application/json');
+    /* --- [5] INPUT DESERIALIZATION --- */                             // [20] Marker for converting raw HTTP data into usable PHP structures.
+    $raw_input = file_get_contents("php://input");                       // [21] Read the raw binary stream from the request body (JSON payload).
+    $data = json_decode($raw_input, true);                               // [22] Parse the JSON string into an associative PHP nested array.
 
-// --- SECURITY CHECK ---
-// We verify if the user is logged in by checking the session variable.
-if (!isset($_SESSION['user_id'])) {
-    // If not logged in, return a failure message.
-    echo json_encode(['success' => false, 'message' => 'Not authenticated']);
-    // Stop the script immediately.
-    exit();
-}
+    $route_id = $data['route_id'] ?? null;                               // [23] Extract the specific trip identifier using null coalescing safety.
+    $target_user_id = $data['user_id'] ?? $_SESSION['user_id'];          // [24] Determine if booking for self or a customer (Agent case).
+    $passengersData = $data['passengers'] ?? [];                         // [25] Extract the array of passenger objects (seat, name, age, id).
 
-// --- RECEIVE INPUT DATA ---
-// We read the raw data sent in the request body (because it's JSON, not a standard form POST).
-$raw_input = file_get_contents("php://input");
-// We decode the JSON string into a PHP associative array.
-$data = json_decode($raw_input, true);
+    /* --- [6] PRE-FLIGHT VALIDATION --- */                             // [26] Marker for ensuring minimal dataset requirements are met.
+    if (!$route_id || empty($passengersData)) {                          // [27] Ensure both a trip and at least one passenger were specified.
+        echo json_encode(['success' => false, 'message' => 'Selection Error: No seats or trip identified.']); // [28] Emit failure response.
+        exit();                                                          // [29] Terminate processing due to insufficient data.
+    }                                                                    // [30] Close requirements check.
 
-// Extract specific pieces of information from the decoded data.
-// We use the '??' operator (null coalescing) to provide defaults if data is missing.
-$route_id = $data['route_id'] ?? null;              // The ID of the trip being booked
-$target_user_id = $data['target_user_id'] ?? $_SESSION['user_id']; // ID of user who gets the ticket
-$bookings_to_process = $data['bookings'] ?? [];     // List of seats and passenger details
+    /* --- [7] TRIP DATA RETRIEVAL --- */                               // [31] Marker for fetching trip context from the database registry.
+    $stmt = $conn->prepare("SELECT r.*, b.max_passengers FROM routes r JOIN buses b ON r.bus_id = b.bus_id WHERE r.route_id = ?"); // [32] Query to fetch route data and vehicle capacity.
+    $stmt->bind_param("i", $route_id);                                   // [33] Safely bind the integer route identifier to the prepared statement.
+    $stmt->execute();                                                    // [34] Command the database to lookup the specific travel segment.
+    $route = $stmt->get_result()->fetch_assoc();                         // [35] Capture the trip record into a descriptive associative array.
+    $stmt->close();                                                      // [36] Release the statement resource to prevent memory leaks.
 
-// --- VALIDATION ---
-// Check if we have the essential information needed to proceed.
-if (!$route_id || empty($bookings_to_process)) {
-    // If route ID is missing or the list of bookings is empty...
-    echo json_encode(['success' => false, 'message' => 'Missing booking selection']);
-    exit();
-}
+    if (!$route) {                                                       // [37] Check if the query actually returned a valid travel route.
+        echo json_encode(['success' => false, 'message' => 'System Error: Trip route is invalid or retired.']); // [38] Emit error for UI.
+        exit();                                                          // [39] Halt processing as the trip target does not exist.
+    }                                                                    // [40] Close route lookup boundary.
 
-// --- FETCH TRIP DETAILS ---
-// We need to know which bus is used for this route to get its Bus ID.
-// We Prepare a SQL statement to prevent SQL Injection attacks.
-$stmt = $conn->prepare("SELECT r.*, b.bus_id, b.max_passengers 
-                        FROM routes r 
-                        JOIN buses b ON r.bus_id = b.bus_id 
-                        WHERE r.route_id = ?");
-// Bind the route_id parameter (integer type 'i').
-$stmt->bind_param("i", $route_id);
-// Execute the query.
-$stmt->execute();
-// Get the result and fetch it as an associative array.
-$route = $stmt->get_result()->fetch_assoc();
-// Close the statement to free up resources.
-$stmt->close();
+    /* --- [8] ATOMIC TRANSACTION COMMENCEMENT --- */                   // [41] Marker for starting the multi-step data write operation.
+    $conn->begin_transaction();                                          // [42] Disable auto-commit to ensure "All or Nothing" record writing.
 
-// If the route ID did not match any trip in the database...
-if (!$route) {
-    echo json_encode(['success' => false, 'message' => 'Route not found']);
-    exit();
-}
+    foreach ($passengersData as $p) {                                // [44] Iterate through each individual passenger seat reservation.
+        $seat_id = $p['seat_id'];                                    // [45] Assign the specific seat marker (e.g. S12) to a variable.
+        $bus_id = $route['bus_id'];                                  // [46] Retrieve the parent vehicle ID from the trip metadata.
+        $p_name = $p['name'];                                        // [47] Capture the traveller's legal name from the input array.
+        $p_age = $p['age'];                                          // [48] Capture the traveller's age for record-keeping/discounts.
+        $p_doc = $p['id'];                                           // [49] Capture the government identification number for security.
+        $booking_status = 'PAID';                                    // [50] Set the default status to 'PAID' for immediate confirmation.
 
-// --- NEW PRIVILEGE CHECK: PREVENT DOUBLE BOOKING ---
-// We check if this passenger (target_user_id) already has an active booking for this specific trip.
-// This prevents users from hoarding seats or booking the same trip multiple times by mistake.
-$stmt_check = $conn->prepare("SELECT booking_id FROM bookings WHERE user_id = ? AND route_id = ? AND booking_status != 'CANCELLED'");
-$stmt_check->bind_param("ii", $target_user_id, $route_id);
-$stmt_check->execute();
-$existing_res = $stmt_check->get_result();
-if ($existing_res->num_rows > 0) {
-    echo json_encode(['success' => false, 'message' => 'This passenger already has an active booking for this route. To book again, the previous ticket must be cancelled.']);
-    $stmt_check->close();
-    exit();
-}
-$stmt_check->close();
-
-// --- START TRANSACTION ---
-// A transaction ensures that either ALL seats are booked successfully, or NONE are.
-// This prevents "partial bookings" if an error occurs halfway through.
-$conn->begin_transaction();
-
-try {
-    // Loop through each seat requested by the user.
-    foreach ($bookings_to_process as $b) {
-        // Extract details for this specific seat.
-        $seat_no = $b['seat_number'];
-        $p_name = $b['passenger_name']; // Passenger Name
-        $p_age = $b['passenger_age'];   // Passenger Age
-        $p_id = $b['passenger_id_number']; // Passenger ID
-
-        // --- STEP A: CHECK FOR DOUBLE BOOKING ---
-        // Check if this specific seat was taken by someone else just seconds ago.
-        // We look for any active booking (not cancelled) for this route and seat.
-        $stmt = $conn->prepare("SELECT booking_id FROM bookings WHERE route_id = ? AND seat_number = ? AND booking_status != 'CANCELLED'");
-        $stmt->bind_param("is", $route_id, $seat_no);
-        $stmt->execute();
+        /* --- [8.A] CONCURRENCY CHECK (RACE CONDITION) --- */       // [51] Marker for checking real-time availability before saving.
+        $stmt_check = $conn->prepare("SELECT booking_id FROM bookings WHERE route_id = ? AND seat_number = ? AND booking_status = 'PAID'"); // [52] Query to see if seat is already occupied.
+        $stmt_check->bind_param("is", $route_id, $seat_id);          // [53] Bind route ID and seat string to the availability check.
+        $stmt_check->execute();                                      // [54] Run the check against the living bookings table.
         
-        // If the query returns any rows, it means the seat is occupied.
-        if ($stmt->get_result()->num_rows > 0) {
-            // We throw an 'Exception' to jump straight to the 'catch' block.
-            throw new Exception("Seat $seat_no is already taken.");
-        }
-        $stmt->close();
+        if ($stmt_check->get_result()->num_rows > 0) {               // [55] If the row count is greater than zero, the seat is taken.
+            throw new Exception("Collision Error: Seat $seat_id was just reserved by another customer."); // [56] Trigger failure.
+        }                                                            // [57] Close availability check.
+        $stmt_check->close();                                        // [58] Clean up the check statement object.
 
-        // --- STEP B: GENERATE DIGITAL TOKEN ---
-        // --------------------------------------------------------------------------------------
-        // DETAILED TOKEN GENERATION EXPLANATION (Line 137):
-        // 1. random_bytes(16): 
-        //    This function generates 16 bytes (128 bits) of cryptographically secure pseudo-random bytes. 
-        //    It pulls "entropy" (unpredictable data) from the operating system's kernel (like /dev/urandom on Linux 
-        //    or the CryptGenRandom API on Windows). This makes the output statistically unique and impossible 
-        //     for an attacker to predict or reverse-engineer.
-        //
-        // 2. bin2hex(...):
-        //    The 16 bytes generated are raw binary data (not readable by humans). 
-        //    bin2hex() converts each byte into its two-character hexadecimal representation (0-9, a-f).
-        //    Result: A 32-character unique string (e.g., "7f3e8a2b...") that serves as the ticket's "Hash" or 
-        //    Digital Fingerprint. This token is stored in the database and used to generate the QR code.
-        //
-        // WHY NOT USE md5() or sha1()?
-        //    Simple hashes of predictable data (like user_id + time) can be "brute-forced." 
-        //    By using random_bytes, we ensure that even if two people book at the exact same microsecond, 
-        //    their tokens will be completely different.
-        // --------------------------------------------------------------------------------------
-        // ENCRYPTION / SECURITY EXPLANATION:
-        // We use the function 'random_bytes(16)' to generate 16 bytes of cryptographically secure random data.
-        // Unlike 'rand()', which is predictable, 'random_bytes()' uses the operating system's entropy source.
-        // This makes it impossible for a hacker to guess the next token.
-        // 'bin2hex()' converts these raw binary bytes into a readable 32-character hexadecimal string.
-        // This string (e.g., "a3f9...") becomes the unique digital fingerprint for this ticket.
-        // --------------------------------------------------------------------------------------
-        $qr_token = bin2hex(random_bytes(16));
-        
-        // Get the current date and time for the booking record.
-        $booking_time = date('Y-m-d H:i:s'); 
-        
-        // Set the status. Since this is a prototype, we assume instant payment verification.
-        $status = 'PAID'; 
-        $bus_id = $route['bus_id'];
+        /* --- [8.B] SECURITY TOKEN GENERATION --- */               // [59] Marker for creating unique digital boarding signatures.
+        $qr_token = bin2hex(random_bytes(16));                       // [60] Generate a 32-character high-entropy hex string for the ticket.
 
-        // --- STEP C: INSERT BOOKING RECORD ---
-        // We construct the SQL command to save all the data into the 'bookings' table.
-        $sql = "INSERT INTO bookings (booking_time, seat_number, booking_status, qr_token, user_id, route_id, bus_id, passenger_name, passenger_age, passenger_id_number) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        /* --- [8.C] DATABASE PERSISTENCE --- */                    // [61] Marker for writing the finalized record to the system ledger.
+        $stmt_insert = $conn->prepare("INSERT INTO bookings (user_id, route_id, bus_id, seat_number, passenger_name, passenger_age, passenger_id_number, booking_status, qr_token, booking_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"); // [62] Prepare insertion SQL.
+        $stmt_insert->bind_param("iiississs", $target_user_id, $route_id, $bus_id, $seat_id, $p_name, $p_age, $p_doc, $booking_status, $qr_token); // [63] Map variables to columns.
         
-        // Prepare the statement.
-        $stmt = $conn->prepare($sql);
-        
-        // Bind all 10 parameters.
-        // Types: s=string, i=integer.
-        // Ordering matches the '?' placeholders exactly.
-        $stmt->bind_param("ssssiiisis", $booking_time, $seat_no, $status, $qr_token, $target_user_id, $route_id, $bus_id, $p_name, $p_age, $p_id);
-        
-        // Execute the insertion. If it fails (returns false), we throw an error.
-        if (!$stmt->execute()) {
-            throw new Exception("Database error: " . $stmt->error);
-        }
-        // Close the statement for this iteration.
-        $stmt->close();
+        if (!$stmt_insert->execute()) {                              // [64] Execute the write and check for database-level errors.
+            throw new Exception("Persistence Error: Failed to record booking for seat " . $seat_id); // [65] Halt on DB failure.
+        }                                                            // [66] Close insertion execution block.
+        $stmt_insert->close();                                       // [67] Release the insertion statement resource.
+    }                                                                // [68] End of the passenger data loop.
+
+    /* --- [9] FINALIZATION --- */                                   // [69] Marker for committing the entire data cluster to disk.
+    $conn->commit();                                                 // [70] Apply all changes made in the try block permanently.
+
+    ob_get_clean();                                                  // [70.1] Discard any accidental output (like warnings) before JSON emission.
+    echo json_encode(['success' => true, 'message' => 'Success! All seats reserved.', 'ticket_count' => count($passengersData)]); // [71] Emit success.
+} catch (Throwable $e) {                                             // [72] Master catch for any failure (Exception or Error).
+    if (isset($conn) && $conn->connect_errno == 0 && ($conn->ping() ?? false)) { // [72.1] Rollback only if connection is still alive.
+        $conn->rollback();                                           // [73] UNDO all database changes to maintain data integrity.
     }
+    ob_get_clean();                                                  // [73.1] Clean buffer on failure too.
+    echo json_encode(['success' => false, 'message' => 'Reservation Aborted: ' . $e->getMessage()]); // [74] Emit failure detail.
+}                                                                    // [75] Close the try-catch error handling architecture.
 
-    // --- COMMIT TRANSACTION ---
-    // If the loop finishes without throwing any exceptions, it means all seats are valid.
-    // We 'permit' the changes to be permanently saved to the database.
-    $conn->commit();
-
-    // Determine where to redirect the user.
-    // If the admin booked it ($target_user_id != session ID), stay on admin page.
-    $is_self = ($target_user_id == $_SESSION['user_id']);
-
-    // Send back a success JSON response.
-    echo json_encode([
-        'success' => true, 
-        'message' => 'Booking successfully confirmed for ' . count($bookings_to_process) . ' seat(s)!',
-        'redirect' => $is_self ? 'view_user_history.php' : 'view_admin_bookings.php'
-    ]);
-
-} catch (Exception $e) {
-    // --- ROLLBACK TRANSACTION ---
-    // If ANY error occurred (like a taken seat or DB failure), we jump here.
-    // 'rollback()' undoes ANY changes made during this transaction block.
-    // This ensures we don't end up with one booked seat and one failed seat.
-    $conn->rollback();
-    
-    // Return a failure JSON response with the error message.
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+if (isset($conn) && $conn instanceof mysqli && $conn->connect_errno == 0) {
+    $conn->close();                                                      // [76] Close the MySQL connection to release server overhead.
 }
-
-// Close the main database connection.
-$conn->close();
 ?>

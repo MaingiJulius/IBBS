@@ -1,158 +1,98 @@
-<?php
-/**
- * USER EDIT INTERFACE (edit_user.php)
- * Purpose: This page allows Staff (Admins and Agents) to modify existing system profiles.
- * It handles profile updates, role elevation/demotion, and password resets.
- */
+<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
+/**                                                                  // [2] Open multi-line documentation block for system meta-data.
+ * USER EDIT INTERFACE (edit_user.php)                               // [3] Title identifying this script as the user modification portal.
+ * Purpose: This page allows Staff (Admins and Agents) to modify existing system profiles. // [4] Main objective: staff-led account modification.
+ * It handles profile updates, role elevation/demotion, and password resets. // [5] Functionality: bridge for identity/permission updates.
+ */                                                                  // [6] Close multi-line documentation block.
 
-// 1. DATA BRIDGE: Include the database configuration file.
-require_once 'db_connection.php';
+require_once 'db_connection.php';                                    // [7] Import database bridge object ($conn) for MySQL communication.
+session_start();                                                    // [8] Initialize or resume user session to identify the administrative officer.
 
-// 2. IDENTITY: Start session to identify the current operative.
-session_start();
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) { // [9] Security Barrier: Verify requester identity and staff role.
+    die("Access Denied: Staff Only Area.");                          // [10] Halt execution with descriptive error if unauthorized.
+}                                                                    // [11] Close security barrier.
 
-// --- SECURITY CHECK: STAFF AUTHORIZATION ---
-// We restrict access to this sensitive management tool to 'ADMIN' or 'AGENT' roles only.
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) {
-    die("Access Denied: Staff Only Area.");
-}
+if (!isset($_GET['user_id'])) {                                      // [12] Parameter Check: Verify presence of target user identifier in URL.
+    die("Error: No user ID specified for modification.");            // [13] Halt execution if no target user is identified.
+}                                                                    // [14] Close parameter check.
 
-// --- ID VALIDATION ---
-// We check if a 'user_id' was passed in the URL (GET parameter).
-if (!isset($_GET['user_id'])) {
-    die("Error: No user ID specified for modification.");
-}
+$target_id = $_GET['user_id'];                                       // [15] Map the URL-provided user ID to a local variable.
+$err = "";                                                           // [16] Initialize error string for database feedback display.
+$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");     // [17] Prepare secure SQL search template with defensive placeholder.
+$stmt->bind_param("i", $target_id);                                  // [18] Safely inject the ID variable into the prepared statement.
+$stmt->execute();                                                    // [19] Execute data retrieval command on the MySQL server.
+$result = $stmt->get_result();                                       // [20] Capture the resulting database outcome.
+$user = $result->fetch_assoc();                                      // [21] Associative array mapping for record manipulation.
+$stmt->close();                                                      // [22] Release statement resource memory.
 
-// Store the target user's ID in a variable.
-$target_id = $_GET['user_id'];
-$err = ""; // Placeholder for any database error messages.
+if (!$user) {                                                        // [23] Integrity Check: Verify if the ID corresponds to an actual record.
+    die("Error: The requested user profile was not found in our records."); // [24] Halt if target ID is invalid or missing.
+}                                                                    // [25] Close integrity check.
 
-// --- STEP 1: FETCH CURRENT DATA ---
-// We need to pull the current profile data to pre-fill the form fields.
-$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $target_id); // Bind the ID as integer.
-$stmt->execute(); // Execute the search.
-$result = $stmt->get_result(); // Get the single row returned.
-$user = $result->fetch_assoc(); // Associate the data into an array.
-$stmt->close(); // Close the statement.
+if (isset($_POST['update_user'])) {                                  // [26] Action Handler: Intercept form submission for profile commit.
+    $fname = $_POST['first_name'];                                   // [27] Capture: Edited first name from form input.
+    $lname = $_POST['last_name'];                                    // [28] Capture: Edited last name from form input.
+    $email = $_POST['email'];                                        // [29] Capture: Updated digital contact address.
+    $phone = $_POST['phone_number'];                                 // [30] Capture: Updated mobile contact record.
+    $role = $_POST['role'];                                          // [31] Capture: New permission level/role assignment.
+    $new_pass = $_POST['password'];                                  // [32] Capture: Optional new password string.
 
-// If the ID doesn't exist in our table, stop.
-if (!$user) {
-    die("Error: The requested user profile was not found in our records.");
-}
+    if (!empty($new_pass)) {                                         // [33] Logic Branch: Detect if a password change was requested.
+        $hashed = password_hash($new_pass, PASSWORD_DEFAULT);        // [34] Cryptographic Hashing: Create secure one-way password hash.
+        $sql = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=?, password=? WHERE user_id=?"; // [35] SQL: Update with password change.
+        $stmt_upd = $conn->prepare($sql);                            // [36] Prepare secure update statement.
+        $stmt_upd->bind_param("ssssssi", $fname, $lname, $email, $phone, $role, $hashed, $target_id); // [37] Bind 7 parameters.
+    } else {                                                         // [38] Logic Branch: Update profile without password modification.
+        $sql = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=? WHERE user_id=?"; // [39] SQL: Update sans password.
+        $stmt_upd = $conn->prepare($sql);                            // [40] Prepare secure update statement.
+        $stmt_upd->bind_param("sssssi", $fname, $lname, $email, $phone, $role, $target_id); // [41] Bind 6 parameters.
+    }                                                                // [42] End logic branch.
 
-// --- STEP 2: HANDLE UPDATE SUBMISSION ---
-// This block runs if the form is submitted via POST.
-if (isset($_POST['update_user'])) {
-    // Capture the modified input values.
-    $fname = $_POST['first_name'];
-    $lname = $_POST['last_name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone_number'];
-    $role = $_POST['role'];
-    
-    // Capturing the 'optional' password field.
-    $new_pass = $_POST['password'];
-    
-    // LOGIC: Conditional Update
-    // We only update the password field if the staff member typed something in that box.
-    if (!empty($new_pass)) {
-        // SCENE A: Update WITH a new password hash.
-        $hashed = password_hash($new_pass, PASSWORD_DEFAULT); // Secure the new password.
-        $sql = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=?, password=? WHERE user_id=?";
-        $stmt_upd = $conn->prepare($sql);
-        $stmt_upd->bind_param("ssssssi", $fname, $lname, $email, $phone, $role, $hashed, $target_id);
-    } else {
-        // SCENE B: Update everything EXCEPT the password.
-        $sql = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=? WHERE user_id=?";
-        $stmt_upd = $conn->prepare($sql);
-        $stmt_upd->bind_param("sssssi", $fname, $lname, $email, $phone, $role, $target_id);
-    }
-    
-    // EXECUTE: Try to save the changes to the database.
-    if ($stmt_upd->execute()) {
-        // If successful, redirect the staff member back to the main sorted user list.
-        header("Location: view_users_sorted.php?msg=System: User profile updated successfully.");
-        exit(); // Stop PHP processing.
-    } else {
-        // If it failed (e.g. duplicate email), capture the technical error.
-        $err = "Critical Database Failure: " . $conn->error;
-    }
-}
-?>
+    if ($stmt_upd->execute()) {                                      // [43] Attempt to commit the modified record to the database.
+        header("Location: view_users_sorted.php?msg=System: User profile updated successfully."); // [44] Case: Success. Redirect to list.
+        exit();                                                      // [45] Halt further execution.
+    } else { $err = "Critical Database Failure: " . $conn->error; } // [46] Case: Failure. Log the technical error.
+}                                                                    // [47] End update handler.
+?>                                                                   <!-- [48] Close PHP script and prepare for document definition. -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit User - Wema Travellers</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        .form-group input, .form-group select { 
-            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; 
-        }
-    </style>
-</head>
-<body>
-    <script src="js/header2.js"></script>
-    <div style="height: 100px;"></div>
+<!DOCTYPE html>                                                         <!-- [49] Define standard HTML5 document type for modern browsers. -->
+<html lang="en">                                                     <!-- [50] Root element identifying English as layout language. -->
+<head>                                                               <!-- [51] Metadata and style asset header section. -->
+    <meta charset="UTF-8">                                           <!-- [52] Declare UTF-8 for international character support. -->
+    <title>Edit User - Wema Travellers</title>                          <!-- [53] Browser tab title identifier. -->
+    <link rel="stylesheet" href="css/main.css">                      <!-- [54] Load shared component style assets. -->
+    <link rel="stylesheet" href="css/style.css">                     <!-- [55] Load global branding layout variables. -->
+    <style>                                                          /* [56] Start internal CSS for user modification layout. */
+        .form-container { max-width: 600px; margin: 40px auto; padding: 30px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } /* [57] Card container. */
+        .form-group { margin-bottom: 20px; }                         /* [58] Vertical field spacing. */
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; } /* [59] Bold field labels. */
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; } /* [60] Input styling. */
+    </style>                                                         <!-- [61] Terminate internal CSS block. -->
+</head>                                                              <!-- [62] Close head section. -->
 
-    <div class="form-container">
-        <h2 style="color: var(--purple); text-align: center;">Edit User Details</h2>
-        
-        <?php if($err): ?>
-            <p style="color: red; text-align: center;"><?= $err ?></p>
-        <?php endif; ?>
+<body>                                                               <!-- [63] Start visible document body. -->
+    <script src="js/header2.js"></script>                                <!-- [64] Inject the unified sitewide navigation header. -->
+    <div style="height: 100px;"></div>                                   <!-- [65] Fixed header offset buffer. -->
 
-        <form method="POST">
-            <div class="form-group">
-                <label>First Name</label>
-                <input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Last Name</label>
-                <input type="text" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" required>
-            </div>
-            <div class="form-group">
-                <label>Role</label>
-                <select name="role">
-                    <option value="PASSENGER" <?= ($user['role'] == 'PASSENGER') ? 'selected' : '' ?>>PASSENGER</option>
-                    <option value="AGENT" <?= ($user['role'] == 'AGENT') ? 'selected' : '' ?>>AGENT</option>
-                    <option value="ADMIN" <?= ($user['role'] == 'ADMIN') ? 'selected' : '' ?>>ADMIN</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>New Password (Leave blank to keep current)</label>
-                <input type="password" name="password" placeholder="Enter new password only if changing">
-            </div>
-            
-            <div style="display: flex; gap: 10px;">
-                <button type="submit" name="update_user" class="button regular-button pink-background" style="flex: 1;">Update User</button>
-                <a href="view_users_sorted.php" class="button regular-button" style="background: #999; text-decoration: none; text-align: center;">Cancel</a>
-            </div>
-        </form>
-    </div>
+    <div class="form-container">                                         <!-- [66] Open the modification card. -->
+        <h2 style="color: var(--purple); text-align: center;">Edit User Details</h2> <!-- [67] Header. -->
+        <?php if($err): ?><p style="color: red; text-align: center;"><?= $err ?></p><?php endif; ?> <!-- [68] Conditional error display. -->
 
-    <div style="height: 100px;"></div>
-    <script src="js/footer.js"></script>
-</body>
-</html>
+        <form method="POST">                                             <!-- [69] Start update form definition. -->
+            <div class="form-group"><label>First Name</label><input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" required></div> <!-- [70] Pre-filled first name. -->
+            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" required></div> <!-- [71] Pre-filled last name. -->
+            <div class="form-group"><label>Email Address</label><input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required></div> <!-- [72] Pre-filled email. -->
+            <div class="form-group"><label>Phone Number</label><input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" required></div> <!-- [73] Pre-filled phone. -->
+            <div class="form-group"><label>Role</label><select name="role"> <!-- [74] Role state selection logic. -->
+                <option value="PASSENGER" <?= ($user['role'] == 'PASSENGER') ? 'selected' : '' ?>>PASSENGER</option> <!-- [75] Choice: PASSENGER. -->
+                <option value="AGENT" <?= ($user['role'] == 'AGENT') ? 'selected' : '' ?>>AGENT</option> <!-- [76] Choice: AGENT. -->
+                <option value="ADMIN" <?= ($user['role'] == 'ADMIN') ? 'selected' : '' ?>>ADMIN</option> <!-- [77] Choice: ADMIN. -->
+            </select></div>                                              <!-- [78] End role selection. -->
+            <div class="form-group"><label>New Password (Leave blank to keep current)</label><input type="password" name="password" placeholder="Enter new password only if changing"></div> <!-- [79] Optional password field. -->
+            <div style="display: flex; gap: 10px;"><button type="submit" name="update_user" class="button regular-button pink-background" style="flex: 1;">Update User</button><a href="view_users_sorted.php" class="button regular-button" style="background: #999; text-decoration: none; text-align: center;">Cancel</a></div> <!-- [80] Action controls. -->
+        </form>                                                          <!-- [81] End form. -->
+    </div>                                                               <!-- [82] End modification card. -->
+
+    <div style="height: 100px;"></div><script src="js/footer.js"></script> <!-- [83] Screen spacing and footer injection. -->
+</body>                                                              <!-- [84] End body. -->
+</html>                                                              <!-- [85] End document termination. -->

@@ -1,282 +1,192 @@
-<?php
-// =================================================================
-// USER MANAGEMENT PAGE (view_users_sorted.php)
-// =================================================================
-// This page allows Staff (Admins & Agents) to view, add, edit, or delete users.
-// It lists all users sorted by their Registration ID (First joined -> Last joined).
-// =================================================================
+<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
+/**                                                                  // [2] Open multi-line documentation block for system meta-data.
+ * ================================================================= // [3] Visual header for administrative documentation clarity.
+ * ADMINISTRATION: USER MANAGEMENT HUB (view_users_sorted.php)       // [4] Title identifying this script as the master user dashboard.
+ * ================================================================= // [5] Visual header for administrative documentation clarity.
+ * Purpose: This script provides an interface for staff members      // [6] Description: bridge for staff to audit the user registry.
+ * (Admins & Agents) to audit the entire system's user database.    // [7] Target audience: high-level personnel.
+ * Capabilities: User Registration, Role Assignment, Edit, and Delete. // [8] Functional summary of management capabilities.
+ * ================================================================= // [9] Visual header for administrative documentation clarity.
+ */                                                                  // [10] Close multi-line documentation block.
 
-// 1. Include the database connection file to communicate with MySQL.
-require_once 'db_connection.php';
+// [1] DATABASE BRIDGE: Import the $conn connection configuration.   // [11] Documentation for the database integration step.
+require_once 'db_connection.php';                                    // [12] Import the database bridge object ($conn) for MySQL communication.
 
-// 2. Start the session to check if the current user is authorized.
-session_start();
+// [2] SESSION STATE: Start the engine to track who is currently accessing the page. // [13] Documentation for session handling.
+session_start();                                                    // [14] Initialize or resume the user session to identify the requester.
 
-// --- SECURITY CHECK ---
-// We verify that the user is logged in AND has the correct role ('ADMIN' or 'AGENT').
-// If they are just a 'PASSENGER', they should not see this page.
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) {
-    die("Access Denied: Staff Only Area.");
-}
+/* --- [3] ACCESS WALL: ROLE-BASED SECURITY --- */                   // [15] Marker for the primary security access control check.
 
-// --- LOGIC: DELETING A USER ---
-// If the variable 'delete_user' exists in the URL (e.g., ?delete_user=5), we run this block.
-if (isset($_GET['delete_user'])) {
-    // Get the ID of the user to be deleted from the URL.
-    $uid = $_GET['delete_user'];
+/**                                                                  // [16] Documentation for security check logic.
+ * Security Check Logic:                                             // [17] Header for authorization verification.
+ * - is_set($_SESSION['role']): Ensures they are logged in.          // [18] Authentication prerequisite.
+ * - in_array(...): Ensures their role is either 'ADMIN' or 'AGENT'. // [19] Role-level prerequisite.
+ * - If check fails: Terminate script with a clear 'Access Denied' message. // [20] Outcome for unauthorized access.
+ */                                                                  // [21] Close documentation block.
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) { // [22] Verify staff permission via role hierarchy.
+    die("Access Denied: Staff Authorization Required.");             // [23] Halt execution and display error if unauthorized.
+}                                                                    // [24] Close security validation boundary.
+
+/* --- [4] TRANSACTIONAL LOGIC: DELETE OPERATION --- */               // [25] Marker for processing the 'Delete' action via URL parameter.
+
+// Condition: Check if the 'delete_user' variable exists in the URL queries. // [26] Documentation for deletion condition.
+if (isset($_GET['delete_user'])) {                                   // [27] Detect if 'delete_user' exists in the incoming query string.
+    // Capture the unique ID of the target user to be removed.        // [28] Documentation for ID capture.
+    $uid = $_GET['delete_user'];                                     // [29] Capture the specific user ID targeted for removal.
     
-    // SAFETY CHECK: Prevent the Admin from deleting their own account accidentally!
-    // We compare the target ID ($uid) with the logged-in ID ($_SESSION['user_id']).
-    if ($uid == $_SESSION['user_id']) {
-        // If they match, redirect with an error message.
-        header("Location: view_users_sorted.php?err=You cannot delete your own account while logged in!");
-    } else {
-        // PREPARE the SQL delete statement.
-        // We use '?' placeholders to prevent SQL Injection attacks.
-        $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
-        // BIND the parameter: 'i' means integer.
-        $stmt->bind_param("i", $uid);
-        // EXECUTE the command.
-        $stmt->execute();
-        // CLOSE the prepared statement.
-        $stmt->close();
+    /* --- [4.5] SELF-DELETION PROTECTION --- */                       // [30] Safety check to prevent administrative lockout.
+    // Logic: Prevent an Admin from locking themselves out of the system. // [31] Rationale for self-deletion block.
+    if ($uid == $_SESSION['user_id']) {                              // [32] Logic: Prevent the active user from deleting themselves.
+        // Redirection with a specific error flag in the URL.        // [33] documentation for error redirect.
+        header("Location: view_users_sorted.php?err=System Safety: You cannot delete your own active session account!"); // [34] Redirect with self-safety error message.
+    } else {                                                         // [35] Else block for standard deletion of other users.
+        // Standard Deletion Flow:                                    // [36] Header for normal deletion logic.
+        // PREPARE: Formulate the DELETE SQL template with security placeholders. // [37] Documentation for SQL prep.
+        $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?"); // [38] Prepare the SQL command for secure execution.
+        // BIND: Inject the user ID safely as an integer ('i').        // [39] Documentation for binding.
+        $stmt->bind_param("i", $uid);                                // [40] Bind the target ID to the placeholder as an integer.
+        // EXECUTE: Command the database to remove the matching record. // [41] Documentation for execution.
+        $stmt->execute();                                            // [42] Commit the deletion on the database server.
+        // TEARDOWN: Close the statement instance.                    // [43] Documentation for cleanup.
+        $stmt->close();                                              // [44] Release the statement resource.
         
-        // REDIRECT back to the user list with a success message.
-        header("Location: view_users_sorted.php?msg=User has been deleted successfully.");
-    }
-    // STOP the script here.
-    exit();
-}
+        // Success Redirection: Refresh the list with a confirmation note. // [45] Documentation for success redirect.
+        header("Location: view_users_sorted.php?msg=Success: The selected user record has been deleted."); // [46] Redirect with success confirmation.
+    }                                                                // [47] Close conditional safety block.
+    // EXIT: Ensure no further code runs after the header relocation. // [48] Documentation for exit.
+    exit();                                                          // [49] Halt processing following the redirect header.
+}                                                                    // [50] Close the deletion logic boundary.
 
-// --- LOGIC: ADDING A NEW USER ---
-// This block runs if the form with button 'add_user' is submitted via POST method.
-if (isset($_POST['add_user'])) {
-    // CAPTURE all inputs from the form fields.
-    $first = $_POST['first_name'];
-    $last = $_POST['last_name'];
-    $email = $_POST['email'];
-    $phone = $_POST['phone_number'];
-    $role = $_POST['role'];
-    
-    // HASH THE PASSWORD.
-    // We never store plain text passwords. 'password_hash' scrambles it securely.
-    // 'PASSWORD_DEFAULT' uses the industry-standard Bcrypt algorithm.
-    // This protects user data even if the database is stolen.
-    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+/* --- [5] TRANSACTIONAL LOGIC: CREATE NEW USER --- */               // [51] Marker for processing new user registrations.
 
-    // PREPARE the INSERT statement.
-    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?, ?)");
+// Condition: Detect if the 'add_user' form was submitted via POST.   // [52] Documentation for POST detection.
+if (isset($_POST['add_user'])) {                                     // [53] Detect if 'add_user' form was submitted via POST method.
+    // DATA CAPTURE: Map raw form inputs to local PHP variables.      // [54] Documentation for data mapping.
+    $first = $_POST['first_name'];      // Passenger/Staff First Name. // [55] Extract new user's first name from form data.
+    $last = $_POST['last_name'];       // Passenger/Staff Last Name.  // [56] Extract new user's last name from form data.
+    $email = $_POST['email'];           // Primary communication/login ID. // [57] Extract new user's email login identifier.
+    $phone = $_POST['phone_number'];    // Contact marker.             // [58] Extract new user's mobile contact number.
+    $role = $_POST['role'];             // Identity: PASSENGER | AGENT | ADMIN. // [59] Extract the systemic permissions level (role).
     
-    // BIND the 6 string parameters ("ssssss").
-    $stmt->bind_param("ssssss", $first, $last, $email, $phone, $pass, $role);
+    /* --- [5.5] SECURITY: CRYPTOGRAPHIC HASHING --- */               // [60] Section for secure password processing.
+    // We never store visible passwords. password_hash() creates a secure one-way hash. // [61] Rationale for hashing.
+    // PASSWORD_DEFAULT ensures the most modern algorithm (currently Bcrypt) is used. // [62] Algorithm selection rationale.
+    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);    // [63] Generate a one-way secure cryptographic password hash.
+
+    // SQL PREPARATION: Build the insertion template.                 // [64] Documentation for INSERT preparation.
+    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?, ?)"); // [65] Prepare the INSERT SQL command.
     
-    // EXECUTE and check if it worked.
-    if($stmt->execute()) {
-        $msg = "Success: New " . $role . " has been added.";
-    } else {
-        // If it failed (e.g., duplicate email), grab the error message.
-        $msg = "Error: Could not add user. " . $conn->error;
-    }
-    // CLOSE statement.
-    $stmt->close();
+    // PARAMETER BINDING: Map the 6 string inputs ("ssssss") to the query placeholders. // [66] Documentation for parameter binding.
+    $stmt->bind_param("ssssss", $first, $last, $email, $phone, $pass, $role); // [67] Map the 6 string variables to the query placeholders.
     
-    // REDIRECT back to refresh the page.
-    header("Location: view_users_sorted.php?msg=" . urlencode($msg));
-    exit();
-}
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Manage Users - Wema Travellers</title>
-    <!-- Import CSS styles -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/style.css">
+    // EXECUTION BLOCK: Run the query and handle potential outcome scenarios. // [68] Documentation for execution block.
+    if($stmt->execute()) {                                           // [69] Attempt to commit the new user record to the database.
+        // CASE: SUCCESS.                                             // [70] Success scenario.
+        $msg = "Success: A new profile for " . $role . " has been initialized."; // [71] Define success message.
+    } else {                                                         // [72] Error scenario.
+        // CASE: DB FAILURE (e.g. Email collision / Unique Constraint violation). // [73] Rationale for failure.
+        $msg = "System Error: The user could not be initialized. " . $conn->error; // [74] Define error message with DB feedback.
+    }                                                                // [75] Close execution check.
     
-    <style>
-        /* --- INTERNAL CSS FOR THIS PAGE --- */
+    // FINALIZATION: Close statement and refresh UI.                  // [76] Documentation for finalization.
+    $stmt->close();                                                  // [77] Release the statement resource.
+    header("Location: view_users_sorted.php?msg=" . urlencode($msg)); // [78] Redirect to clear form and display status message.
+    exit();                                                          // [79] Halt further execution to ensure redirect behavior.
+}                                                                    // [80] Close POST logic boundary.
+?>                                                                   <!-- [81] Close PHP processing and prepare for document rendering. -->
+
+<!DOCTYPE html>                                                         <!-- [82] Define the document type as standard HTML5. -->
+<html lang="en">                                                     <!-- [83] Root element defining the content language as English. -->
+<head>                                                               <!-- [84] Head section containing non-visible document metadata. -->
+    <meta charset="UTF-8">                                           <!-- [85] Specify UTF-8 character encoding for the document. -->
+    <title>User Directory Management - Wema Travellers</title>         <!-- [86] Set the browser tab title for the user directory page. -->
+    
+    <link rel="stylesheet" href="css/main.css">                      <!-- [87] Load the primary shared CSS stylesheet. -->
+    <link rel="stylesheet" href="css/style.css">                     <!-- [88] Load global layout and branding style variables. -->
+    
+    <style>                                                          /* [89] Start internal CSS block for page-specific UI layout. */
+        .view-container {                                            /* [90] Define the primary content card container. */
+            max-width: 1200px;                                       /* [91] Limit max width for optimal layout on large screens. */
+            margin: 30px auto;                                       /* [92] Apply vertical spacing and horizontal centering. */
+            padding: 35px;                                           /* [93] Internal cushioning within the main card. */
+            background: #ffffff;                                     /* [94] High-contrast white background signature. */
+            border-radius: 12px;                                     /* [95] Modern rounded aesthetic for the dashboard card. */
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);                /* [96] Soft shadow for premium depth perception. */
+        }                                                            /* [97] End container definition. */
+
+        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [98] Layout for the return navigation link. */
+        .crud-table { width: 100%; border-collapse: collapse; margin-top: 30px; } /* [99] Base layout for the data grid table. */
+        .crud-table th, .crud-table td { padding: 18px; border-bottom: 1px solid #edf2f7; text-align: left; } /* [100] standard cells. */
+        .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; } /* [101] header style. */
+        .action-btn { padding: 8px 15px; border-radius: 8px; text-decoration: none; color: #ffffff; font-size: 0.85rem; display: inline-block; } /* [102] buttons. */
+        .btn-delete { background-color: #ef4444; }                    /* [103] alert color for deletion. */
+        .add-form { background: #f8fafc; padding: 30px; border-radius: 12px; margin-bottom: 40px; border: 1px solid #e2e8f0; } /* [104] entry form. */
+        .form-row { display: flex; gap: 20px; flex-wrap: wrap; }      /* [105] horizontal form fields layout. */
+        .form-group { flex: 1; min-width: 240px; }                    /* [106] field spacing logic. */
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; color: #4a5568; } /* [107] labels. */
+    </style>                                                         <!-- [108] Terminate internal CSS block. -->
+</head>                                                              <!-- [109] End document head. -->
+
+<body>                                                               <!-- [110] Open the document body for visible content. -->
+    <script src="js/header2.js"></script>                                <!-- [111] Inject the global administrative navigation bar. -->
+    <div style="height: 100px;"></div>                                   <!-- [112] Fixed header offset buffer. -->
+    
+    <div class="back-btn-container">                                      <!-- [113] Container for the return shortcut. -->
+        <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px;">← Return to Main Hub</a> <!-- [114] nav link. -->
+    </div>                                                               <!-- [115] End return container. -->
+
+    <div class="view-container">                                         <!-- [116] Main UI content card start. -->
+        <h2 style="color: var(--purple); margin-bottom: 5px;">👥 User System Directory</h2> <!-- [117] Page header. -->
+        <p style="color: #718096; margin-bottom: 30px; font-size: 0.95rem;">Auditing all registered profiles (Passengers, Agents, and Administrators).</p> <!-- [118] Subheader. -->
+
+        <?php if(isset($_GET['msg'])): ?>                                <!-- [119] Conditional logic for success feedback. -->
+            <div style="background: #f0fff4; color: #22543d; padding: 15px; border-radius: 8px; border-left: 6px solid #38a169; margin-bottom: 20px; font-weight: 600;"> ✅ <?= htmlspecialchars($_GET['msg']) ?> </div> <!-- [120] msg box. -->
+        <?php endif; ?>                                                   <!-- [121] Close success check. -->
         
-        /* Container for the main content box */
-        .view-container {
-            max-width: 1200px;    /* Limit width */
-            margin: 20px auto;    /* Center horizontally */
-            padding: 20px;        /* Inner spacing */
-            background: white;    /* White background */
-            border-radius: 8px;   /* Rounded corners */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Subtle shadow */
-        }
+        <?php if(isset($_GET['err'])): ?>                                <!-- [122] Conditional logic for error feedback. -->
+            <div style="background: #fff5f5; color: #9b2c2c; padding: 15px; border-radius: 8px; border-left: 6px solid #e53e3e; margin-bottom: 20px; font-weight: 600;"> ❌ <?= htmlspecialchars($_GET['err']) ?> </div> <!-- [123] err box. -->
+        <?php endif; ?>                                                   <!-- [124] Close error check. -->
 
-        /* Container for the back button */
-        .back-btn-container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        <div class="add-form">                                           <!-- [125] Wrapper for account provisioning interface. -->
+            <h3>🆕 Initialize New Account</h3>                           <!-- [126] Form title area. -->
+            <form method="POST">                                         <!-- [127] Form definition targeting self with POST method. -->
+                <div class="form-row">                                   <!-- [128] Responsive row for data entry fields. -->
+                    <div class="form-group"><label>First Name</label><input type="text" name="first_name" class="input" placeholder="Samuel" required></div> <!-- [129] field. -->
+                    <div class="form-group"><label>Last Name</label><input type="text" name="last_name" class="input" placeholder="Mwangi" required></div> <!-- [130] field. -->
+                    <div class="form-group"><label>Email ID</label><input type="email" name="email" class="input" placeholder="name@domain.com" required></div> <!-- [131] field. -->
+                    <div class="form-group"><label>Contact Phone</label><input type="text" name="phone_number" class="input" placeholder="0712 XXX XXX" required></div> <!-- [132] field. -->
+                    <div class="form-group"><label>Security Password</label><input type="password" name="password" class="input" placeholder="Set temporary pass..." required></div> <!-- [133] field. -->
+                    <div class="form-group"><label>Official Role</label><select name="role" class="input" required><option value="PASSENGER">PASSENGER</option><option value="AGENT">AGENT</option><option value="ADMIN">ADMIN</option></select></div> <!-- [134] field. -->
+                </div>                                                   <!-- [135] end layout row. -->
+                <button type="submit" name="add_user" class="button regular-button pink-background" style="margin-top: 25px; padding: 12px 40px;">Finalize Registration</button> <!-- [136] submit btn. -->
+            </form>                                                      <!-- [137] end form. -->
+        </div>                                                           <!-- [138] end provision box. -->
 
-        /* Styling for the user list table */
-        .crud-table {
-            width: 100%;          /* Full width */
-            border-collapse: collapse; /* Single borders */
-            margin-top: 20px;     /* Space above table */
-        }
+        <table class="crud-table">                                       <!-- [139] Main registry data table definition. -->
+            <thead><tr><th>ID</th><th>Full Name</th><th>Verified Email</th><th>Mobile Contact</th><th>Identity Role</th><th>Admin Commands</th></tr></thead> <!-- [140] headers. -->
+            <tbody>                                                      <!-- [141] Open body for record rendering loop. -->
+                <?php                                                     // [142] Re-open PHP for data retrieval.
+                $sql = "SELECT * FROM users ORDER BY user_id ASC";       // [143] Define query to fetch all system personnel in sequence.
+                $result = $conn->query($sql);                            // [144] Direct communication with MySQL to fetch user collection.
+                while($row = $result->fetch_assoc()):                    // [145] Iterator: Process the result set row by row.
+                ?>                                                        <!-- [146] Interrupt PHP to output the specific HTML row. -->
+                <tr>                                                     <!-- [147] Data row definition for a single user record. -->
+                    <td><strong style="color: #718096;"><?= $row['user_id'] ?></strong></td> <!-- [148] unique id cell. -->
+                    <td style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td> <!-- [149] name. -->
+                    <td style="color: #4a5568;"><?= htmlspecialchars($row['email']) ?></td> <!-- [150] email cell. -->
+                    <td style="font-family: monospace; letter-spacing: 0.5px;"><?= htmlspecialchars($row['phone_number']) ?></td> <!-- [151] phone cell. -->
+                    <td><span style="background: <?= ($row['role'] == 'ADMIN' ? '#faf5ff' : ($row['role'] == 'AGENT' ? '#f0fff4' : '#ebf8ff')) ?>; color: <?= ($row['role'] == 'ADMIN' ? '#6b46c1' : ($row['role'] == 'AGENT' ? '#2f855a' : '#2b6cb0')) ?>; padding: 5px 12px; border-radius: 50px; font-weight: 900; font-size: 0.7rem; border: 1px solid currentColor;"><?= $row['role'] ?></span></td> <!-- [152] badge. -->
+                    <td>                                                  <!-- [153] Administrative command container. -->
+                        <a href="edit_user.php?user_id=<?= $row['user_id'] ?>" class="action-btn" style="background-color: #3182ce; margin-right: 10px;">Update</a> <!-- [154] update shortcut. -->
+                        <a href="?delete_user=<?= $row['user_id'] ?>" class="action-btn btn-delete" onclick="return confirm('CRITICAL WARNING: Permanent deletion? Proceed?')">Delete</a> <!-- [155] delete. -->
+                    </td>                                                <!-- [156] end commands. -->
+                </tr>                                                    <!-- [157] end record row. -->
+                <?php endwhile; ?>                                       <!-- [158] End database rendering iteration. -->
+            </tbody>                                                     <!-- [159] Close data body. -->
+        </table>                                                         <!-- [160] End data grid. -->
+    </div>                                                               <!-- [161] End central card. -->
 
-        /* Table cells and headers */
-        .crud-table th, .crud-table td {
-            padding: 12px;        /* Space inside cells */
-            border: 1px solid #ddd; /* Light grey border */
-            text-align: left;     /* Left alignment */
-        }
-
-        /* Table Header styles */
-        .crud-table th {
-            background-color: var(--purple); /* Brand color */
-            color: white;         /* White text */
-        }
-
-        /* Button styles for actions */
-        .action-btn {
-            padding: 5px 10px;    /* Small button size */
-            border-radius: 4px;   /* Rounded */
-            text-decoration: none; /* No underline */
-            color: white;         /* White text */
-            font-size: 0.9em;     /* Slightly smaller text */
-        }
-        .btn-delete { background-color: #ff4d4d; } /* Red for delete */
-        
-        /* Form container style */
-        .add-form {
-            background: #f9f9f9;  /* Light grey bg */
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border: 1px solid #eee;
-        }
-
-        .add-form h3 { margin-top: 0; }
-        
-        /* Form layout using flexbox to put inputs in a row */
-        .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
-        .form-group { flex: 1; min-width: 150px; }
-    </style>
-</head>
-<body>
-    <!-- Inject standard navigation -->
-    <script src="js/header2.js"></script>
-    <div style="height: 100px;"></div>
-
-    <!-- Navigation Back Button -->
-    <div class="back-btn-container">
-        <a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← Back to Dashboard</a>
-    </div>
-
-    <!-- Main Content -->
-    <div class="view-container">
-        <h2>Manage Users</h2>
-
-        <!-- Display success/error messages if present in URL -->
-        <?php if(isset($_GET['msg'])): ?>
-            <p style="color: green; font-weight: bold;"><?= htmlspecialchars($_GET['msg']) ?></p>
-        <?php endif; ?>
-        <?php if(isset($_GET['err'])): ?>
-            <p style="color: red; font-weight: bold;"><?= htmlspecialchars($_GET['err']) ?></p>
-        <?php endif; ?>
-
-        <!-- SECTION: ADD NEW USER FORM -->
-        <div class="add-form">
-            <h3>Add New User</h3>
-            <form method="POST">
-                <div class="form-row">
-                    <!-- Form Fields -->
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" name="first_name" class="input" placeholder="e.g. John" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" name="last_name" class="input" placeholder="e.g. Doe" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" name="email" class="input" placeholder="e.g. john@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="text" name="phone_number" class="input" placeholder="07xxxxxxxx" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Assign Password</label>
-                        <input type="password" name="password" class="input" required>
-                    </div>
-                    <div class="form-group">
-                        <label>User Role</label>
-                        <select name="role" class="input" required>
-                            <option value="PASSENGER">PASSENGER</option>
-                            <option value="AGENT">AGENT</option>
-                            <option value="ADMIN">ADMIN</option>
-                        </select>
-                    </div>
-                </div>
-                <!-- Submit Button -->
-                <button type="submit" name="add_user" class="button regular-button pink-background" style="margin-top: 15px;">Create User</button>
-            </form>
-        </div>
-
-        <!-- SECTION: USER LIST TABLE -->
-        <table class="crud-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Full Name</th>
-                    <th>Email Address</th>
-                    <th>Phone Number</th>
-                    <th>Account Role</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // FETCH all users from the database.
-                // We order by 'user_id ASC' to show them in registration order (Oldest first).
-                $sql = "SELECT * FROM users ORDER BY user_id ASC";
-                $result = $conn->query($sql);
-                
-                // LOOP through each user found in the result set.
-                while($row = $result->fetch_assoc()):
-                ?>
-                <tr>
-                    <!-- Display ID -->
-                    <td><?= $row['user_id'] ?></td>
-                    
-                    <!-- Display Name (Sanitized against XSS) -->
-                    <td><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td>
-                    
-                    <!-- Display Email -->
-                    <td><?= htmlspecialchars($row['email']) ?></td>
-                    
-                    <!-- Display Phone -->
-                    <td><?= htmlspecialchars($row['phone_number']) ?></td>
-                    
-                    <!-- Display Role -->
-                    <td><?= $row['role'] ?></td>
-                    
-                    <!-- Action Buttons -->
-                    <td>
-                        <!-- EDIT Button: Links to the Edit Page -->
-                        <a href="edit_user.php?user_id=<?= $row['user_id'] ?>" class="action-btn" style="background-color: #4CAF50; margin-right: 5px;">Edit</a>
-                        
-                        <!-- DELETE Button: Links to self with ?delete_user param. Includes JS confirm(). -->
-                        <a href="?delete_user=<?= $row['user_id'] ?>" class="action-btn btn-delete" onclick="return confirm('WARNING: Are you sure you want to delete this user? This cannot be undone.')">Delete</a>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Footer Space -->
-    <div style="height: 100px;"></div>
-    <!-- Inject Footer -->
-    <script src="js/footer.js"></script>
-</body>
-</html>
+    <div style="height: 120px;"></div>                                   <!-- [162] Buffer for scrolling clearance. -->
+    <script src="js/footer.js"></script>                                 <!-- [163] Inject global site footer script. -->
+</body>                                                              <!-- [164] End visible body section. -->
+</html>                                                              <!-- [165] Formal document termination. -->

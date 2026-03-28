@@ -1,136 +1,89 @@
-<?php
-// =================================================================
-// REVENUE REPORT PAGE (view_revenue_report.php)
-// =================================================================
-// This is the Financial Report page for the Administrator.
-// It calculates how much money Wema Travellers is making from each bus route.
-// =================================================================
+<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
+/**                                                                  // [2] Open multi-line documentation block for system meta-data.
+ * ================================================================= // [3] Visual header for administrative documentation clarity.
+ * ADMINISTRATION: FINANCIAL PERFORMANCE AUDIT (view_revenue_report.php) // [4] Title identifying this script as the master financial dashboard.
+ * ================================================================= // [5] Visual header for administrative documentation clarity.
+ * Purpose: This script provides the Administrator with a high-level  // [6] Description: bridge for financial analysis of the system.
+ * fiscal overview of the system's profitability.                  // [7] Goal: transparency for the owner regarding earnings.
+ * Metric: Aggregate ticket sales per route (PAID status only).      // [8] Logic basis: only confirmed financial transactions.
+ * ================================================================= // [9] Visual header for administrative documentation clarity.
+ */                                                                  // [10] Close multi-line documentation block.
 
-// Include DB connection.
-require_once 'db_connection.php';
-// Start session.
-session_start();
+require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
+session_start();                                                    // [12] Initialize or resume user session to identify the administrative officer.
 
-// --- SECURITY CHECK ---
-// Money reports are highly sensitive! Only the 'ADMIN' can see this page.
-if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {
-    die("Access Denied: Highly Sensitive Financial Data. Admins Only.");
-}
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Revenue Report - Wema Travellers</title>
-    <!-- Import Styles -->
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/style.css">
-    
-    <style>
-        /* CSS styling for the financial table */
-        .view-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {      // [13] Restrict access exclusively to the 'ADMIN' role for financial safety.
+    die("Access Denied: Highly Sensitive Financial Data. Administrator Authorization Required."); // [14] Halt execution for unauthorized personnel.
+}                                                                    // [15] Close authentication barrier.
+?>                                                                   <!-- [16] Close PHP script and prepare for document rendering. -->
 
-        .back-btn-container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+<!DOCTYPE html>                                                         <!-- [17] Define the document type as standard HTML5. -->
+<html lang="en">                                                     <!-- [18] Root element defining English as the content language. -->
+<head>                                                               <!-- [19] Metadata and resource head section. -->
+    <meta charset="UTF-8">                                           <!-- [20] Declare UTF-8 encoding for currency and textual symbols. -->
+    <title>Financial Report: System Revenue - Wema Travellers</title>     <!-- [21] Website title for the browser tab. -->
+    <link rel="stylesheet" href="css/main.css">                      <!-- [22] Load shared component stylings. -->
+    <link rel="stylesheet" href="css/style.css">                     <!-- [23] Load global branding layout variables. -->
+    <style>                                                          /* [24] Open internal CSS block for page-specific layout. */
+        .view-container {                                            /* [25] Define style for the primary content card. */
+            max-width: 1200px;                                       /* [26] Limit width for optimized tabular reading. */
+            margin: 30px auto;                                       /* [27] Apply vertical spacing and horizontal centering. */
+            padding: 40px;                                           /* [28] Internal cushioning within the card. */
+            background: #ffffff;                                     /* [29] High-contrast white background. */
+            border-radius: 12px;                                     /* [30] Modern rounded dashboard aesthetics. */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.06);                /* [31] Soft shadow for premium depth. */
+        }                                                            /* [32] End container definition. */
+        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [33] return navigator layout. */
+        .crud-table { width: 100%; border-collapse: collapse; margin-top: 30px; } /* [34] financial grid architecture. */
+        .crud-table th, .crud-table td { padding: 16px; border-bottom: 1px solid #edf2f7; text-align: left; } /* [35] cell padding. */
+        .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; } /* [36] header branding. */
+    </style>                                                         <!-- [37] Terminate internal CSS block. -->
+</head>                                                              <!-- [38] Close head section. -->
 
-        /* Styling for the revenue data table */
-        .crud-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
+<body>                                                               <!-- [39] Begin visible document body. -->
+    <script src="js/header2.js"></script>                                <!-- [40] Inject the site-wide administrative header. -->
+    <div style="height: 100px;"></div>                                   <!-- [41] Fixed header offset buffer. -->
 
-        .crud-table th, .crud-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
+    <div class="back-btn-container">                                      <!-- [42] return navigation wrapper. -->
+        <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px;">← Return to Main Hub</a> <!-- [43] link. -->
+    </div>                                                               <!-- [44] close navigator. -->
 
-        .crud-table th {
-            background-color: var(--purple);
-            color: white;
-        }
-    </style>
-</head>
-<body>
-    <!-- Standard Navbar -->
-    <script src="js/header2.js"></script>
-    <div style="height: 100px;"></div>
+    <div class="view-container">                                         <!-- [45] Report interface card start. -->
+        <h2 style="color: var(--purple); margin-bottom: 5px;">💰 Revenue Insights & Performance</h2> <!-- [46] title. -->
+        <p style="color: #718096; margin-bottom: 30px;">Analyzing gross earnings across all active bus routes based on finalized bookings.</p> <!-- [47] description. -->
 
-    <div class="back-btn-container">
-        <!-- Back link -->
-        <a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← Back to Dashboard</a>
-    </div>
-
-    <div class="view-container">
-        <h2>Revenue Generation Report</h2>
-
-        <!-- SECTION: Financial Breakdown Table -->
-        <table class="crud-table">
-            <thead>
-                <tr>
-                    <th>Route ID</th>
-                    <th>Full Route Path</th>
-                    <th>Travel Date</th>
-                    <th>No. of Tickets Sold</th>
-                    <th>Total Earned (KES)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // FETCH REVENUE DATA
-                // This SQL query is "smart". It:
-                // 1. Joins bookings and routes.
-                // 2. Only counts 'PAID' bookings.
-                // 3. Groups them by Route ID so we see one row per trip.
-                // 4. Sums the cost of all tickets for that route.
-                $sql = "SELECT r.route_id, r.from_location, r.to_location, r.departure_date, COUNT(b.booking_id) as total_bookings, SUM(r.cost) as revenue
-                        FROM bookings b
-                        JOIN routes r ON b.route_id = r.route_id
-                        WHERE b.booking_status = 'PAID'
-                        GROUP BY r.route_id
-                        ORDER BY revenue DESC"; // Most profitable routes show at the top
-                
-                // Execute Query.
-                $result = $conn->query($sql);
-                
-                $grand_total = 0; // Variable to store the sum of ALL revenue
-                
-                if ($result->num_rows > 0) {
-                    // Loop through each route's revenue result
-                    while($row = $result->fetch_assoc()) {
-                        $grand_total += $row['revenue']; // Add this route's money to the total
-                        echo "<tr>";
-                        echo "<td>" . $row['route_id'] . "</td>";
-                        echo "<td>" . htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) . "</td>";
-                        echo "<td>" . $row['departure_date'] . "</td>";
-                        echo "<td>" . $row['total_bookings'] . " seats booked</td>";
-                        echo "<td>" . number_format($row['revenue'], 2) . "</td>";
-                        echo "</tr>";
-                    }
-                    // Show a final "Grand Total" row at the bottom of the table
-                    echo "<tr style='background-color:#eee;'><td colspan='4' style='text-align:right'><strong>TOTAL SYSTEM REVENUE:</strong></td><td><strong>" . number_format($grand_total, 2) . " KES</strong></td></tr>";
-                } else {
-                     // If no tickets have been sold yet
-                     echo "<tr><td colspan='5' style='text-align:center;'>No tickets have been sold yet. Sales records will appear here.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Padding and Footer -->
-    <div style="height: 100px;"></div>
-    <script src="js/footer.js"></script>
-</body>
-</html>
+        <table class="crud-table">                                       <!-- [48] Open fiscal data grid. -->
+            <thead>                                                      <!-- [49] Data label row. -->
+                <tr><th>Route ID</th><th>Travel Segment</th><th>Schedule Date</th><th>Occupancy (Seats)</th><th>Gross Earnings (KES)</th></tr> <!-- [50] headers. -->
+            </thead>                                                     <!-- [51] close head. -->
+            <tbody>                                                      <!-- [52] Begin record rendering loop. -->
+                <?php                                                     // [53] Re-open PHP for analytical processing.
+                $sql = "SELECT r.route_id, r.from_location, r.to_location, r.departure_date, COUNT(b.booking_id) as total_bookings, SUM(r.cost) as revenue FROM bookings b JOIN routes r ON b.route_id = r.route_id WHERE b.booking_status = 'PAID' GROUP BY r.route_id ORDER BY revenue DESC"; // [54] Main revenue query.
+                $result = $conn->query($sql);                            // [55] Fetch financial result set from MySQL.
+                $grand_total = 0;                                        // [56] Initialize system-wide grand total accumulator.
+                if ($result->num_rows > 0) {                             // [57] Check if sales data exists in the ledger.
+                    while($row = $result->fetch_assoc()) {               // [58] Iterate through profitable routes.
+                        $grand_total += $row['revenue'];                 // [59] Accumulate ticket sales into total revenue.
+                        echo "<tr>";                                     // [60] Output the opening tag for a new table row.
+                        echo "<td><strong style='color: #4a5568;'>" . $row['route_id'] . "</strong></td>"; // [61] Output the specific route identifier inside a strong tag and table cell.
+                        echo "<td style='font-weight: 600; color: #1e293b;'>" . htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) . "</td>"; // [62] Output the full travel segment securely to prevent XSS injections.
+                        echo "<td style='color: #718096;'>" . $row['departure_date'] . "</td>"; // [63] Output the departure date corresponding to this specific route.
+                        echo "<td><span style='background: #f0fff4; color: #2f855a; padding: 4px 10px; border-radius: 4px; font-weight: 800;'>" . $row['total_bookings'] . " Sold</span></td>"; // [64] Output the total aggregated occupancy count for the given route inside a styled span.
+                        echo "<td style='font-weight: 900; color: #2d3748;'>" . number_format($row['revenue'], 2) . " /-</td>"; // [65] Output the total computed revenue formatted to two decimal places representing the gross earnings.
+                        echo "</tr>";                                    // [66] Output the closing tag for the table row element.
+                    }                                                    // [67] Close the while loop iterating through the profitable routes.
+                    echo "<tr style='background-color: #f7fafc; border-top: 2px solid var(--purple);'>"; // [68] Output the final row of the revenue table with a light background and a thick purple top boundary line to distinguish the totals section.
+                    echo "    <td colspan='4' style='text-align:right'><strong>ACCUMULATED SYSTEM REVENUE:</strong></td>"; // [69] Output a summary cell spanning four columns and aligned to the right, containing the bold 'ACCUMULATED SYSTEM REVENUE' label.
+                    echo "    <td><strong style='color: var(--purple); font-size: 1.2rem;'>" . number_format($grand_total, 2) . " KES</strong></td>"; // [70] Output the grand total formatted currency value in KES, styled with a purple color and increased font size within a table cell.
+                    echo "</tr>";                                        // [71] Output the closing tag for the summary table row.
+                } else {                                                 // [72] Execute this alternative block if the database returned zero booking rows for the specified query.
+                    echo "<tr><td colspan='5' style='text-align:center; padding: 80px; color: #a0aec0; font-style: italic;'>Financial ledger empty.</td></tr>"; // [73] Output a spanning table row with a centered italicized message stating that the financial ledger is empty.
+                }                                                        // [74] Terminate the if/else conditional check for the presence of booking records.
+                ?>                                                       <!-- [75] Close the PHP processing block and return to standard HTML rendering. -->
+            </tbody>                                                     <!-- [76] Close the HTML table body section where the financial rows were rendered. -->
+        </table>                                                         <!-- [77] Close the HTML table element. -->
+    </div>                                                               <!-- [78] Close the div container card that encapsulates the entire revenue report interface. -->
+    <div style="height: 120px;"></div>                                   <!-- [79] Insert a structural spacer div with a height of 120 pixels to provide visual padding at the bottom of the page. -->
+    <script src="js/footer.js"></script>                                 <!-- [80] Inject the site-wide footer JavaScript component into the document. -->
+</body>                                                              <!-- [81] Close the visible body content section of the HTML document. -->
+</html>                                                              <!-- [82] Formal termination and closure of the entire HTML document structure. -->

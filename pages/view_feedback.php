@@ -1,209 +1,83 @@
-<?php
-/**
- * VIEW_FEEDBACK.PHP
- * Purpose: This page allows Staff (Admins and Agents) to read what passengers think of our service.
- * It displays ratings, emojis, and comments submitted by users after their trips.
- * Accessible to: ADMIN and AGENT roles.
- */
+<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
+/**                                                                  // [2] Open multi-line documentation block for system meta-data.
+ * ================================================================= // [3] Visual header for administrative documentation clarity.
+ * ADMINISTRATION: CUSTOMER FEEDBACK MODERATION (view_feedback.php)  // [4] Title identifying this script as the customer satisfaction dashboard.
+ * ================================================================= // [5] Visual header for administrative documentation clarity.
+ * Purpose: This script provides staff with an interface to audit    // [6] Main objective: maintain customer service quality standards.
+ * and moderate user-submitted reviews and ratings.                // [7] Task: review and moderate passenger sentiments.
+ * Features: Multi-table aggregation, interactive list, and secure deletion. // [8] Technical scope of the script.
+ * ================================================================= // [9] Visual header for administrative documentation clarity.
+ */                                                                  // [10] Close multi-line documentation block.
 
-// --- BOOTSTRAP: CORE SYSTEM FILES ---
-// Include the standard database connection script to enable MySQL interactions.
-require_once 'db_connection.php';
+require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
+session_start();                                                    // [12] Initialize or resume user session to identify the administrative officer.
 
-// Start the PHP session to access the current user's login status and role.
-session_start();
+if (!isset($_SESSION['role']) || ($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'AGENT')) { // [13] Restrict access to authenticated STAFF (Admin/Agent) only.
+    die("Access Denied: High-Level Personnel Authentication Required for Sentiment Audit."); // [14] Halt execution for unauthorized personnel.
+}                                                                    // [15] Close security barrier.
 
-// --- SECURITY CHECK (RBAC - Role Based Access Control) ---
-// We only allow users with the 'ADMIN' or 'AGENT' role to view this internal report.
-// If the role key is not found in the session, or if the role is 'USER', we block access.
-if (!isset($_SESSION['role']) || ($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'AGENT')) {
-    // Stop execution and show a generic security error.
-    die("Access Denied: Staff Only Area.");
-}
+if (isset($_GET['delete_feedback'])) {                               // [16] Action Handle: Detect a moderation request (deletion) via URL parameter.
+    $fid = $_GET['delete_feedback'];                                 // [17] Map the targeted feedback ID to a local variable.
+    $stmt = $conn->prepare("DELETE FROM feedback WHERE feedback_id = ?"); // [18] Prepare a secure SQL template for record removal.
+    $stmt->bind_param("i", $fid);                                    // [19] Safely inject the ID integer into the query template.
+    $stmt->execute();                                                // [20] Commit the destructive command to the database engine.
+    $stmt->close();                                                  // [21] Release database resources.
+    header("Location: view_feedback.php?msg=Success: Customer sentiment entry has been permanently DELETED."); // [22] Redirect with confirmation message.
+    exit();                                                          // [23] Halt logic flow.
+}                                                                    // [24] Close deletion block.
+?>                                                                   <!-- [25] Close PHP script and prepare for document definition. -->
 
-// --- LOGIC: MODERATE/DELETE FEEDBACK ---
-// This part runs if the "Remove" link is clicked. The link passes a 'delete_feedback' ID in the URL.
-if (isset($_GET['delete_feedback'])) {
-    // Capture the specific feedback ID from the GET parameters.
-    $fid = $_GET['delete_feedback']; 
+<!DOCTYPE html>                                                         <!-- [26] Define standard HTML5 document type. -->
+<html lang="en">                                                     <!-- [27] Root element identifying English as the layout language. -->
+<head>                                                               <!-- [28] Metadata and resource header section. -->
+    <meta charset="UTF-8">                                           <!-- [29] Declare UTF-8 for international character support. -->
+    <title>Customer Satisfaction Review - Wema Travellers Hub</title>    <!-- [30] Website title for browser identification. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- [31] Responsive scaling for mobile devices. -->
+    <link rel="stylesheet" href="css/main.css">                      <!-- [32] Load shared component style assets. -->
+    <link rel="stylesheet" href="css/style.css">                     <!-- [33] Load global project branding variables. -->
+    <style>                                                          /* [34] Page-specific internal CSS architecture. */
+        .view-container { max-width: 1200px; margin: 30px auto; padding: 40px; background: #ffffff; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); } /* [35] Main card. */
+        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [36] navigation buffer. */
+        .crud-table { width: 100%; border-collapse: collapse; margin-top: 30px; } /* [37] sentiment grid. */
+        .crud-table th, .crud-table td { padding: 18px; border-bottom: 1px solid #edf2f7; text-align: left; } /* [38] cell padding. */
+        .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; } /* [39] branding. */
+        .action-btn { padding: 8px 15px; border-radius: 8px; text-decoration: none; color: #ffffff; font-size: 0.85rem; font-weight: 600; display: inline-block; } /* [40] cmd. */
+        .btn-delete { background-color: #ef4444; } /* [41] destructive alert. */
+    </style>                                                         <!-- [42] Terminate internal CSS block. -->
+</head>                                                              <!-- [43] Close head section. -->
 
-    // SECURE DELETE: Use a Prepared Statement to prevent SQL Injection when deleting records.
-    $stmt = $conn->prepare("DELETE FROM feedback WHERE feedback_id = ?");
-    
-    // Bind the $fid variable to the '?' placeholder as an integer ("i").
-    $stmt->bind_param("i", $fid);
-    
-    // Run the deletion query on the server.
-    $stmt->execute();
-    
-    // Close the statement to free up database resources.
-    $stmt->close();
-    
-    // Redirect the browser back to the same page (view_feedback.php) with a URL message 'msg'.
-    // This prevents accidental re-deletion on page refresh.
-    header("Location: view_feedback.php?msg=Feedback review has been removed.");
-    exit(); // Always exit after a header redirect.
-}
-?>
+<body>                                                               <!-- [44] Start visible document body. -->
+    <script src="js/header2.js"></script>                                <!-- [45] Inject the unified administrative header. -->
+    <div style="height: 100px;"></div>                                   <!-- [46] Fixed header offset buffer. -->
+    <div class="back-btn-container">                                      <!-- [47] Navigation wrapper. -->
+        <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px; font-weight: 700;">← Back to Command Center</a> <!-- [48] link. -->
+    </div>                                                               <!-- [49] Close wrap. -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- DOCUMENT META INFORMATION -->
-    <meta charset="UTF-8">
-    <title>User Feedback - Wema Travellers</title>
-    
-    <!-- CORE STYLESHEETS -->
-    <link rel="stylesheet" href="css/main.css">  <!-- General project layout -->
-    <link rel="stylesheet" href="css/style.css"> <!-- Color and spacing variables -->
-    
-    <style>
-        /* CSS styling for the feedback list view (Local Overrides for specialized layout) */
-        .view-container {
-            max-width: 1200px; /* Limits the table width for readability on large screens */
-            margin: 20px auto; /* Perfectly centers the container horizontally */
-            padding: 20px;
-            background: white; /* Clean white card look */
-            border-radius: 8px; /* Smooth rounded corners */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Subtle shadow for depth */
-        }
+    <div class="view-container">                                         <!-- [50] Open sentiment dashboard card. -->
+        <h2 style="color: var(--purple); margin-bottom: 5px;">⭐ Guest Satisfaction & Reviews</h2> <!-- [51] title. -->
+        <p style="color: #718096; margin-bottom: 30px;">Analyzing passenger feedback and ratings submitted across all travel segments.</p> <!-- [52] description. -->
 
-        /* Container for the 'Back to Dashboard' button */
-        .back-btn-container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+        <?php if(isset($_GET['msg'])): ?>                                <!-- [53] Open notification logic. -->
+            <div style="background: #f0fff4; color: #22543d; padding: 15px; border-radius: 8px; border-left: 6px solid #38a169; margin-bottom: 20px; font-weight: 600;">✅ <?= htmlspecialchars($_GET['msg']) ?></div> <!-- [54] toast. -->
+        <?php endif; ?>                                                   <!-- [55] close check. -->
 
-        /* Styling for the main data table */
-        .crud-table {
-            width: 100%;
-            border-collapse: collapse; /* Merges borders for a modern 'one-line' look */
-            margin-top: 20px;
-        }
-
-        /* Cell padding and border color for the table */
-        .crud-table th, .crud-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        /* Table header styling using the project's brand purple */
-        .crud-table th {
-            background-color: var(--purple);
-            color: white; /* White text for contrast on purple background */
-        }
-
-        /* Base styles for action buttons (like Delete) */
-        .action-btn {
-            padding: 5px 10px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: white;
-            font-size: 0.9em;
-        }
-        
-        /* Vibrant Red background to indicate a destructive 'Delete' action */
-        .btn-delete { background-color: #ff4d4d; }
-    </style>
-</head>
-<body>
-    <!-- HEADER COMPONENT -->
-    <!-- Inject the dashboard navigation bar (Home, Profile, logout, etc.) using communal JS -->
-    <script src="js/header2.js"></script>
-    
-    <!-- SPACER: Prevents the header from hiding the top of our content -->
-    <div style="height: 100px;"></div>
-
-    <!-- BACK ACTION BUTTON -->
-    <div class="back-btn-container">
-        <!-- Dashboard back link allows staff to return to their main panel instantly -->
-        <a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← Back to Dashboard</a>
-    </div>
-
-    <!-- MAIN DATA VIEW -->
-    <div class="view-container">
-        <h2>Customer Feedback Overview</h2>
-
-        <!-- NOTIFICATION ALERT -->
-        <!-- Logic: If a 'msg' exists in the URL, display it in bold green text -->
-        <?php if(isset($_GET['msg'])): ?>
-            <p style="color: green; font-weight: bold;"><?= htmlspecialchars($_GET['msg']) ?></p>
-        <?php endif; ?>
-
-        <!-- DATA TABLE: List of all customer ratings and comments -->
-        <table class="crud-table">
-            <thead>
-                <tr>
-                    <th>Date Received</th>
-                    <th>Passenger Name</th>
-                    <th>Rating</th>
-                    <th>Customer Comments</th>
-                    <th>Travel Route</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                /* 
-                   SQL QUERY LOGIC:
-                   - Select everything (* ) from feedback table (f).
-                   - JOIN with users (u) on user_id to translate IDs into actual names.
-                   - JOIN with routes (r) on route_id to show WHERE the trip was from/to.
-                   - ORDER BY f.feedback_date DESC ensures the newest feedback is at the TOP.
-                */
-                $sql = "SELECT f.*, u.first_name, u.last_name, r.from_location, r.to_location 
-                        FROM feedback f
-                        JOIN users u ON f.user_id = u.user_id
-                        JOIN routes r ON f.route_id = r.route_id
-                        ORDER BY f.feedback_date DESC";
-                
-                // Execute the query via the MySQL object.
-                $result = $conn->query($sql);
-                
-                // DATA LOOP: fetch_assoc() grabs one database row at a time until no more are left.
-                while($row = $result->fetch_assoc()):
-                ?>
-                <tr>
-                    <!-- CELL 1: The date the feedback was submitted -->
-                    <td><?= $row['feedback_date'] ?></td>
-                    
-                    <!-- CELL 2: The full name of the passenger (Concatenated first + last) -->
-                    <td><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td>
-                    
-                    <!-- CELL 3: Rating Visualization.
-                         Uses str_repeat to loop a Star symbol (★) based on the database rating number (1-5).
-                    -->
-                    <td style="color: #ffcc00; font-weight:bold;"><?= str_repeat("★", $row['rating']) ?></td>
-                    
-                    <!-- CELL 4: The text comments written by the user.
-                         htmlspecialchars is used to prevent any malicious script injection (XSS).
-                    -->
-                    <td><?= htmlspecialchars($row['comments']) ?></td>
-                    
-                    <!-- CELL 5: Descriptive travel route (e.g. "Nairobi to Mombasa") -->
-                    <td><?= htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) ?></td>
-                    
-                    <!-- CELL 6: Management Operations -->
-                    <td>
-                        <!-- DELETE ACTION: 
-                             - Passes the specific feedback_id back to the PHP block at the top via GET.
-                             - onclick: Triggers a browser pop-up to confirm the deletion.
-                        -->
-                        <a href="?delete_feedback=<?= $row['feedback_id'] ?>" class="action-btn btn-delete" onclick="return confirm('Do you want to PERMANENTLY remove this feedback?')">Remove</a>
-                    </td>
-                </tr>
-                <?php endwhile; // End of the while loop ?>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- BOTTOM UI PADDING: Ensure some scrolling space at the end of the page -->
-    <div style="height: 100px;"></div>
-    
-    <!-- FOOTER COMPONENT -->
-    <!-- Inject the site-wide global footer script -->
-    <script src="js/footer.js"></script>
-</body>
-</html>
+        <table class="crud-table">                                       <!-- [56] Open review data grid. -->
+            <thead><tr><th>Processed</th><th>Traveler Identity</th><th>Sentiment</th><th>Written Dossier</th><th>Trip Path</th><th>Control Deck</th></tr></thead> <!-- [57] headers. -->
+            <tbody>                                                      <!-- [58] Records start. -->
+                <?php $sql = "SELECT f.*, u.first_name, u.last_name, r.from_location, r.to_location FROM feedback f JOIN users u ON f.user_id = u.user_id JOIN routes r ON f.route_id = r.route_id ORDER BY f.feedback_date DESC"; // [59] Aggregate query logic.
+                $result = $conn->query($sql); while($row = $result->fetch_assoc()): ?> <!-- [60] Iterate through feedback entries. -->
+                <tr><td style="color: #718096; white-space: nowrap; font-size: 0.9rem;"><?= $row['feedback_date'] ?></td> <!-- [61] timestamp. -->
+                    <td style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td> <!-- [62] identity. -->
+                    <td style="color: #ecc94b; font-size: 1.1rem; letter-spacing: 2px;"><?= str_repeat("★", $row['rating']) ?></td> <!-- [63] star visualizer. -->
+                    <td style="color: #4a5568; line-height: 1.6; max-width: 300px;"><?= htmlspecialchars($row['comments']) ?></td> <!-- [64] comment body. -->
+                    <td style="font-size: 0.85rem; color: #718096; font-weight: 600;"><?= htmlspecialchars($row['from_location'] . ' → ' . $row['to_location']) ?></td> <!-- [65] route context. -->
+                    <td><a href="?delete_feedback=<?= $row['feedback_id'] ?>" class="action-btn btn-delete" onclick="return confirm('SECURITY WARNING: Permanently DELETE this entry? Irreversible.')">Delete</a></td> <!-- [66] moderation cmd. -->
+                </tr>                                                    <!-- [67] end row. -->
+                <?php endwhile; ?>                                       <!-- [68] end iteration. -->
+            </tbody>                                                     <!-- [69] end table body. -->
+        </table>                                                         <!-- [70] end grid. -->
+    </div>                                                               <!-- [71] end card. -->
+    <div style="height: 120px;"></div>                                   <!-- [72] buffer. -->
+    <script src="js/footer.js"></script>                                 <!-- [73] inject footer. -->
+</body>                                                              <!-- [74] end body. -->
+</html>                                                              <!-- [75] end document. -->

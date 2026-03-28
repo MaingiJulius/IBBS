@@ -25,22 +25,26 @@ if (!$route_id) {
 // 4. Query Database.
 // specific query: Find seat_number from bookings table for this route 
 // AND ensure status is NOT 'CANCELLED'.
-$sql = "SELECT seat_number FROM bookings WHERE route_id = ? AND booking_status != 'CANCELLED'";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $route_id);
-$stmt->execute();
-$result = $stmt->get_result();
+try {
+    $sql = "SELECT seat_number FROM bookings WHERE route_id = ? AND booking_status != 'CANCELLED'";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $route_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-// 5. Build Array of Seats.
-$occupiedCount = [];
-while ($row = $result->fetch_assoc()) {
-    $occupiedCount[] = $row['seat_number']; // Add to array (e.g., ['S1', 'S4'])
+    // 5. Build Array of Seats.
+    $occupiedCount = [];
+    while ($row = $result->fetch_assoc()) {
+        $occupiedCount[] = $row['seat_number']; // Add to array (e.g., ['S1', 'S4'])
+    }
+
+    // 6. Return JSON response.
+    echo json_encode(['occupied' => $occupiedCount]);
+    $stmt->close();
+} catch (Throwable $e) {
+    echo json_encode(['occupied' => [], 'error' => $e->getMessage()]);
 }
 
-// 6. Return JSON response.
-echo json_encode(['occupied' => $occupiedCount]);
-
 // Clean up.
-$stmt->close();
 $conn->close();
 ?>

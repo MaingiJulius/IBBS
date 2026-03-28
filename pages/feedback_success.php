@@ -1,3 +1,16 @@
+<?php
+
+session_start();
+// Check if the user is logged in
+
+require_once 'db_connection.php';
+
+$user_id = $_SESSION['user_id'] ?? null;
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +26,9 @@
     <div class="container">
         <h2>Thank You!</h2>
         <p>Your feedback has been submitted successfully. We appreciate your input and will use it to improve our services.</p>
-        <a href="index(home).html" class="btn">Return to Home</a>
+      
+      <button onclick="window.location.href='home.php'" class="btn">Return to Home</button> <!-- Add a button to return to the home page-->
+      
     </div>
 
     <!-- Footer -->
