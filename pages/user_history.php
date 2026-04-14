@@ -61,8 +61,9 @@ $conn->close();                                                      // [29] Clo
     </style>                                                         <!-- [54] End style block. -->
 </head>                                                              <!-- [55] End head. -->
 
-<body>                                                               <!-- [56] Begin visible body. -->
-    <script src="js/header.js"></script>                                 <!-- [57] Inject primary navigation header. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">                                                               <!-- [56] Begin visible body. -->
+    <script src="js/header2.js"></script>
+    <div style="height: 100px;"></div>                                 <!-- [57] Inject primary navigation header. -->
     <div class="container">                                              <!-- [58] UI wrap. -->
         <h1 class="header">Your Booking History</h1>                      <!-- [59] Title. -->
         <?php if (!empty($booking_history)): ?>                        <!-- [60] check if records exist. -->

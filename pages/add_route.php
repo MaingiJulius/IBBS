@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_route'])) {
         }
     </style>
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role'] ?? 'admin') ?>-role">
 
     <!-- Load the dynamic Javascript Navbar -->
     <script src="js/header2.js"></script>

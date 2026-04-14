@@ -70,7 +70,7 @@ if (isset($_POST['update_user'])) {                                  // [26] Act
     </style>                                                         <!-- [61] Terminate internal CSS block. -->
 </head>                                                              <!-- [62] Close head section. -->
 
-<body>                                                               <!-- [63] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [63] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [64] Inject the unified sitewide navigation header. -->
     <div style="height: 100px;"></div>                                   <!-- [65] Fixed header offset buffer. -->
 

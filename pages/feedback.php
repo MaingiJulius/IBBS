@@ -133,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
 
     <!-- Header / Navbar: Injected via JavaScript for consistency across the site -->
     <script src="js/header2.js"></script>

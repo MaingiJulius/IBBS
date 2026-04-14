@@ -146,9 +146,10 @@ if (!$route) {                                                       // [49] Che
         }                                                            /* [124] Close hover style definition. */
     </style>                                                         <!-- [125] Terminate internal CSS block. -->
 </head>                                                              <!-- [126] Close document head. -->
-<body>                                                               <!-- [127] Begin the visible body section of the webpage. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'admin') ?>-role">                <!-- [127] Begin the visible body section of the webpage. -->
 
 <script src="js/header2.js"></script>                                <!-- [128] Inject the dynamic site-wide navigation header. -->
+<div style="height: 100px;"></div>                                   <!-- [128b] Layout spacer for fixed header. -->
 
 <div class="container">                                              <!-- [129] Open main content wrapper for layout alignment. -->
     <h2>Edit Route</h2>                                              <!-- [130] Visual title identifying the current administrative task. -->

@@ -17,8 +17,12 @@ $user_id = $_SESSION['user_id'];
 <html>
 <head>
     <title>My Profile Summary</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
+    <script src="js/header2.js"></script>
+    <div style="height: 100px;"></div>
     <h2>My Profile</h2>
     <?php
     $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");
@@ -37,5 +41,6 @@ $user_id = $_SESSION['user_id'];
     }
     $stmt->close();
     ?>
+    <script src="js/footer.js"></script>
 </body>
 </html>

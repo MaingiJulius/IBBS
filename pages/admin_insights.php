@@ -37,7 +37,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {      // [12] A
     </style>                                                         <!-- [34] Terminate internal CSS block. -->
 </head>                                                              <!-- [35] Close head section. -->
 
-<body>                                                               <!-- [36] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [36] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [37] Inject external global navigation header. -->
     <div style="height: 100px;"></div>                                   <!-- [38] Layout offset for fixed header. -->
 

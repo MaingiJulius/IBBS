@@ -42,10 +42,13 @@ $stmt->close();                                                      // [22] Rel
         .role-badge { display: inline-block; padding: 8px 18px; border-radius: 50px; background: var(--pink); color: #1e1b4b; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 15px; } /* [38] badge. */
         .back-link { display: block; text-align: center; margin-top: 30px; color: var(--purple); text-decoration: none; font-weight: 800; font-size: 1rem; } /* [39] cmd. */
         .back-link:hover { text-decoration: underline; }             /* [40] interaction. */
-    </style>                                                         <!-- [41] Terminate internal CSS block. -->
+        .password-section { margin-top: 50px; padding-top: 30px; border-top: 2px dashed #e2e8f0; }
+        .password-form { display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 20px auto 0; }
+        .password-form input { padding: 12px 20px; border-radius: 50px; border: 1px solid #cbd5e1; background: #f8fafc; font-family: inherit; }
+    </style>                                                         
 </head>                                                              <!-- [42] Close head section. -->
 
-<body>                                                               <!-- [43] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role"> <!-- [43] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [44] Inject the unified sitewide navigation header. -->
     <div style="height: 100px;"></div>                                   <!-- [45] Fixed header offset buffer. -->
 
@@ -62,6 +65,24 @@ $stmt->close();                                                      // [22] Rel
             <div class="info-label">Phone Contact:</div><div class="info-value" style="font-family: monospace; letter-spacing: 1px;"><?= htmlspecialchars($user_data['phone_number']) ?></div> <!-- [55] Mobile. -->
             <div class="info-label">Index ID:</div><div class="info-value" style="color: #94a3b8; font-family: monospace;"><?= $user_data['user_id'] ?></div> <!-- [56] System Index. -->
         </div>                                                           <!-- [57] End data matrix. -->
+
+        <div class="password-section">
+            <h3 style="color: var(--purple); text-align: center; margin-bottom: 5px;">🔐 Security Vault</h3>
+            <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 25px;">Update your authentication credentials below.</p>
+            
+            <?php if(isset($_GET['status'])): ?>
+                <p style="text-align: center; font-weight: 700; color: <?= $_GET['status'] === 'success' ? '#059669' : '#dc2626' ?>; margin-bottom: 20px;">
+                    <?= $_GET['status'] === 'success' ? '✅ Password updated successfully!' : '❌ ' . htmlspecialchars($_GET['error'] ?? 'Update failed.') ?>
+                </p>
+            <?php endif; ?>
+
+            <form action="op_update_password.php" method="POST" class="password-form">
+                <input type="password" name="current_password" placeholder="Current Password" required>
+                <input type="password" name="new_password" placeholder="New Password" required minlength="6">
+                <input type="password" name="confirm_password" placeholder="Confirm New Password" required minlength="6">
+                <button type="submit" class="button regular-button" style="background: var(--purple); color: white; border-radius: 50px; padding: 12px; font-weight: 700;">Update Password →</button>
+            </form>
+        </div>
 
         <a href="dashboard.php" class="back-link">← Return to Dashboard Hub</a> <!-- [58] Navigation exit command. -->
     </div>                                                               <!-- [59] End container. -->

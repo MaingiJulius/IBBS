@@ -17,9 +17,15 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {      // [13] A
     exit();                                                          // [15] Halt Execution: Ensure no fiscal metrics are leaked to guests.
 }                                                                    // [16] Close security barrier.
 
-$sql = "SELECT b.booking_id, b.booking_time, CONCAT(u.first_name, ' ', u.last_name) AS passenger_name, r.from_location, r.to_location, b.seat_number, b.booking_status FROM bookings b JOIN users u ON b.user_id = u.user_id JOIN routes r ON b.route_id = r.route_id WHERE YEARWEEK(b.booking_time, 1) = YEARWEEK(CURDATE() - INTERVAL 1 WEEK, 1) ORDER BY b.booking_time DESC"; // [17] Analytical Query: Aggregates previous week's logs using INTERVAL math.
-$result = $conn->query($sql);                                        // [18] Execute the data retrieval command on the MySQL server.
-?>                                                                   <!-- [19] Close PHP script and prepare for document definition. -->
+$sql = "SELECT b.booking_id, b.booking_time, CONCAT(u.first_name, ' ', u.last_name) AS passenger_name, r.from_location, r.to_location, b.seat_number, b.booking_status, r.cost 
+        FROM bookings b 
+        JOIN users u ON b.user_id = u.user_id 
+        JOIN routes r ON b.route_id = r.route_id 
+        WHERE YEARWEEK(b.booking_time, 1) = YEARWEEK(CURDATE() - INTERVAL 1 WEEK, 1) 
+        ORDER BY b.booking_time DESC"; 
+$result = $conn->query($sql);                                        
+$total_revenue = 0;                                                  
+?>                                                                   
 
 <!DOCTYPE html>                                                         <!-- [20] Define standard HTML5 document type. -->
 <html lang="en">                                                     <!-- [21] Root element identifying English as layout language. -->
@@ -38,7 +44,7 @@ $result = $conn->query($sql);                                        // [18] Exe
     </style>                                                         <!-- [34] Terminate internal CSS block. -->
 </head>                                                              <!-- [35] Close head section. -->
 
-<body>                                                               <!-- [36] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
     <script src="js/header2.js"></script>                                <!-- [37] Inject the unified administrative header. -->
     <div style="height: 100px;"></div>                                   <!-- [38] Fixed header offset buffer. -->
 
@@ -48,17 +54,25 @@ $result = $conn->query($sql);                                        // [18] Exe
         <p style="color: #64748b; font-size: 1.05rem; margin-bottom: 10px;">Aggregated ticket sales and commuter activity for the previous ISO-8601 week.</p> <!-- [42] desc. -->
 
         <table class="data-table">                                       <!-- [43] Start audit grid. -->
-            <thead><tr><th>Ref ID</th><th>Stamp</th><th>Full Name</th><th>Travel Segment</th><th>Seat</th><th>Log Status</th></tr></thead> <!-- [44] head labels. -->
+            <thead><tr><th>Ref ID</th><th>Stamp</th><th>Full Name</th><th>Travel Segment</th><th>Seat</th><th>Price</th><th>Log Status</th></tr></thead> 
             <tbody>                                                      <!-- [45] Records start. -->
                 <?php if ($result->num_rows > 0): while($row = $result->fetch_assoc()): ?> <!-- [46] Conditional loop through records. -->
-                <tr><td><strong style="color: #94a3b8;"><?= $row['booking_id'] ?></strong></td> <!-- [47] ID cell. -->
-                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #475569;"><?= $row['booking_time'] ?></td> <!-- [48] stamp. -->
-                    <td style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['passenger_name']) ?></td> <!-- [49] name. -->
-                    <td style="color: #64748b;"><?= htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) ?></td> <!-- [50] segment. -->
-                    <td><span style="background: #f8fafc; color: #475569; padding: 5px 10px; border-radius: 6px; font-weight: 800; border: 1px solid #e2e8f0;"><?= $row['seat_number'] ?></span></td> <!-- [51] seat mapping. -->
-                    <td style="color: <?= ($row['booking_status'] == 'CANCELLED') ? '#ef4444' : '#10b981' ?>; font-weight: 900; text-transform: uppercase; font-size: 0.85rem;"><?= $row['booking_status'] ?></td> <!-- [52] log status. -->
-                </tr>                                                    <!-- [53] end row. -->
-                <?php endwhile; else: ?>                                 <!-- [54] end loop. -->
+                <tr><td><strong style="color: #94a3b8;"><?= $row['booking_id'] ?></strong></td> 
+                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #475569;"><?= $row['booking_time'] ?></td> 
+                    <td style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['passenger_name']) ?></td> 
+                    <td style="color: #64748b;"><?= htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) ?></td> 
+                    <td><span style="background: #f8fafc; color: #475569; padding: 5px 10px; border-radius: 6px; font-weight: 800; border: 1px solid #e2e8f0;"><?= $row['seat_number'] ?></span></td> 
+                    <td style="font-weight: 700; color: #0f172a;">$<?= number_format($row['cost'], 2) ?></td>
+                    <td style="color: <?= ($row['booking_status'] == 'CANCELLED') ? '#ef4444' : '#10b981' ?>; font-weight: 900; text-transform: uppercase; font-size: 0.85rem;"><?= $row['booking_status'] ?></td> 
+                </tr>                                                    
+                <?php 
+                    if($row['booking_status'] !== 'CANCELLED') { $total_revenue += $row['cost']; }
+                endwhile; ?>
+                <tr style="background-color: #f8fafc; font-size: 1.1rem; border-top: 2px solid var(--purple);">
+                    <td colspan="5" style="text-align: right; font-weight: 800; color: var(--purple);">TOTAL REVENUE:</td>
+                    <td colspan="2" style="font-weight: 900; color: #10b981; font-size: 1.3rem;">$<?= number_format($total_revenue, 2) ?></td>
+                </tr>
+                <?php else: ?>                                 
                 <tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 100px;"><div style="font-size: 1.25rem; font-style: italic;">No booking records found for the previous week instance.</div></td></tr> <!-- [55] empty state. -->
                 <?php endif; ?>                                          <!-- [56] end check. -->
             </tbody>                                                     <!-- [57] end table body. -->

@@ -22,12 +22,23 @@ $user_id = $_SESSION['user_id'];                                     // [17] Map
 /**                                                                  // [18] Documentation for multi-table analytical query.
  * SQL ARCHITECTURE:                                                 // [19] Logic header for data retrieval.
  */                                                                  // [20] Close documentation block.
-$sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name FROM bookings b JOIN routes r ON b.route_id = r.route_id JOIN buses bs ON b.bus_id = bs.bus_id WHERE b.user_id = ? AND b.booking_status = 'PAID' ORDER BY r.departure_date DESC"; // [21] Define data join.
-$stmt = $conn->prepare($sql);                                        // [22] Compile SQL template on the database server for injection safety.
-$stmt->bind_param("i", $user_id);                                    // [23] Inject user ID safely into the prepared statement placeholder.
+/* --- [DATABASE FETCHING: PASSENGER RECORDS] --- */
+// [1] Define the target Query: We perform a 3-table JOIN (bookings + routes + buses).
+// We fetch 'FROM/TO' locations and 'DEPARTURE' times from the routes table,
+// and 'BUS NAME' from the buses table, filtered specifically for the logged-in user.
+$sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name 
+        FROM bookings b 
+        JOIN routes r ON b.route_id = r.route_id 
+        JOIN buses bs ON b.bus_id = bs.bus_id 
+        WHERE b.user_id = ? AND b.booking_status = 'PAID' 
+        ORDER BY r.departure_date DESC"; 
+
+$stmt = $conn->prepare($sql);                                        // Prepare template.
+$stmt->bind_param("i", $user_id);                                    // Bind user ID securely.
 $stmt->execute();                                                    // [24] Execute query to fetch finalized travel tickets.
 $result = $stmt->get_result();                                       // [25] Capture the resultant rows into a traversable data object.
 ?>                                                                   <!-- [26] Close PHP logic and prepare for document rendering. -->
+                                                                     <!-- [L41] Blank line for structural separation. -->
 
 <!DOCTYPE html>                                                         <!-- [27] Declare document as standard HTML5. -->
 <html lang="en">                                                     <!-- [28] Define language for accessibility. -->
@@ -39,39 +50,144 @@ $result = $stmt->get_result();                                       // [25] Cap
     <link rel="stylesheet" href="css/style.css">                     <!-- [34] Global theme and layout variables. -->
     <style>                                                          /* [35] Page-specific CSS block. */
         .ticket-container { max-width: 800px; margin: 50px auto; padding: 20px; } /* [36] Wallet wrapper. */
-        .ticket-card { background: #ffffff; border-radius: 16px; padding: 30px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 12px solid var(--purple); transition: transform 0.3s ease; } /* [37] Card style. */
+        .ticket-card { background: #ffffff; border-radius: 16px; padding: 30px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 12px solid var(--purple); transition: transform 0.3s ease; position: relative; overflow: hidden; } /* [37] Card style. */
         .ticket-card:hover { transform: translateY(-3px); }          /* [38] Hover interaction. */
         .ticket-info h3 { margin: 0 0 10px 0; color: var(--purple); font-size: 1.4rem; } /* [39] Destination title. */
         .ticket-info p { margin: 5px 0; color: #4a5568; line-height: 1.5; } /* [40] Meta-data rows. */
-        .ticket-qr { background: #f7fafc; padding: 15px; border-radius: 10px; border: 1px dashed #cbd5e0; text-align: center; min-width: 140px; } /* [41] Token zone. */
-        .no-tickets { text-align: center; padding: 80px 40px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); } /* [42] Empty state. */
-    </style>                                                         <!-- [43] End internal CSS. -->
-</head>                                                              <!-- [44] Close head. -->
+        .ticket-qr-section { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 160px; } /* [41] Align action buttons vertically. */
+        .ticket-qr-container { 
+            padding: 10px;                                           /* [42] Internal spacing around content. */
+            background: white;                                       /* [43] Contrast background color. */
+            border: 1px solid #e2e8f0;                               /* [44] Subtle border for definition. */
+            border-radius: 8px;                                      /* [45] Slightly rounded corners for modern look. */
+            width: 120px;                                            /* [46] Fixed width for container consistency. */
+            height: 120px;                                           /* [47] Fixed height for container consistency. */
+            display: flex;                                           /* [48] Enable flexbox for center alignment. */
+            align-items: center;                                     /* [49] Center children vertically. */
+            justify-content: center;                                 /* [50] Center children horizontally. */
+        }
+        .booking-id-badge {                                          /* [51] Style for the ID reference tag. */
+            background: var(--purple);                               /* [52] Use theme color for branding. */
+            color: white;                                            /* [53] High-contrast text color. */
+            padding: 4px 12px;                                       /* [54] Cushioned inner spacing. */
+            border-radius: 20px;                                     /* [55] Capsule-shaped aesthetics. */
+            font-size: 0.8rem;                                       /* [56] Compact font size. */
+            font-weight: 700;                                        /* [57] Bold font weight for visibility. */
+            margin-bottom: 5px;                                      /* [58] Gap below the badge. */
+            display: inline-block;                                   /* [59] Allow padding/width control while inline. */
+        }
+        
+        /* Print Styles - Logic for traditional browser-based printing */
+        @media print {                                               /* [60] Definitions for physical paper printing. */
+            body * { visibility: hidden; }                           /* [61] Hide everything by default for a clean state. */
+            #print-area, #print-area * { visibility: visible; }      /* [62] Reveal ONLY the designated print container. */
+            #print-area {                                            /* [63] Positioning for the print-only area. */
+                position: absolute;                                  /* [64] Move to true document origin. */
+                left: 0;                                             /* [65] Align to left paper edge. */
+                top: 0;                                              /* [66] Align to top paper edge. */
+                width: 100%;                                         /* [67] Span full width of the page. */
+                margin: 0;                                           /* [68] Reset margins for precision. */
+                padding: 20px;                                       /* [69] Internal padding for border gap. */
+                background: white;                                   /* [70] Ensure white background on paper. */
+            }
+            .ticket-card {                                           /* [71] Adjust card styling for ink efficiency. */
+                border: 2px solid #edf2f7;                           /* [72] Swap shadow for a thin line border. */
+                box-shadow: none;                                    /* [73] Disable shadows to prevent dark ink blobs. */
+                margin: 0;                                           /* [74] Reset external margins. */
+                padding: 30px;                                       /* [75] Maintain internal cushioning. */
+                border-radius: 16px;                                 /* [76] Retain modern rounded aesthetics. */
+                border-left: 15px solid #9a4d9a;                      /* [77] Thick left border for color branding. */
+                display: flex !important;                            /* [78] Force flex layout on paper. */
+                flex-direction: row !important;                      /* [79] Ensure horizontal info/action split. */
+                justify-content: space-between;                      /* [80] Push content to paper edges. */
+                align-items: center;                                 /* [81] Vertically center align text. */
+            }
+            .button, .back-btn, .print-btn, #banner, #nav-links { display: none !important; } /* [82] Hide UI interactions. */
+            .ticket-qr-container { display: block !important; border: 1px solid #e2e8f0; } /* [83] Ensure content container is visible. */
+        }
+    </style>                                                         
+    <script>
+        /**
+         * FUNCTION: printSelectedTicket
+         * Logic: Extracts ticket data from the DOM, creates a temporary HTML window, 
+         * and triggers the browser's native print manager.
+         */
+        function printSelectedTicket(bookingId) {
+            // [1] Locate the source ticket container by its dynamic ID.
+            const ticketCard = document.getElementById('ticket-' + bookingId);
+            if (!ticketCard) {
+                alert('System Error: Ticket source not found.');
+                return;
+            }
+            
+            // [2] Create a memory-only clone of the ticket to prevent damaging the live UI.
+            const clonedCard = ticketCard.cloneNode(true);
+            
+            // [3] Strip out UI buttons (Print/Cancel) and scripts from the cloned content.
+            clonedCard.querySelectorAll('button, .button, a, script').forEach(el => el.remove());
 
-<body>                                                               <!-- [45] Begin document body. -->
-<script src="js/header2.js"></script>                                <!-- [46] Inject site-wide navigation bar. -->
-<div style="height: 100px;"></div>                                   <!-- [47] Fixed header offset. -->
+            // [4] Open a new browser window context for the printing stage.
+            const printWindow = window.open('', '_blank', 'width=850,height=900');
+            
+            // [5] Construct the print-optimized HTML document.
+            printWindow.document.write('<!DOCTYPE html><html><head><title>Boarding Pass #' + bookingId + '</title>');
+            
+            // [CSS] Print Styling: Hides browser headers/footers and centers the content.
+            printWindow.document.write('<style>@page { size: auto; margin: 0; } body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a202c; background: #fff; margin: 1cm; } .ticket-card { border: 4px double #9a4d9a; border-radius: 12px; padding: 40px; max-width: 600px; margin: auto; } .company-name { text-align: center; color: #9a4d9a; margin-bottom: 25px; font-size: 30px; font-weight: 800; text-transform: uppercase; border-bottom: 3px solid #f7fafc; padding-bottom: 15px; } .ticket-info h3 { color: #2d3748; font-size: 24px; margin: 0 0 15px 0; } .ticket-info p { margin: 12px 0; font-size: 18px; color: #4a5568; line-height: 1.6; } .booking-id-badge { background: #9a4d9a; color: white; padding: 6px 18px; border-radius: 50px; font-weight: bold; margin-bottom: 20px; display: inline-block; font-size: 1rem; } .footer-note { margin-top: 30px; font-style: italic; color: #718096; font-size: 0.9rem; text-align: center; border-top: 1px solid #edf2f7; padding-top: 20px; }</style></head><body>');
+            
+            // [Content] Inject the centered Company Name and the cleaned cloned ticket info.
+            printWindow.document.write('<div class="ticket-card"><div class="company-name">WEMA TRAVELLERS</div><div class="ticket-info">' + clonedCard.querySelector('.ticket-info').innerHTML + '</div><div class="footer-note">Verification: Please present your National ID / Passport for boarding.</div></div>');
+            
+            // [Action] Trigger the print dialog specifically once the window content finishes loading.
+            printWindow.document.write('<script>window.onload = function() { window.print(); window.close(); };<\/script></body></html>');
+            printWindow.document.close();                                    // [L142] Standardize the stream end for the browser window.
+        }                                                            // [L143] Close the printSelectedTicket function block.
+    </script>                                                        <!-- [L144] Terminate the JavaScript logic section. -->
+</head>                                                              <!-- [44] Close the document head metadata section. -->
+                                                                     <!-- [L146] Blank line for readability. -->
 
-<div class="ticket-container">                                         <!-- [48] UI wallet start. -->
-    <h2 style="text-align:center; color: var(--purple); margin-bottom: 40px; font-weight: 800;">🎫 My Digital Travel Wallet</h2> <!-- [49] page title. -->
-    <?php if ($result->num_rows > 0): ?>                             <!-- [50] verify if the passenger wallet holds any active tickets. -->
-        <?php while($ticket = $result->fetch_assoc()): ?>            <!-- [51] begin rendering individual boarding passes. -->
-            <div class="ticket-card">                                <!-- [52] pass container. -->
-                <div class="ticket-info">                            <!-- [53] detail section. -->
-                    <h3><?= htmlspecialchars($ticket['from_location']) ?> → <?= htmlspecialchars($ticket['to_location']) ?></h3> <!-- [54] Output the secure journey route wrapped in an h3 header tag. -->
-                    <p><strong>📅 Departure:</strong> <?= $ticket['departure_date'] ?> | <strong>⏰ Time:</strong> <?= $ticket['departure_time'] ?></p> <!-- [55] Output the departure date and specified time within a stylized paragraph element. -->
-                    <p><strong>💺 Seat:</strong> <span style="color:var(--purple); font-weight:bold;"><?= $ticket['seat_number'] ?></span> | <strong>🚌 Coach:</strong> <?= htmlspecialchars($ticket['bus_name']) ?></p> <!-- [56] Output the assigned seat number wrapped in a styled span, alongside the securely extracted coach name. -->
-                    <p><strong>👤 Traveler:</strong> <?= htmlspecialchars($ticket['passenger_name'] ?: $_SESSION['name']) ?></p> <!-- [57] Output the passenger's actual name, defaulting to the session name if it is not specifically defined on the booking log. -->
-                </div>                                               <!-- [58] Close the ticket detail and information div section. -->
-                <div class="ticket-qr">                              <!-- [59] Open the dedicated div area intended for rendering the validation QR element. -->
-                    <strong style="font-size: 0.8rem; color: #718096; letter-spacing: 1px;">BOARDING TOKEN</strong><br> <!-- [60] Output the static text 'BOARDING TOKEN' as a styled strong header for the hash value. -->
-                    <span style="font-family: monospace; font-size: 0.9em; word-break: break-all; color: #2d3748; font-weight: 700;"> <?= $ticket['qr_token'] ?> </span> <!-- [61] Output the database-retrieved QR cryptographic hash code within a monospace word-breaking span. -->
-                    <div style="margin-top: 15px;">                   <!-- [62] Open the nested action button container with a top margin. -->
-                        <a href="user_cancel_ticket.php?booking_id=<?= $ticket['booking_id'] ?>" class="button" style="background-color: #f56565; color: white; padding: 10px 15px; text-decoration: none; border-radius: 8px; font-size: 0.8em; font-weight: 600; display: block;" onclick="return confirm('CANCEL: Proceed irreversibly?')"> ❌ Cancel Ticket </a> <!-- [63] Render an interactive hyperlink formatted as a red cancellation button configured to prompt user confirmation before passing the booking constraint ID context to the controller via GET. -->
-                    </div>                                           <!-- [64] Close the action buttons div wrapper. -->
-                </div>                                               <!-- [65] Close the div section dedicated to rendering the validation and boarding token data. -->
-            </div>                                                   <!-- [66] Close the main ticket card div container that represents a single passenger booking. -->
-        <?php endwhile; ?>                                           <!-- [67] Terminate the while loop that iterates through and renders the user's active ticket result set. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">               <!-- [L147] Open body with a dynamic class based on user role (e.g. passenger). -->
+<script src="js/header2.js"></script>                                <!-- [46] Inject site-wide navigation bar and logo component. -->
+<div style="height: 100px;"></div>                                   <!-- [47] Fixed header offset to prevent content overlap. -->
+                                                                     <!-- [L150] Structural spacing gap. -->
+<div class="ticket-container">                                         <!-- [48] Open the primary UI wallet container. -->
+    <h2 style="text-align:center; color: var(--purple); margin-bottom: 40px; font-weight: 800;">🎫 My Digital Travel Wallet</h2> <!-- [49] Main page heading. -->
+    <?php if ($result->num_rows > 0): ?>                             <!-- [50] Conditional check: Iterate only if tickets exist in DB. -->
+        <?php while($ticket = $result->fetch_assoc()): ?>            <!-- [L154] Start row loop to fetch individual ticket details. -->
+            <div class="ticket-card" id="ticket-<?= $ticket['booking_id'] ?>"> <!-- [L155] Unique card container with dynamic ID. -->                <div class="ticket-info">                            <!-- [53] detail section. -->
+                    <div class="booking-id-badge">ID: #<?= $ticket['booking_id'] ?></div>
+                    <h3><?= htmlspecialchars($ticket['from_location']) ?> → <?= htmlspecialchars($ticket['to_location']) ?></h3> 
+                    <p><strong>📅 Departure:</strong> <?= $ticket['departure_date'] ?> | <strong>⏰ Time:</strong> <?= $ticket['departure_time'] ?></p> 
+                    <p><strong>💺 Seat:</strong> <span style="color:var(--purple); font-weight:bold;"><?= $ticket['seat_number'] ?></span> | <strong>🚌 Coach:</strong> <?= htmlspecialchars($ticket['bus_name']) ?></p> 
+                    <p><strong>👤 Traveler:</strong> <?= htmlspecialchars($ticket['passenger_name'] ?: $_SESSION['name']) ?></p> <!-- [L161] Display passenger name or account default. -->
+                    <p>                                              <!-- [L162] Open paragraph for identity verification details. -->
+                        <strong>🆔 ID/Passport:</strong>             <!-- [L163] Field label for identity document. -->                        <!-- [RETROACTIVE UPDATE LOGIC] -->
+                        <!-- If passenger ID is missing, provide an inline form to capture data. -->
+                        <?php if (empty($ticket['passenger_id_number'])): ?>
+                            <form action="op_update_passenger_details.php" method="POST" style="display:inline-block; margin:0; vertical-align:middle;">
+                                <input type="hidden" name="booking_id" value="<?= $ticket['booking_id'] ?>">
+                                <input type="hidden" name="redirect_to" value="view_tickets.php">
+                                <!-- ID Field -->
+                                <input type="text" name="passenger_id_number" placeholder="Enter ID..." required style="width:100px; padding:2px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem;">
+                                | <strong>🎂 Age:</strong>
+                                <!-- Age Field -->
+                                <input type="number" name="passenger_age" placeholder="Age" required style="width:50px; padding:2px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem;">
+                                <!-- Save Button: Transmits to op_update_passenger_details.php -->
+                                <button type="submit" style="background:#48bb78; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; margin-left:5px; font-weight:bold;">Save Details</button>
+                            </form>
+                        <?php else: ?>
+                            <!-- Display verified saved details -->
+                            <?= htmlspecialchars($ticket['passenger_id_number']) ?> | <strong>🎂 Age:</strong> <?= htmlspecialchars($ticket['passenger_age']) ?>
+                        <?php endif; ?>
+                    </p>                                             <!-- [L182] Close the passenger data paragraph. -->
+                </div>                                               <!-- [183] Close the ticket information text block. -->
+                <div class="ticket-qr-section">                              <!-- [L184] Open the secondary action/QR section. -->
+                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px; width: 100%;"> <!-- [L185] Action button wrapper. -->
+                        <button class="print-btn" onclick="printSelectedTicket(<?= $ticket['booking_id'] ?>)" style="background: #9a4d9a; color: white; border: none; padding: 10px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: 700; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">🖨️ Print Ticket</button> <!-- [L186] Print trigger button. -->
+                        <a href="user_cancel_ticket.php?booking_id=<?= $ticket['booking_id'] ?>" class="button" style="background-color: #f59e0b; color: white; padding: 10px; text-decoration: none; border-radius: 50px; font-size: 0.85rem; font-weight: 700; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);" onclick="return confirm('CANCEL: Proceed irreversibly?')"> ❌ Cancel </a> <!-- [L187] Ticket cancellation link. -->
+                    </div>                                           <!-- [L188] Close action button wrapper. -->
+                </div>                                               <!-- [L189] Close the QR/action section div. -->
+            </div>                                                   <!-- [L190] Close the entire ticket card container. -->        <?php endwhile; ?>                                           <!-- [67] Terminate the while loop that iterates through and renders the user's active ticket result set. -->
     <?php else: ?>                                                   <!-- [68] Execute this alternative block if the database returned zero active booking results for the current logged-in user. -->
         <div class="empty-state">                                    <!-- [69] Open a styled div container wrapper to display the empty state placeholder content. -->
             <p style="color: #64748b; font-size: 1.1rem;">You haven't reserved any active tickets yet.</p> <!-- [70] Output a descriptive paragraph message informing the user that no active reservations were found in their account. -->

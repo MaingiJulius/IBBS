@@ -42,7 +42,7 @@ if (!$res_report) {                                                  // [15] Int
     </style>                                                         <!-- [37] Terminate internal CSS block. -->
 </head>                                                              <!-- [38] Close head section. -->
 
-<body>                                                               <!-- [39] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [39] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [40] Inject the unified administrative header. -->
     <div class="container">                                              <!-- [41] Open the audit card. -->
         <h1>Customer Satisfaction Report</h1>                            <!-- [42] Section title. -->

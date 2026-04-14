@@ -66,7 +66,7 @@ if (isset($_POST['add_route'])) {                                    // [25] Act
     </style>                                                         <!-- [61] Terminate internal CSS block. -->
 </head>                                                              <!-- [62] Close head section. -->
 
-<body>                                                               <!-- [63] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'staff') ?>-role"> <!-- [63] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [64] Inject the unified administrative header. -->
     <div style="height: 100px;"></div>                                   <!-- [65] Fixed header offset buffer. -->
     <div class="back-btn-container">                                      <!-- [66] Navigation wrapper. -->
@@ -126,5 +126,6 @@ if (isset($_POST['add_route'])) {                                    // [25] Act
     </div>                                                               <!-- [116] end card. -->
     <div style="height: 120px;"></div>                                   <!-- [117] bottom spacer. -->
     <script src="js/footer.js"></script>                                 <!-- [118] inject footer. -->
+    <script src="js/table_manager.js"></script>
 </body>                                                              <!-- [119] end body. -->
 </html>                                                              <!-- [120] end document. -->

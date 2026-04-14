@@ -40,7 +40,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {      // [13] Re
     </style>                                                         <!-- [37] Terminate internal CSS block. -->
 </head>                                                              <!-- [38] Close head section. -->
 
-<body>                                                               <!-- [39] Begin visible document body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [39] Begin visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [40] Inject the site-wide administrative header. -->
     <div style="height: 100px;"></div>                                   <!-- [41] Fixed header offset buffer. -->
 

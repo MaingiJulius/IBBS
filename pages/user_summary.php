@@ -40,10 +40,11 @@ $conn->close();
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/entry-page.css" />
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
 
 <!-- Dynamically load the header and footer via JavaScript modules -->
-<script src="js/header.js"></script>
+<script src="js/header2.js"></script>
+<div style="height: 100px;"></div>
 <script src="js/footer.js"></script>
 
 <!-- Main Profile Content Section -->

@@ -149,7 +149,7 @@ session_start();
   </style>
 </head>
 
-<body>
+<body class="<?= isset($_SESSION['role']) ? strtolower($_SESSION['role']) . '-role' : '' ?>">
 
   <!-- Load the global navigation menu -->
   <script src="js/header2.js"></script>

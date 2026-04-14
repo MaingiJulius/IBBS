@@ -145,7 +145,9 @@ if (isset($_POST['add_user'])) {
         }
     </style>
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role'] ?? 'admin') ?>-role">
+<script src="js/header2.js"></script>
+<div style="height: 100px;"></div>
 
 <div class="container">
     <h2>Add New User (Admin)</h2>

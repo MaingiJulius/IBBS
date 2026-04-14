@@ -120,7 +120,7 @@ $stmt->close();
         }
     </style>
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
     <!-- HEADER INJECTION -->
     <!-- Loads the communal navigation bar (Home, Profile, etc.) -->
     <script src="js/header2.js"></script>

@@ -60,8 +60,8 @@ try {                                                                // [1.2] Wr
         }                                                            // [57] Close availability check.
         $stmt_check->close();                                        // [58] Clean up the check statement object.
 
-        /* --- [8.B] SECURITY TOKEN GENERATION --- */               // [59] Marker for creating unique digital boarding signatures.
-        $qr_token = bin2hex(random_bytes(16));                       // [60] Generate a 32-character high-entropy hex string for the ticket.
+        /* --- [8.B] SECURITY TOKEN GENERATION (DEPRECATED) --- */
+        $qr_token = NULL;                                            // QR generation removed as per system simplification.
 
         /* --- [8.C] DATABASE PERSISTENCE --- */                    // [61] Marker for writing the finalized record to the system ledger.
         $stmt_insert = $conn->prepare("INSERT INTO bookings (user_id, route_id, bus_id, seat_number, passenger_name, passenger_age, passenger_id_number, booking_status, qr_token, booking_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"); // [62] Prepare insertion SQL.

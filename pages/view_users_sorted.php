@@ -120,6 +120,7 @@ if (isset($_POST['add_user'])) {                                     // [53] Det
         .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; } /* [101] header style. */
         .action-btn { padding: 8px 15px; border-radius: 8px; text-decoration: none; color: #ffffff; font-size: 0.85rem; display: inline-block; } /* [102] buttons. */
         .btn-delete { background-color: #ef4444; }                    /* [103] alert color for deletion. */
+        .btn-reset { background-color: #f59e0b; }                     /* [103.5] Warning color for password reset. */
         .add-form { background: #f8fafc; padding: 30px; border-radius: 12px; margin-bottom: 40px; border: 1px solid #e2e8f0; } /* [104] entry form. */
         .form-row { display: flex; gap: 20px; flex-wrap: wrap; }      /* [105] horizontal form fields layout. */
         .form-group { flex: 1; min-width: 240px; }                    /* [106] field spacing logic. */
@@ -127,7 +128,7 @@ if (isset($_POST['add_user'])) {                                     // [53] Det
     </style>                                                         <!-- [108] Terminate internal CSS block. -->
 </head>                                                              <!-- [109] End document head. -->
 
-<body>                                                               <!-- [110] Open the document body for visible content. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
     <script src="js/header2.js"></script>                                <!-- [111] Inject the global administrative navigation bar. -->
     <div style="height: 100px;"></div>                                   <!-- [112] Fixed header offset buffer. -->
     
@@ -177,8 +178,9 @@ if (isset($_POST['add_user'])) {                                     // [53] Det
                     <td style="font-family: monospace; letter-spacing: 0.5px;"><?= htmlspecialchars($row['phone_number']) ?></td> <!-- [151] phone cell. -->
                     <td><span style="background: <?= ($row['role'] == 'ADMIN' ? '#faf5ff' : ($row['role'] == 'AGENT' ? '#f0fff4' : '#ebf8ff')) ?>; color: <?= ($row['role'] == 'ADMIN' ? '#6b46c1' : ($row['role'] == 'AGENT' ? '#2f855a' : '#2b6cb0')) ?>; padding: 5px 12px; border-radius: 50px; font-weight: 900; font-size: 0.7rem; border: 1px solid currentColor;"><?= $row['role'] ?></span></td> <!-- [152] badge. -->
                     <td>                                                  <!-- [153] Administrative command container. -->
-                        <a href="edit_user.php?user_id=<?= $row['user_id'] ?>" class="action-btn" style="background-color: #3182ce; margin-right: 10px;">Update</a> <!-- [154] update shortcut. -->
-                        <a href="?delete_user=<?= $row['user_id'] ?>" class="action-btn btn-delete" onclick="return confirm('CRITICAL WARNING: Permanent deletion? Proceed?')">Delete</a> <!-- [155] delete. -->
+                        <a href="edit_user.php?user_id=<?= $row['user_id'] ?>" class="action-btn" style="background-color: #3182ce; margin-right: 5px;">Update</a> 
+                        <a href="op_reset_password.php?user_id=<?= $row['user_id'] ?>" class="action-btn btn-reset" style="margin-right: 5px;" onclick="return confirm('RESET PASSWORD: This will set the user\'s password to 123456. Proceed?')">Reset</a>
+                        <a href="?delete_user=<?= $row['user_id'] ?>" class="action-btn btn-delete" onclick="return confirm('CRITICAL WARNING: Permanent deletion? Proceed?')">Delete</a> 
                     </td>                                                <!-- [156] end commands. -->
                 </tr>                                                    <!-- [157] end record row. -->
                 <?php endwhile; ?>                                       <!-- [158] End database rendering iteration. -->
@@ -188,5 +190,6 @@ if (isset($_POST['add_user'])) {                                     // [53] Det
 
     <div style="height: 120px;"></div>                                   <!-- [162] Buffer for scrolling clearance. -->
     <script src="js/footer.js"></script>                                 <!-- [163] Inject global site footer script. -->
+    <script src="js/table_manager.js"></script>
 </body>                                                              <!-- [164] End visible body section. -->
 </html>                                                              <!-- [165] Formal document termination. -->

@@ -63,7 +63,7 @@ if (isset($_GET['remove_driver'])) {                                 // [26] Act
     </style>                                                         <!-- [58] End internal CSS. -->
 </head>                                                              <!-- [59] End head. -->
 
-<body>                                                               <!-- [60] Start visible body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [60] Start visible body. -->
     <script src="js/header2.js"></script>                                <!-- [61] Inject global header. -->
     <div style="height: 100px;"></div>                                   <!-- [62] Layout offset. -->
 

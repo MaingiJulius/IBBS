@@ -75,7 +75,7 @@ if (isset($_POST['assign_driver'])) {                                // [37] Act
     </style>                                                         <!-- [69] End internal CSS. -->
 </head>                                                              <!-- [70] End head. -->
 
-<body>                                                               <!-- [71] Start visible body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [71] Start visible body. -->
     <script src="js/header2.js"></script>                                <!-- [72] Inject global navigation. -->
     <div style="height: 100px;"></div>                                   <!-- [73] Fixed header offset. -->
 

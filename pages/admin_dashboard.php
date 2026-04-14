@@ -39,18 +39,18 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {      // [9] Ac
     </style>                                                         <!-- [35] Terminate internal CSS block. -->
 </head>                                                              <!-- [36] Close head section. -->
 
-<body>                                                               <!-- [37] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
     <script src="js/header2.js"></script>                                <!-- [38] Inject external global navigation header. -->
     <div style="height: 100px;"></div>                                   <!-- [39] Layout offset for fixed header. -->
 
     <div class="container">                                              <!-- [40] Content constraint start. -->
-        <div class="back-btn-container"><a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← External Dashboard</a></div> <!-- [41] Navigator. -->
-        <div class="welcome-banner">                                     <!-- [42] User greeting hub. -->
-            <h1>Administrative Operations</h1>                            <!-- [43] Section title. -->
-            <p>Authorized access granted to: <strong><?= htmlspecialchars($_SESSION['name']) ?></strong></p> <!-- [44] Identity display. -->
-        </div>                                                           <!-- [45] End greeting. -->
+        <div class="welcome-banner">                                     
+            <h1>Administrative Operations</h1>                            
+            <p>Authorized access granted to: <strong><?= htmlspecialchars($_SESSION['name']) ?></strong></p> 
+        </div>                                                           
 
         <div class="admin-options">                                      <!-- [46] Start operational grid. -->
+            <div class="card" style="border: 2px solid var(--purple); background: #fdfaff;"><h3>Ticket Verification</h3><p>Real-time boarding control. Scan or enter Booking IDs to authorize passenger entry.</p><a href="admin_verify_ticket.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white;">Open Verification Hub</a></div> <!-- [46.1] verification. -->
             <div class="card"><h3>Walk-in Booking</h3><p>Register tickets for customers who arrive at the station without a mobile account.</p><a href="book.php" class="button regular-button green-background" style="text-decoration:none;">Open Booking Desk</a></div> <!-- [47] Booking. -->
             <div class="card"><h3>User Accounts</h3><p>Full control over passengers, agents, and other administrators.</p><a href="view_users_sorted.php" class="button regular-button pink-background" style="text-decoration:none;">Manage Identities</a></div> <!-- [48] Auth. -->
             <div class="card"><h3>Trip Routes</h3><p>Define departure cities, destinations, and adjust ticket prices dynamically.</p><a href="view_routes.php" class="button regular-button pink-background" style="text-decoration:none;">Manage Network</a></div> <!-- [49] Logistics. -->

@@ -73,7 +73,7 @@ if ($is_staff) {                                                     // [30] Che
     </style>                                                         <!-- [67] Terminate internal CSS block. -->
 </head>                                                              <!-- [68] Close head section. -->
 
-<body>                                                               <!-- [69] Open document body for visible components. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role"> <!-- [69] Open document body for visible components. -->
 <script src="js/header2.js"></script>                                <!-- [70] Inject site-wide global navigation header script. -->
 <div style="height: 100px;"></div>                                   <!-- [71] Layout spacer for fixed header visibility. -->
 
@@ -144,7 +144,8 @@ if ($is_staff) {                                                     // [30] Che
 </div>                                                               <!-- [133] end overlay. -->
 
 <div style="height: 100px;"></div>                                   <!-- [134] Scrolling buffer. -->
-<script src="js/footer.js"></script>                                 <!-- [135] site footer script. -->
+    <script src="js/footer.js"></script>                                 <!-- [135] site footer script. -->
+    <script src="js/table_manager.js"></script>
 
 <script>                                                             /* [136] Start high-orchestration Client-Side Application Logic. */
 let currentRouteId = null;                                           // [137] Track the global state: Trip currently in-focus.

@@ -34,7 +34,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {       // [13] S
     </style>                                                         <!-- [31] Terminate internal CSS block. -->
 </head>                                                              <!-- [32] Close head section. -->
 
-<body>                                                               <!-- [33] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'admin') ?>-role"> <!-- [33] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [34] Inject the unified administrative header. -->
     <div style="height: 100px;"></div>                                   <!-- [35] Fixed header offset buffer. -->
 
@@ -67,6 +67,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {       // [13] S
             </tbody>                                                     <!-- [60] End body. -->
         </table>                                                         <!-- [61] End grid. -->
     </div>                                                               <!-- [62] End card. -->
-    <div style="height: 120px;"></div><script src="js/footer.js"></script> <!-- [63] Fixed offset and footer injection. -->
+    <div style="height: 120px;"></div><script src="js/footer.js"></script>
+    <script src="js/table_manager.js"></script>
 </body>                                                              <!-- [64] End body. -->
 </html>                                                              <!-- [65] End document. -->

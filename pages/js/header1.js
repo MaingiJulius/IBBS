@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <a href="index.html">Home</a> <!-- Link back to the primary landing page. -->
         <a href="login.html">Login</a> <!-- Link to the user authentication portal. -->
         <a href="signup.html">SignUp</a> <!-- Link to the new user registration form. -->
+        <a href="contact.php">Contact Us</a> <!-- Link to contact details. -->
       </div> <!-- Closes the navigation container. -->
     `; // Ends the template string.
 

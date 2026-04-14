@@ -78,6 +78,61 @@ body { /* Targeted styles for the entire page body. */
   text-decoration: underline; /* Briefly adds an underline to signal that the item is clickable. */
 }
 
+/* --- DROPDOWN NAVIGATION --- */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 200px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1000;
+  border-radius: 8px;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 0;
+  text-align: left;
+}
+
+#nav-links .dropdown-content a {
+  color: #000000 !important; /* Force black for maximum visibility */
+  padding: 8px 16px;
+  text-decoration: none;
+  display: block;
+  margin: 0;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+  text-decoration: none !important;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Role-based Visibility Control - ENSURING DROPDOWNS SHOW UP */
+.admin-only, .user-only, .agent-only { display: none !important; }
+
+body.admin-role .admin-only { 
+    display: inline-block !important; 
+}
+
+body.agent-role .agent-only { 
+    display: inline-block !important; 
+}
+
+body.passenger-role .user-only { 
+    display: inline-block !important; 
+}
+
 /* --- INPUT FIELDS (Pill Shape) --- */
 input.input { /* Styles for <input> elements with the class 'input'. */
   width: 100%; /* Forces the field to stretch to the full width of its container. */
@@ -126,13 +181,20 @@ button:active { /* State triggered while the button is being held down by the us
 .action-btn {
   display: inline-block; /* Allows buttons to sit side-by-side. */
   width: auto; /* Does not stretch to 100%. */
-  padding: 5px 15px; /* Slimmer padding for a compact look. */
-  font-size: 0.9rem; /* Smaller text for secondary actions. */
+  padding: 8px 18px; /* Slightly larger for better touch/click targets. */
+  font-size: 0.85rem; /* Smaller text for secondary actions. */
   color: white !important; /* Forces text to white. */
   text-decoration: none; /* Removes underlines. */
-  border-radius: 5px; /* Soft rectangular corners instead of pill shape. */
-  box-shadow: none; /* Removes the heavy hard shadow for a cleaner look in tables. */
+  border-radius: 50px; /* Modern Pill Shape for all action buttons. */
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Subtle elevation. */
   border: none; /* Removes the heavy border. */
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
 }
 
 .btn-view { /* Stylized specifically for viewing records. */
@@ -144,7 +206,17 @@ button:active { /* State triggered while the button is being held down by the us
 }
 
 .btn-cancel { /* Color-coding for non-destructive removals (cancellations). */
-  background-color: #ba68c8; /* Soft purple/lavender. */
+  background-color: #f59e0b; /* Vibrant Orange for Warning/Cancel. */
+}
+
+.btn-print { /* Purple Print Button as requested. */
+    background-color: #9a4d9a;
+}
+
+.print-btn { /* Alias for compatibility. */
+    background-color: #9a4d9a;
+    color: white !important;
+    border-radius: 50px;
 }
 
 /* --- LABELS --- */

@@ -46,7 +46,7 @@ if (isset($_GET['delete_feedback'])) {                               // [16] Act
     </style>                                                         <!-- [42] Terminate internal CSS block. -->
 </head>                                                              <!-- [43] Close head section. -->
 
-<body>                                                               <!-- [44] Start visible document body. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'staff') ?>-role"> <!-- [44] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [45] Inject the unified administrative header. -->
     <div style="height: 100px;"></div>                                   <!-- [46] Fixed header offset buffer. -->
     <div class="back-btn-container">                                      <!-- [47] Navigation wrapper. -->
@@ -79,5 +79,6 @@ if (isset($_GET['delete_feedback'])) {                               // [16] Act
     </div>                                                               <!-- [71] end card. -->
     <div style="height: 120px;"></div>                                   <!-- [72] buffer. -->
     <script src="js/footer.js"></script>                                 <!-- [73] inject footer. -->
+    <script src="js/table_manager.js"></script>
 </body>                                                              <!-- [74] end body. -->
 </html>                                                              <!-- [75] end document. -->

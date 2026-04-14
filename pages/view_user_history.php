@@ -66,7 +66,7 @@ $user_id = $_SESSION['user_id'];
         }
     </style>
 </head>
-<body>
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
     <!-- Inject Header -->
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
@@ -188,5 +188,6 @@ $user_id = $_SESSION['user_id'];
     <div style="height: 100px;"></div>
     <!-- Inject Footer -->
     <script src="js/footer.js"></script>
+    <script src="js/table_manager.js"></script>
 </body>
 </html>
