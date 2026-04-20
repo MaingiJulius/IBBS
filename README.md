@@ -1,7 +1,7 @@
 # Wema Travellers: International Bus Booking System (IBBS)
 
 ![Project Status](https://img.shields.io/badge/Status-Prototype-purple)
-![Tech Stack](https://img.shields.io/badge/Tech-PHP%20%7C%20MySQL%20%7C%20Vanilla%20CSS-blue)
+![Tech Stack](https://img.shields.io/badge/Tech-HTML5%20%7C%20PHP%20%7C%20MySQL%20%7C%20CSS3-orange)
 
 ## 🚌 Overview
 **Wema Travellers (IBBS)** is a digital-first transit platform designed to eliminate the "Last-Mile Manual Bottleneck" in the international bus industry across East Africa. While many systems handle digital bookings, IBBS focuses on the critical boarding and verification phase, replacing slow manual paper checks with a **Secure Digital Token Search Framework**.
@@ -31,7 +31,7 @@ Our system generates a unique **Digital Token** for every booking. Staff verify 
 ## 🛠️ Technology Stack
 - **Backend**: PHP 8.x
 - **Database**: MySQL (RDBMS)
-- **Frontend**: Custom Vanilla CSS & Javascript (No heavy frameworks for maximum performance).
+- **Frontend**: HTML5, Vanilla CSS, & JavaScript (Focus on high-speed, native browser performance).
 - **Security**: Cryptographic password hashing (BCrypt) and session-based role authorization.
 
 ---
@@ -43,9 +43,9 @@ Our system generates a unique **Digital Token** for every booking. Staff verify 
    - Run the automated setup script: `http://localhost/IBBS_PROTOTYPE/setup_database.php`.
    - This will create the `IBBS_PROTOTYPE` database and populate it with sample routes, buses, and users.
 3. **Login**:
-   - **Admin Access**: `alice1@gmail.com` / `123456`
-   - **Agent Access**: `karen1@gmail.com` / `123456`
-   - **Passenger Access**: `uma1@gmail.com` / `123456`
+   - **Admin Access**: `alice1@gmail.com` / `Alice@2025$`
+   - **Agent Access**: `karen1@gmail.com` / `Karen@2025$`
+   - **Passenger Access**: `uma1@gmail.com` / `Uma@2025$`
 
 ---
 
