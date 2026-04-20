@@ -18,45 +18,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new = $_POST['new_password'];
     $confirm = $_POST['confirm_password'];
 
-    // 1. Basic validation
+    // [1] Integrity Verification: Ensure that the new password and confirmation match.
     if ($new !== $confirm) {
         header("Location: profile.php?status=error&error=New passwords do not match.");
         exit();
     }
 
+    // [2] Complexity Requirement: Enforce a minimum length for security.
     if (strlen($new) < 6) {
         header("Location: profile.php?status=error&error=Password must be at least 6 characters.");
         exit();
     }
 
-    // 2. Fetch current hashed password
+    // [3] Database Query: Fetch the user's current hashed credential for verification.
     $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
-    $stmt->bind_param("i", $user_id);
+    $stmt->bind_param("i", $user_id); // [4] Bind only the logged-in user's session identifier.
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
     $stmt->close();
 
+    // [5] Existence Check: Confirm the user account still exists in the system.
     if (!$user) {
         header("Location: profile.php?status=error&error=User not found.");
         exit();
     }
 
-    // 3. Verify current password
-    // Note: Assuming the system uses password_hash() for security.
+    // [6] Cryptographic Validation: Use password_verify to check the raw entry against the DB hash.
     if (!password_verify($current, $user['password'])) {
         header("Location: profile.php?status=error&error=Incorrect current password.");
         exit();
     }
 
-    // 4. Update password
+    // [7] Credential Transformation: Generate a fresh BCrypt hash for the new password.
     $new_hashed = password_hash($new, PASSWORD_DEFAULT);
+    // [8] Persistence: Write the new securely hashed password to the database record.
     $stmt = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
     $stmt->bind_param("si", $new_hashed, $user_id);
     
     if ($stmt->execute()) {
+        // [9] Feedback: Redirect with success status on completion.
         header("Location: profile.php?status=success");
     } else {
+        // [10] Error Handling: Report database persistence failures.
         header("Location: profile.php?status=error&error=Database update failed.");
     }
     $stmt->close();

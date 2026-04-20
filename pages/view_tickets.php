@@ -107,40 +107,37 @@ $result = $stmt->get_result();                                       // [25] Cap
         }
     </style>                                                         
     <script>
-        /**
-         * FUNCTION: printSelectedTicket
-         * Logic: Extracts ticket data from the DOM, creates a temporary HTML window, 
-         * and triggers the browser's native print manager.
-         */
+        // [1] FUNCTION: printSelectedTicket
+        // Purpose: Extracts boarding data and triggers a clean browser print dialog.
         function printSelectedTicket(bookingId) {
-            // [1] Locate the source ticket container by its dynamic ID.
+            // [2] Target Locator: Find the specific ticket container in the DOM by its dynamic ID.
             const ticketCard = document.getElementById('ticket-' + bookingId);
             if (!ticketCard) {
                 alert('System Error: Ticket source not found.');
                 return;
             }
             
-            // [2] Create a memory-only clone of the ticket to prevent damaging the live UI.
+            // [3] Isolation: Clone the ticket card into memory so we can strip UI elements without affecting the live page.
             const clonedCard = ticketCard.cloneNode(true);
             
-            // [3] Strip out UI buttons (Print/Cancel) and scripts from the cloned content.
+            // [4] Cleanup: Remove buttons, links, and scripts from the cloned object to ensure a clean paper output.
             clonedCard.querySelectorAll('button, .button, a, script').forEach(el => el.remove());
 
-            // [4] Open a new browser window context for the printing stage.
+            // [5] Context Creation: Open a secondary, blank browser window for the dedicated print stage.
             const printWindow = window.open('', '_blank', 'width=850,height=900');
             
-            // [5] Construct the print-optimized HTML document.
+            // [6] Document Construction: Write the HTML headers and page title for the new window.
             printWindow.document.write('<!DOCTYPE html><html><head><title>Boarding Pass #' + bookingId + '</title>');
             
-            // [CSS] Print Styling: Hides browser headers/footers and centers the content.
-            printWindow.document.write('<style>@page { size: auto; margin: 0; } body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a202c; background: #fff; margin: 1cm; } .ticket-card { border: 4px double #9a4d9a; border-radius: 12px; padding: 40px; max-width: 600px; margin: auto; } .company-name { text-align: center; color: #9a4d9a; margin-bottom: 25px; font-size: 30px; font-weight: 800; text-transform: uppercase; border-bottom: 3px solid #f7fafc; padding-bottom: 15px; } .ticket-info h3 { color: #2d3748; font-size: 24px; margin: 0 0 15px 0; } .ticket-info p { margin: 12px 0; font-size: 18px; color: #4a5568; line-height: 1.6; } .booking-id-badge { background: #9a4d9a; color: white; padding: 6px 18px; border-radius: 50px; font-weight: bold; margin-bottom: 20px; display: inline-block; font-size: 1rem; } .footer-note { margin-top: 30px; font-style: italic; color: #718096; font-size: 0.9rem; text-align: center; border-top: 1px solid #edf2f7; padding-top: 20px; }</style></head><body>');
+            // [7] Presentation Layer: Inject CSS specifically optimized for physical paper or PDF saving.
+            printWindow.document.write('<style>@page { size: auto; margin: 0; } body { font-family: "Segoe UI", sans-serif; padding: 40px; color: #1a202c; background: #fff; } .ticket-card { border: 4px double #9a4d9a; border-radius: 12px; padding: 40px; max-width: 600px; margin: auto; } .company-name { text-align: center; color: #9a4d9a; font-size: 30px; font-weight: 800; border-bottom: 3px solid #f7fafc; padding-bottom: 15px; }</style></head><body>');
             
-            // [Content] Inject the centered Company Name and the cleaned cloned ticket info.
-            printWindow.document.write('<div class="ticket-card"><div class="company-name">WEMA TRAVELLERS</div><div class="ticket-info">' + clonedCard.querySelector('.ticket-info').innerHTML + '</div><div class="footer-note">Verification: Please present your National ID / Passport for boarding.</div></div>');
+            // [8] Content Injection: Transfer the cleaned ticket data into the new print environment.
+            printWindow.document.write('<div class="ticket-card"><div class="company-name">WEMA TRAVELLERS</div><div class="ticket-info">' + clonedCard.querySelector('.ticket-info').innerHTML + '</div><div style="margin-top:20px; font-style:italic; font-size:0.8rem; text-align:center;">Valid for Boarding with Passport/ID</div></div>');
             
-            // [Action] Trigger the print dialog specifically once the window content finishes loading.
+            // [9] Command Execution: Wait for content loading, then fire the browser print manager and close the window.
             printWindow.document.write('<script>window.onload = function() { window.print(); window.close(); };<\/script></body></html>');
-            printWindow.document.close();                                    // [L142] Standardize the stream end for the browser window.
+            printWindow.document.close(); // [10] Finalize the output stream.
         }                                                            // [L143] Close the printSelectedTicket function block.
     </script>                                                        <!-- [L144] Terminate the JavaScript logic section. -->
 </head>                                                              <!-- [44] Close the document head metadata section. -->

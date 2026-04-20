@@ -42,6 +42,44 @@ Public transport is the backbone of the economy. IBBS introduces a digital trans
 *   **Routes Table:** Links locations, buses, and pricing.
 *   **Bookings Table:** The central transaction table linking Users, Routes, and Buses.
 
+### 2.4 Functional Design (Data Flow Diagrams)
+
+Functional design represents how data moves through the IBBS system. The following diagrams (Levels 0, 1, and 2) visualize the flow of information between external entities, processes, and data stores.
+
+#### 2.4.1 DFD Level 0 (Context Diagram)
+The Context Diagram defines the system boundary and its interaction with external entities.
+
+![DFD Level 0](./assets/dfd_level_0.png)
+
+**Process Descriptions:**
+*   **Passenger Entity:** Initiates the flow by sending "Search Queries" (locations, dates) and "Booking Requests" (seat preference, ID details). In return, the system provides "Search Results" and "Tickets/QR Codes".
+*   **Admin Entity:** Manages system data by sending "Fleet & Route Updates". The system provides "Administrative Reports" (Revenue, Passenger lists) to the Admin.
+*   **Payment Gateway:** Receives "Payment Requests" from the system and returns "Transaction Confirmation" tokens.
+
+#### 2.4.2 DFD Level 1 (Major Processes)
+Level 1 breaks the system into its primary functional modules.
+
+![DFD Level 1](./assets/dfd_level_1.png)
+
+**Detailed Process Explanations:**
+*   **1.0 User Authentication:** Handles Login and Registration. It validates credentials against the **D1 Users** data store.
+*   **2.0 Fleet & Route Management:** Used by Admins to populate **D2 Buses/Routes**. This process ensures that trip schedules are available for booking.
+*   **3.0 Booking & Reservation:** The core logic where passengers select trips and seats. It reads availability from **D2** and writes finalized sessions to **D3 Bookings**.
+*   **4.0 Payment Processing:** Validates financial transactions. Once a payment is confirmed, it updates the "Paid" status in the **D3 Bookings** store.
+*   **5.0 Feedback & Reporting:** Passengers submit ratings to **D4 Feedback**, while the system aggregates data from **D2** and **D3** to generate Admin reports.
+
+#### 2.4.3 DFD Level 2 (Booking System Detail)
+Level 2 zooms into the "3.0 Booking & Reservation" process to show granular logic.
+
+![DFD Level 2](./assets/dfd_level_2.png)
+
+**Sub-Process Explanations:**
+*   **3.1 Search & Filter Routes:** Processes user input to fetch matching records from the **Routes** table.
+*   **3.2 Select Seat & Occupancy:** Checks the **Bookings** table for existing seat numbers to prevent double-booking. It temporary locks the selected seat.
+*   **3.3 Input Passenger Info:** Captures legal names and ID numbers required for international travel manifestos.
+*   **3.4 Generate Ticket & QR Token:** The final step which creates a unique MD5/SHA hash (QR Token) and persists the record to the **D3 Bookings** store.
+
+
 ---
 
 ## CHAPTER 3: IMPLEMENTATION

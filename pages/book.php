@@ -151,59 +151,55 @@ if ($is_staff) {                                                     // [30] Che
 let currentRouteId = null;                                           // [137] Track the global state: Trip currently in-focus.
 let selectedSeats = [];                                              // [138] Track the global state: Dynamic array of picked seats.
 
-function openSeatMap(route_id, max_passengers) {                     // [139] Controller: initialize reservation flow for a specific trip.
-    currentRouteId = route_id;                                       // [140] Map path: save the target route for the backend.
-    selectedSeats = [];                                              // [141] Logic reset: wipe selections from previous interaction.
-    updateBookingButton();                                           // [142] State reset: lock the confirm button for fresh data.
-    document.body.style.overflow = 'hidden';                         // [143] UX: Lock page scroll to focus the user on the modal.
-    fetch(`op_get_occupied_seats.php?route_id=${route_id}`)          // [144] AJAX: Poll server for real-time seat occupancy status.
-        .then(res => {                                               // [145] check response integrity.
-            if (!res.ok) throw new Error(`HTTP Error: ${res.status}`); 
-            return res.text();
+// [1] FUNCTION: openSeatMap
+// Logical role: Triggers the reservation flow, fetches live occupancy, and reveals the modal.
+function openSeatMap(route_id, max_passengers) {
+    currentRouteId = route_id; // [2] Save the targeted trip ID for server submission.
+    selectedSeats = [];        // [3] Reset selection state for a fresh booking session.
+    updateBookingButton();     // [4] Refresh button state (locked until seat picked).
+    document.body.style.overflow = 'hidden'; // [5] UI: Prevent page scrolling behind the modal.
+    
+    // [6] Polling: Fetch real-time busy seats via AJAX to prevent double-booking.
+    fetch(`op_get_occupied_seats.php?route_id=${route_id}`)
+        .then(res => res.json())
+        .then(data => {
+            const occupiedList = data.occupied || []; 
+            // [7] Orchestration: Pass vehicle capacity and busy seats to the generator.
+            generateLayout(max_passengers, occupiedList); 
+            document.getElementById('seat-modal').style.display = 'block'; // [8] Reveal the interactive deck.
         })
-        .then(text => {                                              // [145.1] parse JSON or throw meaningful error.
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('Invalid Occupancy Data:', text);
-                throw new Error('System failed to retrieve occupancy data.');
-            }
-        })
-        .then(data => {                                              // [146] process data from the backend.
-            const occupiedList = data.occupied || [];                 // [147] normalize data.
-            generateLayout(max_passengers, occupiedList);            // [148] Render process.
-            document.getElementById('seat-modal').style.display = 'block'; // [149] UI reveal.
-            document.getElementById('passenger-details-section').style.display = 'none'; // [150] UI reset.
-            document.getElementById('passenger-info-container').innerHTML = ''; // [151] DOM cleanup.
-        })
-        .catch(err => {                                              // [152] error boundary.
-            console.error('Occupancy Load Failure:', err);
-            alert('Booking Initialization Error: ' + err.message);
-        });
-}                                                                    // [153] close function.
+        .catch(err => alert('Seat Map Error: ' + err.message));
+}
 
-function generateLayout(total, occupied) {                            // [154] Logic: Architectural generator for the virtual vehicle deck.
-    const container = document.getElementById('bus-layout');         // [155] Locate target DOM node for injection.
-    container.innerHTML = '';                                        // [156] Clean slate: wipe old mapping.
-    for (let i = 1; i <= total; i++) {                               // [157] iterator: create a node for every physical vehicle seat.
-        const seatNo = `S${i}`;                                      // [158] identifier: define the standard seat key (e.g. S4).
-        const currentGridIndex = container.children.length + 1;      // [159] tracking: monitor current position in the grid layout.
-        if (currentGridIndex % 5 === 3) {                            // [160] Aisle Logic: Detect the center column for walkway injection.
-            const spacer = document.createElement('div');            // [161] DOM creation: build spacer element.
-            spacer.className = 'aisle-spacer';                       // [162] apply spacer style.
-            container.appendChild(spacer);                           // [163] inject into grid.
-        }                                                            // [164] close aisle logic.
-        const seatNode = document.createElement('div');              // [165] DOM creation: build seat UI unit.
-        if (occupied.includes(seatNo)) {                             // [166] conditional: check if seat is already sold.
-            seatNode.className = 'seat occupied';                    // [167] apply status: 'occupied' red highlight.
-            seatNode.innerText = seatNo;                             // [168] identifier text.
-        } else {                                                     // [169] else: seat is available for purchase.
-            seatNode.className = 'seat available';                   // [170] apply status: 'available' clickable white.
-            seatNode.innerText = seatNo;                             // [171] identifier text.
-            seatNode.onclick = () => toggleSeatSelection(seatNode, seatNo); // [172] connect listener: trigger selection logic on click.
-        }                                                            // [173] close status check.
-        container.appendChild(seatNode);                             // [174] finish injection: place seat into grid.
-    }                                                                // [175] close layout loop.
+// [9] FUNCTION: generateLayout
+// Logical role: Builds the virtual vehicle grid and identifies 'Occupied' vs 'Available' units.
+function generateLayout(total, occupied) {
+    const container = document.getElementById('bus-layout');
+    container.innerHTML = ''; // [10] Clear the previous trip's layout from memory.
+    for (let i = 1; i <= total; i++) {
+        const seatNo = `S${i}`;
+        const currentGridIndex = container.children.length + 1;
+        
+        // [11] AISLE LOGIC: Inject a physical walkway gap every 2 seats (column 3).
+        if (currentGridIndex % 5 === 3) {
+            const spacer = document.createElement('div');
+            spacer.className = 'aisle-spacer';
+            container.appendChild(spacer);
+        }
+
+        const seatNode = document.createElement('div');
+        // [12] OCCUPANCY LOGIC: If the seat ID exists in the busy list, mark it as 'Occupied'.
+        if (occupied.includes(seatNo)) {
+            seatNode.className = 'seat occupied'; // [13] Highlight red and disable interaction.
+            seatNode.innerText = seatNo;
+        } else {
+            // [14] AVAILABILITY LOGIC: If seat is free, apply interaction listeners.
+            seatNode.className = 'seat available';
+            seatNode.innerText = seatNo;
+            seatNode.onclick = () => toggleSeatSelection(seatNode, seatNo); // [15] Link click event to status toggle.
+        }
+        container.appendChild(seatNode);
+    }
 }                                                                    // [176] close function.
 
 function toggleSeatSelection(element, seatNo) {                      // [177] Logic: State-Machine for seat selection toggling.

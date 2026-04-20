@@ -18,32 +18,34 @@ $ticket = null;
 $error = '';
 $success_msg = '';
 
-// Handle Verification Action
+// [1] Handle the 'Confirm Boarding' action when staff clicks the verification button.
 if (isset($_POST['confirm_boarding'])) {
-    $bid = $_POST['booking_id'];
+    $bid = $_POST['booking_id']; // [2] Capture the primary key of the specific booking to update.
+    // [3] Prepare SQL to update the status from 'PAID' to 'CHECKED_IN'.
     $stmt = $conn->prepare("UPDATE bookings SET booking_status = 'CHECKED_IN' WHERE booking_id = ?");
-    $stmt->bind_param("i", $bid);
+    $stmt->bind_param("i", $bid); // [4] Bind the booking ID as an integer.
     if ($stmt->execute()) {
-        $success_msg = "Passenger Successfully Checked-In. Boarding Authorized.";
+        $success_msg = "Passenger Successfully Checked-In. Boarding Authorized."; // [5] Success feedback for staff.
     }
-    $stmt->close();
+    $stmt->close(); // [6] Close the update statement.
 }
 
-// Handle Search
+// [7] Handle the 'Search' action when staff enters an ID/Passport number.
 if ($search_id) {
+    // [8] Define the lookup query: JOIN bookings with routes, buses, and users.
     $sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name, u.first_name, u.last_name 
             FROM bookings b 
             JOIN routes r ON b.route_id = r.route_id 
             JOIN buses bs ON b.bus_id = bs.bus_id 
             JOIN users u ON b.user_id = u.user_id
-            WHERE b.passenger_id_number = ?";
+            WHERE b.passenger_id_number = ?"; // [9] Filter results by the specific passenger Document ID.
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $search_id); 
+    $stmt->bind_param("s", $search_id); // [10] Bind the search string securely.
     $stmt->execute();
-    $ticket = $stmt->get_result()->fetch_assoc();
+    $ticket = $stmt->get_result()->fetch_assoc(); // [11] Retrieve the single matching record.
     $stmt->close();
     if (!$ticket) {
-        $error = "No active booking found for ID Document #$search_id.";
+        $error = "No active booking found for ID Document #$search_id."; // [12] Error if no match exists.
     }
 }
 ?>
