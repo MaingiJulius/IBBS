@@ -85,10 +85,28 @@ if ($search_id) {
         <?php if ($error): ?> <div class="msg error"><?= $error ?></div> <?php endif; ?>
         <?php if ($success_msg): ?> <div class="msg success"><?= $success_msg ?></div> <?php endif; ?>
 
-        <form action="" method="GET" class="search-box">
-            <input type="text" name="search_id" placeholder="National ID / Passport No." value="<?= htmlspecialchars($search_id) ?>" required>
+        <form action="" method="GET" class="search-box" id="verifyForm" onsubmit="return validateSearch()">
+            <input type="text" name="search_id" id="search_id" placeholder="National ID / Passport No." value="<?= htmlspecialchars($search_id) ?>" onmouseout="validateSearchField()">
             <button type="submit" class="button regular-button pink-background" style="margin:0; width: auto;">Search</button>
         </form>
+
+        <script>
+            // Custom JS Validation for Ticket Verification Search
+            function validateSearchField() {
+                var val = document.getElementById("search_id").value.trim();
+                if (val.length < 5) {
+                    alert("Please enter a valid National ID or Passport Number (min 5 characters).");
+                    document.getElementById("search_id").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateSearch() {
+                return validateSearchField();
+            }
+        </script>
+
 
         <?php if ($ticket): ?>
             <div class="result-card <?= $ticket['booking_status'] === 'CHECKED_IN' ? 'verified' : 'pending' ?>">

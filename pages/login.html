@@ -39,15 +39,15 @@
       <!-- login.html Form: Sends credentials to the backend for verification. -->
       <!-- action="account2.php": Points to the central login/signup processing script. -->
       <!-- method="POST": Hides user passwords from the URL log. -->
-      <form class="form" action="account2.php" method="POST" autocomplete="off">
+      <form class="form" id="loginForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
 
         <!-- EMAIL INPUT -->
         <label for="email" class="label">Email</label> <!-- Instructional label. -->
-        <input type="text" name="email" id="email" class="input" required /> <!-- The unique user email address. -->
+        <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();" /> <!-- The unique user email address. -->
 
         <!-- PASSWORD INPUT -->
         <label for="password" class="label">Password</label> <!-- Instructional label. -->
-        <input type="password" name="password" id="password" class="input" required />
+        <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();" />
         <!-- Masked password field for privacy. -->
 
         <!-- LOGIN ACTION -->
@@ -56,6 +56,43 @@
           Log in
         </button>
       </form>
+
+      <script>
+        // Custom JavaScript validation for Login Form
+        // This function validates the email field
+        function validateEmail() {
+          var email = document.getElementById("email").value; // Get the email value from the input field
+          // Check if email is empty or lacks '@' or '.' characters
+          if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+            alert("You must enter a valid email address"); // Alert the user of the error
+            document.getElementById("email").focus(); // Set focus back to the email field
+            return false; // Return false to indicate validation failed
+          }
+          return true; // Return true if valid
+        }
+
+        // This function validates the password field
+        function validatePassword() {
+          var password = document.getElementById("password").value; // Get the password value
+          if (password.length == 0) { // Check if password is empty
+            alert("Password cannot be empty"); // Alert the user
+            document.getElementById("password").focus(); // Focus on the password field
+            return false; // Validation failed
+          }
+          return true; // Valid
+        }
+
+        // Main validation function called on form submission
+        function validateForm() {
+          var rtned = true; // Initialize return variable as true
+          rtned = validateEmail(); // Call email validation
+          if (rtned == true) { // If email is valid, proceed to password validation
+            rtned = validatePassword();
+          }
+          return rtned; // Return final boolean to allow or block form submission
+        }
+      </script>
+
 
       <p class="sign-up-prompt">
         Don’t have an account?

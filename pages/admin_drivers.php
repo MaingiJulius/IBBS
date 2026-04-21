@@ -78,13 +78,68 @@ if (isset($_GET['remove_driver'])) {                                 // [26] Act
 
             <div class="add-form">                                       <!-- [70] Open registration form. -->
                 <h3>New Staff Registration</h3>                          <!-- [71] Form Title. -->
-                <form method="POST"><div class="form-row">               <!-- [72] Open form layout. -->
-                    <div class="form-group"><label>Full Legal Name</label><input type="text" name="full_name" class="input" placeholder="e.g. John Kamau" required></div> <!-- [73] Name entry. -->
-                    <div class="form-group"><label>National ID / Passport</label><input type="text" name="national_id" class="input" placeholder="ID Number" required></div> <!-- [74] ID entry. -->
-                    <div class="form-group"><label>Phone Number</label><input type="text" name="phone" class="input" placeholder="0712345678" required></div> <!-- [75] Phone entry. -->
-                    <div class="form-group"><label>Work Email Address</label><input type="email" name="email" class="input" placeholder="john.k@wematravellers.com" required></div> <!-- [76] Email entry. -->
-                </div><button type="submit" name="add_driver" class="button regular-button pink-background" style="margin-top: 15px;">Finalize Registration</button></form> <!-- [77] Submit btn. -->
+                <form method="POST" id="driverForm" onsubmit="return validateForm()">
+                    <div class="form-row">               <!-- [72] Open form layout. -->
+                        <div class="form-group"><label>Full Legal Name</label><input type="text" name="full_name" id="full_name" class="input" placeholder="e.g. John Kamau" onmouseout="validateFullName()"></div> <!-- [73] Name entry. -->
+                        <div class="form-group"><label>ID / PASSPORT / BIRTH CERT. NO</label><input type="text" name="national_id" id="national_id" class="input" placeholder="ID/PASSPORT/BIRTH CERT. NO" onmouseout="validateID()"></div> <!-- [74] ID entry. -->
+                        <div class="form-group"><label>Phone Number</label><input type="text" name="phone" id="phone" class="input" placeholder="0712345678" onmouseout="validatePhone()"></div> <!-- [75] Phone entry. -->
+                        <div class="form-group"><label>Work Email Address</label><input type="text" name="email" id="email" class="input" placeholder="john.k@wematravellers.com" onmouseout="validateEmail()"></div> <!-- [76] Email entry. -->
+                    </div>
+                    <button type="submit" name="add_driver" class="button regular-button pink-background" style="margin-top: 15px;">Finalize Registration</button>
+                </form> <!-- [77] Submit btn. -->
             </div>                                                       <!-- [78] End form. -->
+
+            <script>
+                // Custom JS Validation for New Staff Registration
+                function validateFullName() {
+                    var val = document.getElementById("full_name").value.trim();
+                    if (val.length < 3) {
+                        alert("Please enter a valid full name (min 3 characters).");
+                        document.getElementById("full_name").focus();
+                        return false;
+                    }
+                    return true;
+                }
+
+                function validateID() {
+                    var val = document.getElementById("national_id").value.trim();
+                    if (val.length < 5) {
+                        alert("ID/PASSPORT/BIRTH CERT. NO is required (min 5 characters).");
+                        document.getElementById("national_id").focus();
+                        return false;
+                    }
+                    return true;
+                }
+
+                function validatePhone() {
+                    var val = document.getElementById("phone").value.trim();
+                    if (val.length < 9 || isNaN(val)) {
+                        alert("Please enter a valid numeric phone number.");
+                        document.getElementById("phone").focus();
+                        return false;
+                    }
+                    return true;
+                }
+
+                function validateEmail() {
+                    var email = document.getElementById("email").value.trim();
+                    if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+                        alert("Please enter a valid work email address.");
+                        document.getElementById("email").focus();
+                        return false;
+                    }
+                    return true;
+                }
+
+                function validateForm() {
+                    if (!validateFullName()) return false;
+                    if (!validateID()) return false;
+                    if (!validatePhone()) return false;
+                    if (!validateEmail()) return false;
+                    return true;
+                }
+            </script>
+
 
             <table class="crud-table">                                   <!-- [79] Start registry grid. -->
                 <thead><tr><th>Ref ID</th><th>Name</th><th>ID Number</th><th>Phone</th><th>Email</th><th>Operating Vehicle</th><th>Actions</th></tr></thead> <!-- [80] Head. -->

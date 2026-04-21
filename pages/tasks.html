@@ -17,7 +17,8 @@
     <!-- Filter Section -->
     <div id="filter-section">
       <label for="filter-date">Filter by Due Date:</label>
-      <input type="date" id="filter-date">
+      <input type="text" id="filter-date" placeholder="YYYY-MM-DD">
+
       <label for="filter-status">Filter by Status:</label>
       <select id="filter-status">
         <option value="all">All</option>
@@ -47,18 +48,18 @@
 
     <!-- Add New Task Form -->
     <h3>Add New Task</h3>
-    <form id="add-task-form" action="add_task.php" method="POST">
+    <form id="add-task-form" action="add_task.php" method="POST" onsubmit="return validateTaskForm()">
       <label for="new-task">Task:</label>
-      <input type="text" id="new-task" name="new-task" required>
+      <input type="text" id="new-task" name="new-task" onmouseout="validateTask()">
 
       <label for="task-description">Description:</label>
-      <textarea id="task-description" name="task-description" required></textarea>
+      <textarea id="task-description" name="task-description" onmouseout="validateDescription()"></textarea>
 
       <label for="due-date">Due Date:</label>
-      <input type="date" id="due-date" name="due-date" required>
+      <input type="text" id="due-date" name="due-date" placeholder="YYYY-MM-DD" onmouseout="validateDueDate()">
 
       <label for="priority">Priority:</label>
-      <select id="priority" name="priority" required>
+      <select id="priority" name="priority">
         <option value="low">Low</option>
         <option value="medium">Medium</option>
         <option value="high">High</option>
@@ -66,7 +67,7 @@
 
       <!-- Add Status Field -->
       <label for="status">Status:</label>
-      <select id="status" name="status" required>
+      <select id="status" name="status">
         <option value="pending">Pending</option>
         <option value="completed">Completed</option>
         <option value="overdue">Overdue</option>
@@ -74,6 +75,41 @@
 
       <button type="submit">Add Task</button>
     </form>
+
+    <script>
+      function validateTask() {
+        var val = document.getElementById("new-task").value.trim();
+        if (val == "") {
+          alert("Task name is required.");
+          return false;
+        }
+        return true;
+      }
+      function validateDescription() {
+        var val = document.getElementById("task-description").value.trim();
+        if (val == "") {
+          alert("Task description is required.");
+          return false;
+        }
+        return true;
+      }
+      function validateDueDate() {
+        var val = document.getElementById("due-date").value.trim();
+        var regex = /^\d{4}-\d{2}-\d{2}$/;
+        if (!regex.test(val)) {
+          alert("Due Date must be in YYYY-MM-DD format.");
+          return false;
+        }
+        return true;
+      }
+      function validateTaskForm() {
+        if (!validateTask()) return false;
+        if (!validateDescription()) return false;
+        if (!validateDueDate()) return false;
+        return true;
+      }
+    </script>
+
 
     <!-- Calendar Section -->
     <h3>Calendar</h3>

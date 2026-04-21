@@ -156,16 +156,17 @@ if (isset($_GET['delete_booking'])) {                                // [28] Det
                         <!-- [STAFF DATA CORRECTION FORM] -->
                         <!-- If ID is missing, allow Admin/Agent to fill it in directly from the ledger. -->
                         <?php if (empty($row['passenger_id_number'])): ?>
-                            <form action="op_update_passenger_details.php" method="POST" style="background:#f8fafc; padding:8px; border-radius:8px; border:1px dashed #cbd5e0; margin-top:5px;">
+                            <form action="op_update_passenger_details.php" method="POST" onsubmit="return validateInlineForm(this)" style="background:#f8fafc; padding:8px; border-radius:8px; border:1px dashed #cbd5e0; margin-top:5px;">
                                 <input type="hidden" name="booking_id" value="<?= $row['booking_id'] ?>">
                                 <input type="hidden" name="redirect_to" value="view_admin_bookings.php">
                                 <!-- ID Entry -->
                                 <div style="margin-bottom:5px;">
-                                    <input type="text" name="passenger_id_number" placeholder="ID/Passport" required style="width:100%; padding:4px; border:1px solid #e2e8f0; border-radius:4px; font-size:0.75rem;">
+                                    <input type="text" name="passenger_id_number" placeholder="ID/PASSPORT/BIRTH CERT. NO" onmouseout="validateInlineID(this)" style="width:100%; padding:4px; border:1px solid #e2e8f0; border-radius:4px; font-size:0.75rem;">
                                 </div>
+
                                 <!-- Age Entry & Save Action -->
                                 <div style="display:flex; gap:5px; align-items:center;">
-                                    <input type="number" name="passenger_age" placeholder="Age" required style="width:60px; padding:4px; border:1px solid #e2e8f0; border-radius:4px; font-size:0.75rem;">
+                                    <input type="text" name="passenger_age" placeholder="Age" onmouseout="validateInlineAge(this)" style="width:60px; padding:4px; border:1px solid #e2e8f0; border-radius:4px; font-size:0.75rem;">
                                     <button type="submit" style="background:var(--purple); color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:bold;">SAVE</button>
                                 </div>
                             </form>
@@ -205,10 +206,42 @@ if (isset($_GET['delete_booking'])) {                                // [28] Det
         </tbody>                                                     <!-- [113] end body. -->
     </table>                                                         <!-- [114] end table. -->
 </div>                                                               <!-- [115] end card. -->
+
+<script>
+    // Custom JS Validation for Inline Booking Updates
+    function validateInlineID(input) {
+        if (input.value.trim().length < 5) {
+            alert("Please enter a valid ID/PASSPORT/BIRTH CERT. NO (min 5 chars).");
+            input.focus();
+            return false;
+        }
+        return true;
+    }
+
+    function validateInlineAge(input) {
+        var age = input.value.trim();
+        if (age == "" || isNaN(age) || parseInt(age) < 1 || parseInt(age) > 120) {
+            alert("Please enter a valid passenger age (1-120).");
+            input.focus();
+            return false;
+        }
+        return true;
+    }
+
+    function validateInlineForm(form) {
+        var idInput = form.querySelector('input[name="passenger_id_number"]');
+        var ageInput = form.querySelector('input[name="passenger_age"]');
+        if (!validateInlineID(idInput)) return false;
+        if (!validateInlineAge(ageInput)) return false;
+        return true;
+    }
+</script>
+
 <div style="height: 120px;"></div>                                   <!-- [116] buffer. -->
 <script src="js/footer.js"></script>                                 <!-- [117] footer injection. -->
 <script src="js/table_manager.js"></script>
 </body>                                                              <!-- [118] end body. -->
-</html>                                                              <!-- [119] end HTML document. -->
+</html>
+                                                              <!-- [119] end HTML document. -->
 
 

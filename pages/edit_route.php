@@ -153,33 +153,110 @@ if (!$route) {                                                       // [49] Che
 
 <div class="container">                                              <!-- [129] Open main content wrapper for layout alignment. -->
     <h2>Edit Route</h2>                                              <!-- [130] Visual title identifying the current administrative task. -->
-    <form method="POST">                                             <!-- [131] Open the data submission form using the POST method. -->
+    <form method="POST" id="editRouteForm" onsubmit="return validateForm()">                                             <!-- [131] Open the data submission form using the POST method. -->
         <div class="form-group">                                     <!-- [132] Group container for the 'Starting Location' input. -->
             <label>From Location</label>                             <!-- [133] Textual label identifying the starting city field. -->
-            <input type="text" name="from_location" value="<?= htmlspecialchars($route['from_location']) ?>" required> <!-- [134] Text input pre-filled with existing data (XSS protected). -->
+            <input type="text" name="from_location" id="from_location" value="<?= htmlspecialchars($route['from_location']) ?>" onmouseout="validateFrom()"> <!-- [134] Text input pre-filled with existing data (XSS protected). -->
         </div>                                                       <!-- [135] Close starting location group. -->
         <div class="form-group">                                     <!-- [136] Group container for the 'Destination' input. -->
             <label>To Location</label>                               <!-- [137] Textual label identifying the arrival city field. -->
-            <input type="text" name="to_location" value="<?= htmlspecialchars($route['to_location']) ?>" required> <!-- [138] Text input pre-filled with existing arrival data (XSS protected). -->
+            <input type="text" name="to_location" id="to_location" value="<?= htmlspecialchars($route['to_location']) ?>" onmouseout="validateTo()"> <!-- [138] Text input pre-filled with existing arrival data (XSS protected). -->
         </div>                                                       <!-- [139] Close destination group. -->
         <div class="form-group">                                     <!-- [140] Group container for the 'Departure Date' input. -->
             <label>Departure Date</label>                            <!-- [141] Textual label for the calendar scheduling field. -->
-            <input type="date" name="departure_date" value="<?= $route['departure_date'] ?>" required> <!-- [142] Date picker input pre-filled with current scheduled date. -->
+            <input type="text" name="departure_date" id="departure_date" value="<?= $route['departure_date'] ?>" placeholder="YYYY-MM-DD" onmouseout="validateDate()"> <!-- [142] Date input. -->
         </div>                                                       <!-- [143] Close date group. -->
         <div class="form-group">                                     <!-- [144] Group container for the 'Departure Time' input. -->
             <label>Departure Time</label>                            <!-- [145] Textual label for the clock-time scheduling field. -->
-            <input type="time" name="departure_time" value="<?= $route['departure_time'] ?>" required> <!-- [146] Time picker input pre-filled with the current departure hour. -->
+            <input type="text" name="departure_time" id="departure_time" value="<?= $route['departure_time'] ?>" placeholder="HH:MM" onmouseout="validateTime()"> <!-- [146] Time input. -->
         </div>                                                       <!-- [147] Close time group. -->
         <div class="form-group">                                     <!-- [148] Group container for the 'Ticket Cost' input. -->
             <label>Cost</label>                                      <!-- [149] Textual label for the pricing adjustment field. -->
-            <input type="number" step="0.01" name="cost" value="<?= $route['cost'] ?>" required> <!-- [150] Numeric input for fare value, supports two decimal places. -->
+            <input type="text" name="cost" id="cost" value="<?= $route['cost'] ?>" onmouseout="validateCost()"> <!-- [150] Text input for fare value to avoid browser validation. -->
         </div>                                                       <!-- [151] Close cost group. -->
         <div class="form-group">                                     <!-- [152] Group container for the 'Bus Assignment' input. -->
             <label>Bus ID</label>                                    <!-- [153] Textual label for the vehicle association field. -->
-            <input type="number" name="bus_id" value="<?= $route['bus_id'] ?>" required> <!-- [154] Numeric input for the specific vehicle ID linked to this route. -->
+            <input type="text" name="bus_id" id="bus_id" value="<?= $route['bus_id'] ?>" onmouseout="validateBusId()"> <!-- [154] Text input for the specific vehicle ID. -->
         </div>                                                       <!-- [155] Close bus ID group. -->
         <button type="submit" name="edit_route" class="btn-submit">Update Route</button> <!-- [156] Finalize submission button to trigger the POST action. -->
     </form>                                                          <!-- [157] Close the data entry form. -->
+
+    <script>
+        // Custom JavaScript validation for Admin Edit Route Form
+        function validateFrom() {
+            var val = document.getElementById("from_location").value.trim();
+            if (val.length < 3) {
+                alert("Please enter a valid source city (min 3 characters).");
+                document.getElementById("from_location").focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateTo() {
+            var val = document.getElementById("to_location").value.trim();
+            if (val.length < 3) {
+                alert("Please enter a valid destination city (min 3 characters).");
+                document.getElementById("to_location").focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateDate() {
+            var val = document.getElementById("departure_date").value.trim();
+            var regex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!regex.test(val)) {
+                alert("Please enter departure date in YYYY-MM-DD format.");
+                document.getElementById("departure_date").focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateTime() {
+            var val = document.getElementById("departure_time").value.trim();
+            var regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            if (!regex.test(val)) {
+                alert("Please enter departure time in HH:MM (24h) format.");
+                document.getElementById("departure_time").focus();
+                return false;
+            }
+            return true;
+        }
+
+
+        function validateCost() {
+            var val = document.getElementById("cost").value;
+            if (val == "" || isNaN(val) || parseFloat(val) <= 0) {
+                alert("Please enter a valid positive cost amount.");
+                document.getElementById("cost").focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateBusId() {
+            var val = document.getElementById("bus_id").value;
+            if (val == "" || isNaN(val) || parseInt(val) <= 0) {
+                alert("Please enter a valid numeric Bus System ID.");
+                document.getElementById("bus_id").focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateForm() {
+            if (!validateFrom()) return false;
+            if (!validateTo()) return false;
+            if (!validateDate()) return false;
+            if (!validateTime()) return false;
+            if (!validateCost()) return false;
+            if (!validateBusId()) return false;
+            return true;
+        }
+    </script>
+
 
     <a href="dashboard.php" class="back-btn">← Back to Dashboard</a> <!-- [158] Emergency exit link to return to the admin portal safely. -->
 </div>                                                               <!-- [159] Close the central content wrapper. -->

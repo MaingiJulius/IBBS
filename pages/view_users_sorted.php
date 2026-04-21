@@ -150,18 +150,93 @@ if (isset($_POST['add_user'])) {                                     // [53] Det
 
         <div class="add-form">                                           <!-- [125] Wrapper for account provisioning interface. -->
             <h3>🆕 Initialize New Account</h3>                           <!-- [126] Form title area. -->
-            <form method="POST">                                         <!-- [127] Form definition targeting self with POST method. -->
+            <form method="POST" id="userForm" onsubmit="return validateForm()">
                 <div class="form-row">                                   <!-- [128] Responsive row for data entry fields. -->
-                    <div class="form-group"><label>First Name</label><input type="text" name="first_name" class="input" placeholder="Samuel" required></div> <!-- [129] field. -->
-                    <div class="form-group"><label>Last Name</label><input type="text" name="last_name" class="input" placeholder="Mwangi" required></div> <!-- [130] field. -->
-                    <div class="form-group"><label>Email ID</label><input type="email" name="email" class="input" placeholder="name@domain.com" required></div> <!-- [131] field. -->
-                    <div class="form-group"><label>Contact Phone</label><input type="text" name="phone_number" class="input" placeholder="0712 XXX XXX" required></div> <!-- [132] field. -->
-                    <div class="form-group"><label>Security Password</label><input type="password" name="password" class="input" placeholder="Set temporary pass..." required></div> <!-- [133] field. -->
-                    <div class="form-group"><label>Official Role</label><select name="role" class="input" required><option value="PASSENGER">PASSENGER</option><option value="AGENT">AGENT</option><option value="ADMIN">ADMIN</option></select></div> <!-- [134] field. -->
+                    <div class="form-group"><label>First Name</label><input type="text" name="first_name" id="first_name" class="input" placeholder="Samuel" onmouseout="validateFirstName()"></div> <!-- [129] field. -->
+                    <div class="form-group"><label>Last Name</label><input type="text" name="last_name" id="last_name" class="input" placeholder="Mwangi" onmouseout="validateLastName()"></div> <!-- [130] field. -->
+                    <div class="form-group"><label>Email ID</label><input type="text" name="email" id="email" class="input" placeholder="name@domain.com" onmouseout="validateEmail()"></div> <!-- [131] field. -->
+                    <div class="form-group"><label>Contact Phone</label><input type="text" name="phone_number" id="phone_number" class="input" placeholder="0712 XXX XXX" onmouseout="validatePhone()"></div> <!-- [132] field. -->
+                    <div class="form-group"><label>Security Password</label><input type="password" name="password" id="password" class="input" placeholder="Set temporary pass..." onmouseout="validatePassword()"></div> <!-- [133] field. -->
+                    <div class="form-group"><label>Official Role</label><select name="role" id="role" class="input" onmouseout="validateRole()"><option value="PASSENGER">PASSENGER</option><option value="AGENT">AGENT</option><option value="ADMIN">ADMIN</option></select></div> <!-- [134] field. -->
                 </div>                                                   <!-- [135] end layout row. -->
                 <button type="submit" name="add_user" class="button regular-button pink-background" style="margin-top: 25px; padding: 12px 40px;">Finalize Registration</button> <!-- [136] submit btn. -->
             </form>                                                      <!-- [137] end form. -->
         </div>                                                           <!-- [138] end provision box. -->
+
+        <script>
+            // Custom JS Validation for User Management
+            function validateFirstName() {
+                var val = document.getElementById("first_name").value.trim();
+                if (val == "") {
+                    alert("First Name is required.");
+                    document.getElementById("first_name").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateLastName() {
+                var val = document.getElementById("last_name").value.trim();
+                if (val == "") {
+                    alert("Last Name is required.");
+                    document.getElementById("last_name").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateEmail() {
+                var val = document.getElementById("email").value.trim();
+                if (val == "" || val.indexOf("@") == -1 || val.indexOf(".") == -1) {
+                    alert("A valid Email address is required.");
+                    document.getElementById("email").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validatePhone() {
+                var val = document.getElementById("phone_number").value.trim();
+                if (val == "" || isNaN(val.replace(/\s/g, '')) || val.length < 10) {
+                    alert("A valid contact phone number is required (min 10 digits).");
+                    document.getElementById("phone_number").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validatePassword() {
+                var val = document.getElementById("password").value;
+                var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                if (!regex.test(val)) {
+                    alert("Password must be at least 8 characters long, including uppercase, lowercase, number, and special character.");
+                    document.getElementById("password").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateRole() {
+                var val = document.getElementById("role").value;
+                if (val == "") {
+                    alert("Please select a role.");
+                    document.getElementById("role").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateForm() {
+                if (!validateFirstName()) return false;
+                if (!validateLastName()) return false;
+                if (!validateEmail()) return false;
+                if (!validatePhone()) return false;
+                if (!validatePassword()) return false;
+                if (!validateRole()) return false;
+                return true;
+            }
+        </script>
+
 
         <table class="crud-table">                                       <!-- [139] Main registry data table definition. -->
             <thead><tr><th>ID</th><th>Full Name</th><th>Verified Email</th><th>Mobile Contact</th><th>Identity Role</th><th>Admin Commands</th></tr></thead> <!-- [140] headers. -->

@@ -189,14 +189,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div id="rating-label"></div>
 
                 <!-- SUBMISSION FORM -->
-                <form action="feedback.php" method="post" id="feedback-form">
+                <form action="feedback.php" method="post" id="feedback-form" onsubmit="return validateForm()">
                     
                     <!-- Hidden input to store chosen rating number (1-5) for submission -->
                     <input type="hidden" name="rating" id="rating-value" value="">
 
                     <!-- DROP-DOWN: TRIP SELECTION -->
                     <div class="dropdown-container">
-                        <select name="trip_select" id="trip-select" required>
+                        <select name="trip_select" id="trip-select">
                             <option value="" disabled selected>Select the trip you want to rate...</option>
                             <?php foreach ($trips as $trip): ?>
                                 <!-- Each option value is formatted as "route_id:bus_id" -->
@@ -210,8 +210,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <!-- TEXTAREA: COMMENTS -->
                     <div class="textarea">
-                        <textarea name="comment" placeholder="Describe your experience..." required></textarea>
+                        <textarea name="comment" id="comment" id="comment" placeholder="Describe your experience..." onmouseout="validateComment()"></textarea>
                     </div>
+
+
 
                     <!-- SUBMIT ACTION -->
                     <div class="btn">
@@ -229,14 +231,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- CLIENT-SIDE VALIDATION & INTERACTIVITY -->
     <script>
         // --- OBJECT REFERENCES ---
-        const btn = document.querySelector("button"); 
         const ratingInputs = document.querySelectorAll('input[name="rating_radio"]'); 
         const ratingHidden = document.getElementById('rating-value'); 
         const ratingLabel = document.getElementById('rating-label'); 
         const tripSelect = document.getElementById('trip-select'); 
 
         // --- RATING FEEDBACK MAPPING ---
-        // Maps the numeric value to a human-readable string and emoji.
         const ratingTexts = {
             "5": "I just love it 😍",
             "4": "I just like it 😎",
@@ -246,47 +246,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         };
 
         // --- STAR INTERACTION HANDLER ---
-        // Adds an event listener to every star radio button. 
-        // When clicked, it updates the text label below the stars.
         ratingInputs.forEach(input => {
             input.addEventListener('change', () => {
                 ratingLabel.innerText = ratingTexts[input.value];
             });
         });
 
-        // --- FORM SUBMISSION VALIDATION ---
-        // Runs immediately when the user clicks 'POST'.
-        btn.onclick = (e) => {
+        // --- VALIDATION FUNCTIONS ---
+        function validateRating() {
             let selectedRating = "";
-            
-            // Loop through the stars to find the checked one.
             ratingInputs.forEach(input => {
                 if (input.checked) {
                     selectedRating = input.value;
                 }
             });
-            
-            // Set the value of the hidden input so PHP can read the chosen rating.
             ratingHidden.value = selectedRating;
-
-            // Stop the form if no rating (star) was selected.
             if(!selectedRating) {
                 alert("Please select a star rating first!");
-                e.preventDefault(); // Stop the form submission
                 return false;
             }
+            return true;
+        }
 
-            // Stop the form if no trip was picked from the list.
+        function validateTrip() {
             if(tripSelect && !tripSelect.value) {
                 alert("Please select the trip you want to rate!");
-                e.preventDefault(); // Stop the form submission
+                tripSelect.focus();
                 return false;
             }
-
-            // If all checks pass, the form submits normally.
             return true;
-        };
+        }
+
+        function validateComment() {
+            const comment = document.getElementById("comment").value.trim();
+            if (comment.length < 5) {
+                alert("Please provide a brief comment describing your experience (at least 5 characters).");
+                document.getElementById("comment").focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateForm() {
+            if (!validateRating()) return false;
+            if (!validateTrip()) return false;
+            if (!validateComment()) return false;
+            return true;
+        }
     </script>
+
 
 </body>
 </html>

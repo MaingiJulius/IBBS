@@ -76,13 +76,61 @@ $stmt->close();                                                      // [22] Rel
                 </p>
             <?php endif; ?>
 
-            <form action="op_update_password.php" method="POST" class="password-form">
-                <input type="password" name="current_password" placeholder="Current Password" required>
-                <input type="password" name="new_password" placeholder="New Password" required minlength="6">
-                <input type="password" name="confirm_password" placeholder="Confirm New Password" required minlength="6">
+            <form action="op_update_password.php" id="passwordForm" method="POST" class="password-form" onsubmit="return validateForm()">
+                <input type="password" name="current_password" id="current_password" placeholder="Current Password" onmouseout="validateCurrentPassword()">
+                <input type="password" name="new_password" id="new_password" placeholder="New Password" onmouseout="validateNewPassword()">
+                <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm New Password" onmouseout="validateConfirmPassword()">
                 <button type="submit" class="button regular-button" style="background: var(--purple); color: white; border-radius: 50px; padding: 12px; font-weight: 700;">Update Password →</button>
             </form>
         </div>
+
+        <script>
+            // Custom JavaScript validation for Password Update Form
+            // Validates that the current password field is not empty
+            function validateCurrentPassword() {
+                var pass = document.getElementById("current_password").value;
+                if (pass.length == 0) {
+                    alert("Current password is required to authorize this change.");
+                    document.getElementById("current_password").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            // Validates the New Password with strict strength requirements
+            function validateNewPassword() {
+                var password = document.getElementById("new_password").value;
+                // Regex for: Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+                var strengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                if (!strengthRegex.test(password)) {
+                    alert("New password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character (@$!%*?&)");
+                    document.getElementById("new_password").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            // Validates that the confirmation password matches the new password
+            function validateConfirmPassword() {
+                var newPass = document.getElementById("new_password").value;
+                var confirmPass = document.getElementById("confirm_password").value;
+                if (confirmPass !== newPass) {
+                    alert("Confirmation password does not match the new password.");
+                    document.getElementById("confirm_password").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            // Main caller function for form submission validation
+            function validateForm() {
+                var rtned = true;
+                rtned = validateCurrentPassword();
+                if (rtned == true) rtned = validateNewPassword();
+                if (rtned == true) rtned = validateConfirmPassword();
+                return rtned; // Blocks submission if any check fails
+            }
+        </script>
 
         <a href="dashboard.php" class="back-link">← Return to Dashboard Hub</a> <!-- [58] Navigation exit command. -->
     </div>                                                               <!-- [59] End container. -->
@@ -90,4 +138,5 @@ $stmt->close();                                                      // [22] Rel
     <div style="height: 120px;"></div>                                   <!-- [60] bottom spacer. -->
     <script src="js/footer.js"></script>                                 <!-- [61] inject footer. -->
 </body>                                                              <!-- [62] end body. -->
-</html>                                                              <!-- [63] end document. -->
+</html>
+                                                              <!-- [63] end document. -->

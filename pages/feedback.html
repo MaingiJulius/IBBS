@@ -49,20 +49,21 @@
       </div>
 
       <!-- Feedback Form - The actual submission block. -->
-      <form action="feedback.php" method="post"> <!-- Sends data to feedback.php using the POST method. -->
+      <form action="feedback.php" id="feedbackForm" method="post" onsubmit="return validateForm()"> <!-- Sends data to feedback.php using the POST method. -->
         <header></header> <!-- Empty header placeholder for dynamic JS messages. -->
 
         <!-- Hidden input to store rating from JS - This value is read by PHP during submission. -->
         <input type="hidden" name="rating" id="rating-value" value="">
 
-        <!-- Optional Bus ID input - Allows users to tie feedback to a specific vehicle. -->
-        <input type="number" name="bus_id" placeholder="Enter Bus ID (optional)" min="1"
-          style="margin: 10px 0; padding: 8px; width: 100%;">
+        <!-- Bus ID input - Allows users to tie feedback to a specific vehicle. -->
+        <!-- type="text" instead of "number" to avoid browser validation -->
+        <input type="text" name="bus_id" id="bus_id" placeholder="Enter Bus ID" 
+          style="margin: 10px 0; padding: 8px; width: 100%;" onmouseout="validateBusId()">
 
         <!-- Comment textarea - The main text entry box for detailed reviews. -->
         <div class="textarea">
-          <textarea cols="30" name="comment" placeholder="Describe your experience..." required></textarea>
-          <!-- Required field. -->
+          <!-- removed 'required' to use manual validation -->
+          <textarea cols="30" name="comment" id="comment" placeholder="Describe your experience..." onmouseout="validateComment()"></textarea>
         </div>
 
         <!-- Submit button - Triggers the JavaScript validation and subsequent POST submission. -->
@@ -82,31 +83,69 @@
 
   <!-- Rating logic - Custom JavaScript for UI transitions and data capturing. -->
   <script>
-    const btn = document.querySelector("button"); // Selects the 'Post' button for event listener attachment.
-    const post = document.querySelector(".post"); // Selects the 'success' message box.
-    const widget = document.querySelector(".star-widget"); // Selects the main rating widget box.
-    const editBtn = document.querySelector(".edit"); // Selects the 'EDIT' button for post-submission changes.
+    // Selected UI elements
+    const btn = document.querySelector("button"); 
+    const post = document.querySelector(".post"); 
+    const widget = document.querySelector(".star-widget"); 
+    const editBtn = document.querySelector(".edit"); 
 
-    btn.onclick = () => { // Function that runs when the 'Post' button is clicked.
-      const ratingInputs = document.querySelectorAll('input[name="rating"]'); // Grabs all 5 radio buttons.
-      let ratingValue = ""; // Variable to store the final chosen number.
-      ratingInputs.forEach(input => { // Iterates through each star input.
-        if (input.checked) { // Checks if the user has selected this specific star.
-          ratingValue = input.value; // Assigns the star's value (1-5) to the variable.
+    // Function to validate the Rating selection
+    function validateRating() {
+      const ratingInputs = document.querySelectorAll('input[name="rating"]'); 
+      let ratingValue = ""; 
+      ratingInputs.forEach(input => { 
+        if (input.checked) { 
+          ratingValue = input.value; 
         }
       });
-      document.getElementById('rating-value').value = ratingValue; // Updates the hidden form field so PHP can process the data.
+      if (ratingValue === "") {
+        alert("Please select a star rating before posting.");
+        return false;
+      }
+      document.getElementById('rating-value').value = ratingValue; // Update hidden input
+      return true;
+    }
 
-      widget.style.display = "none"; // Hides the rating form.
-      post.style.display = "block"; // Shows the "Thank you" message.
+    // Function to validate that a Bus ID is entered and is numeric
+    function validateBusId() {
+      const busId = document.getElementById("bus_id").value.trim();
+      if (busId === "" || isNaN(busId)) {
+        alert("Please enter a valid numeric Bus ID for the trip you are rating.");
+        document.getElementById("bus_id").focus();
+        return false;
+      }
+      return true;
+    }
 
-      editBtn.onclick = () => { // Logic for when the user clicks 'EDIT' after submission.
-        widget.style.display = "block"; // Brings back the rating form.
-        post.style.display = "none"; // Hides the thank you message.
+    // Function to validate the comment text
+    function validateComment() {
+      const comment = document.getElementById("comment").value.trim();
+      if (comment.length < 5) {
+        alert("Please provide a brief comment describing your experience (at least 5 characters).");
+        document.getElementById("comment").focus();
+        return false;
+      }
+      return true;
+    }
+
+    // Main validation caller for form submission
+    function validateForm() {
+      // Run all validations sequentially
+      if (!validateRating()) return false;
+      if (!validateBusId()) return false;
+      if (!validateComment()) return false;
+
+      // Successful validation: Update UI to show 'Thank you'
+      widget.style.display = "none"; 
+      post.style.display = "block"; 
+
+      editBtn.onclick = () => { 
+        widget.style.display = "block"; 
+        post.style.display = "none"; 
       };
 
-      return true; // Continues the form submission process to the server.
-    };
+      return true; // Allow form submission to proceed to PHP script
+    }
   </script>
 
 </body> <!-- Closes the document body. -->

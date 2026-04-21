@@ -153,16 +153,74 @@ if (isset($_POST['add_user'])) {
     <h2>Add New User (Admin)</h2>
     
     <!-- Signup Form -->
-    <form method="POST">
-        <!-- Input fields with 'required' to prevent empty submissions -->
-        <input type="text" name="first_name" placeholder="First Name" required>
-        <input type="text" name="last_name" placeholder="Last Name" required>
-        <input type="email" name="email" placeholder="Email Address" required>
-        <input type="text" name="password" placeholder="Temporary Password" required>
+    <form method="POST" id="addUserForm" onsubmit="return validateForm()">
+        <!-- Input fields with manual JS validation -->
+        <input type="text" name="first_name" id="first_name" placeholder="First Name" onmouseout="validateFirstName()">
+        <input type="text" name="last_name" id="last_name" placeholder="Last Name" onmouseout="validateLastName()">
+        <input type="text" name="email" id="email" placeholder="Email Address" onmouseout="validateEmail()">
+        <input type="text" name="password" id="password" placeholder="Temporary Password" onmouseout="validatePassword()">
         
         <!-- Submission Switch -->
         <button type="submit" name="add_user">Create User Account</button>
     </form>
+
+    <script>
+        // Custom JavaScript validation for Admin Add User Form
+        // This function validates the first name
+        function validateFirstName() {
+            var val = document.getElementById("first_name").value;
+            if (val.length == 0) {
+                alert("First Name is required.");
+                document.getElementById("first_name").focus();
+                return false;
+            }
+            return true;
+        }
+
+        // This function validates the last name
+        function validateLastName() {
+            var val = document.getElementById("last_name").value;
+            if (val.length == 0) {
+                alert("Last Name is required.");
+                document.getElementById("last_name").focus();
+                return false;
+            }
+            return true;
+        }
+
+        // This function validates the email format
+        function validateEmail() {
+            var email = document.getElementById("email").value;
+            if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+                alert("Please enter a valid email address.");
+                document.getElementById("email").focus();
+                return false;
+            }
+            return true;
+        }
+
+        // This function validates the password
+        function validatePassword() {
+            var val = document.getElementById("password").value;
+            if (val.length == 0) {
+                alert("Please provide a temporary password.");
+                document.getElementById("password").focus();
+                return false;
+            }
+            return true;
+        }
+
+        // Main caller function for form submission
+        function validateForm() {
+            var rtned = true;
+            rtned = validateFirstName();
+            if (rtned == true) rtned = validateLastName();
+            if (rtned == true) rtned = validateEmail();
+            if (rtned == true) rtned = validatePassword();
+            return rtned; // Block submission if any check fails
+        }
+    </script>
+
     
     <!-- Back to management list -->
     <a href="admin_users.php" class="back-link">← Cancel & Back to User List</a>

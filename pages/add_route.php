@@ -181,46 +181,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_route'])) {
         <h2>Register New Trip Route</h2>
         
         <!-- FORM start: Sending to 'add_route.php' via POST -->
-        <form method="POST">
+        <form method="POST" id="addRouteForm" onsubmit="return validateForm()">
             <!-- Box 1: Start Location -->
             <div class="form-group">
                 <label>From (Source City)</label>
-                <input type="text" name="from_location" placeholder="e.g. Nairobi, Kenya" required>
+                <input type="text" name="from_location" id="from_location" placeholder="e.g. Nairobi, Kenya" onmouseout="validateFrom()">
             </div>
             
             <!-- Box 2: Destination -->
             <div class="form-group">
                 <label>To (Destination City)</label>
-                <input type="text" name="to_location" placeholder="e.g. Kampala, Uganda" required>
+                <input type="text" name="to_location" id="to_location" placeholder="e.g. Kampala, Uganda" onmouseout="validateTo()">
             </div>
             
             <!-- Box 3: Traveling Date -->
             <div class="form-group">
                 <label>Departure Date</label>
-                <input type="date" name="departure_date" required>
+                <input type="text" name="departure_date" id="departure_date" placeholder="YYYY-MM-DD" onmouseout="validateDate()">
             </div>
             
             <!-- Box 4: Traveling Time -->
             <div class="form-group">
                 <label>Departure Time</label>
-                <input type="time" name="departure_time" required>
+                <input type="text" name="departure_time" id="departure_time" placeholder="HH:MM" onmouseout="validateTime()">
             </div>
             
             <!-- Box 5: Seat Price -->
             <div class="form-group">
                 <label>Ticket Cost (KSH)</label>
-                <input type="number" name="cost" step="0.01" placeholder="99.99" required>
+                <!-- type="text" to avoid browser's built-in number/step validation -->
+                <input type="text" name="cost" id="cost" placeholder="99.99" onmouseout="validateCost()">
             </div>
             
             <!-- Box 6: Bus ID -->
             <div class="form-group">
                 <label>Assign Bus (System ID)</label>
-                <input type="number" name="bus_id" placeholder="Look up IDs in Bus Fleet Management" required>
+                <input type="text" name="bus_id" id="bus_id" placeholder="Look up IDs in Bus Fleet Management" onmouseout="validateBusId()">
             </div>
             
             <!-- Action Button -->
             <button type="submit" name="add_route" class="btn-submit">Save Route to Database</button>
         </form>
+
+        <script>
+            // Custom JavaScript validation for Admin Add Route Form
+            function validateFrom() {
+                var val = document.getElementById("from_location").value.trim();
+                if (val.length < 3) {
+                    alert("Please enter a valid source city (min 3 characters).");
+                    document.getElementById("from_location").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateTo() {
+                var val = document.getElementById("to_location").value.trim();
+                if (val.length < 3) {
+                    alert("Please enter a valid destination city (min 3 characters).");
+                    document.getElementById("to_location").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateDate() {
+                var val = document.getElementById("departure_date").value.trim();
+                var regex = /^\d{4}-\d{2}-\d{2}$/;
+                if (!regex.test(val)) {
+                    alert("Please enter departure date in YYYY-MM-DD format.");
+                    document.getElementById("departure_date").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateTime() {
+                var val = document.getElementById("departure_time").value.trim();
+                var regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+                if (!regex.test(val)) {
+                    alert("Please enter departure time in HH:MM (24h) format.");
+                    document.getElementById("departure_time").focus();
+                    return false;
+                }
+                return true;
+            }
+
+
+            function validateCost() {
+                var val = document.getElementById("cost").value;
+                if (val == "" || isNaN(val) || parseFloat(val) <= 0) {
+                    alert("Please enter a valid positive cost amount.");
+                    document.getElementById("cost").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateBusId() {
+                var val = document.getElementById("bus_id").value;
+                if (val == "" || isNaN(val) || parseInt(val) <= 0) {
+                    alert("Please enter a valid numeric Bus System ID.");
+                    document.getElementById("bus_id").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateForm() {
+                if (!validateFrom()) return false;
+                if (!validateTo()) return false;
+                if (!validateDate()) return false;
+                if (!validateTime()) return false;
+                if (!validateCost()) return false;
+                if (!validateBusId()) return false;
+                return true;
+            }
+        </script>
+
 
         <!-- Navigation Button -->
         <a href="dashboard.php" class="back-btn">← Cancel & Back to Dashboard</a>

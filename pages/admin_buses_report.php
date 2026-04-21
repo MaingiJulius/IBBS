@@ -87,12 +87,55 @@ if (isset($_POST['assign_driver'])) {                                // [37] Act
 
         <div class="add-form">                                       <!-- [78] Open registration form. -->
             <h3>Fleet Registration Form</h3>                         <!-- [79] Form title. -->
-            <form method="POST"><div class="form-row">               <!-- [80] Open form layout. -->
-                <div class="form-group"><label>Vehicle Plate No.</label><input type="text" name="reg_no" class="input" required placeholder="e.g. KCA 001Z"></div> <!-- [81] Plate entry. -->
-                <div class="form-group"><label>Bus Display Name</label><input type="text" name="bus_name" class="input" required placeholder="e.g. Scania Luxury"></div> <!-- [82] Name entry. -->
-                <div class="form-group"><label>Total Seat Count</label><input type="number" name="max_passengers" class="input" required value="40" min="10" max="100"></div> <!-- [83] Cap entry. -->
-            </div><button type="submit" name="add_bus" class="button regular-button pink-background" style="margin-top: 15px;">Add Vehicle to Fleet</button></form> <!-- [84] Save btn. -->
+            <form method="POST" id="busForm" onsubmit="return validateForm()">
+                <div class="form-row">               <!-- [80] Open form layout. -->
+                    <div class="form-group"><label>Vehicle Plate No.</label><input type="text" name="reg_no" id="reg_no" class="input" placeholder="e.g. KCA 001Z" onmouseout="validatePlate()"></div> <!-- [81] Plate entry. -->
+                    <div class="form-group"><label>Bus Display Name</label><input type="text" name="bus_name" id="bus_name" class="input" placeholder="e.g. Scania Luxury" onmouseout="validateBusName()"></div> <!-- [82] Name entry. -->
+                    <div class="form-group"><label>Total Seat Count</label><input type="text" name="max_passengers" id="max_passengers" class="input" value="40" onmouseout="validateCapacity()"></div> <!-- [83] Cap entry. -->
+                </div><button type="submit" name="add_bus" class="button regular-button pink-background" style="margin-top: 15px;">Add Vehicle to Fleet</button>
+            </form> <!-- [84] Save btn. -->
         </div>                                                       <!-- [85] End form. -->
+
+        <script>
+            // Custom JS Validation for Bus Fleet Registration
+            function validatePlate() {
+                var val = document.getElementById("reg_no").value.trim();
+                if (val.length < 5) {
+                    alert("Please enter a valid vehicle plate number (min 5 characters).");
+                    document.getElementById("reg_no").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateBusName() {
+                var val = document.getElementById("bus_name").value.trim();
+                if (val.length < 3) {
+                    alert("Please enter a valid bus display name (min 3 characters).");
+                    document.getElementById("bus_name").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateCapacity() {
+                var val = document.getElementById("max_passengers").value.trim();
+                if (val == "" || isNaN(val) || parseInt(val) < 10 || parseInt(val) > 100) {
+                    alert("Please enter a valid numeric seat capacity between 10 and 100.");
+                    document.getElementById("max_passengers").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateForm() {
+                if (!validatePlate()) return false;
+                if (!validateBusName()) return false;
+                if (!validateCapacity()) return false;
+                return true;
+            }
+        </script>
+
 
         <table class="crud-table">                                   <!-- [86] Start fleet grid. -->
             <thead><tr><th>Ref ID</th><th>Bus Identity</th><th>Plate Number</th><th>Capacity</th><th>Crew Assignment (Driver)</th><th>Operations</th></tr></thead> <!-- [87] Head. -->

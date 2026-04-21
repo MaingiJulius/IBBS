@@ -78,19 +78,96 @@ if (isset($_POST['update_user'])) {                                  // [26] Act
         <h2 style="color: var(--purple); text-align: center;">Edit User Details</h2> <!-- [67] Header. -->
         <?php if($err): ?><p style="color: red; text-align: center;"><?= $err ?></p><?php endif; ?> <!-- [68] Conditional error display. -->
 
-        <form method="POST">                                             <!-- [69] Start update form definition. -->
-            <div class="form-group"><label>First Name</label><input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" required></div> <!-- [70] Pre-filled first name. -->
-            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" required></div> <!-- [71] Pre-filled last name. -->
-            <div class="form-group"><label>Email Address</label><input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required></div> <!-- [72] Pre-filled email. -->
-            <div class="form-group"><label>Phone Number</label><input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" required></div> <!-- [73] Pre-filled phone. -->
-            <div class="form-group"><label>Role</label><select name="role"> <!-- [74] Role state selection logic. -->
+        <form method="POST" id="editUserForm" onsubmit="return validateForm()">                                             <!-- [69] Start update form definition. -->
+            <div class="form-group"><label>First Name</label><input type="text" name="first_name" id="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" onmouseout="validateFirstName()"></div> <!-- [70] Pre-filled first name. -->
+            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" id="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" onmouseout="validateLastName()"></div> <!-- [71] Pre-filled last name. -->
+            <div class="form-group"><label>Email Address</label><input type="text" name="email" id="email" value="<?= htmlspecialchars($user['email']) ?>" onmouseout="validateEmail()"></div> <!-- [72] Pre-filled email. -->
+            <div class="form-group"><label>Phone Number</label><input type="text" name="phone_number" id="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" onmouseout="validatePhoneNumber()"></div> <!-- [73] Pre-filled phone. -->
+            <div class="form-group"><label>Role</label><select name="role" id="role" onmouseout="validateRole()"> <!-- [74] Role state selection logic. -->
                 <option value="PASSENGER" <?= ($user['role'] == 'PASSENGER') ? 'selected' : '' ?>>PASSENGER</option> <!-- [75] Choice: PASSENGER. -->
                 <option value="AGENT" <?= ($user['role'] == 'AGENT') ? 'selected' : '' ?>>AGENT</option> <!-- [76] Choice: AGENT. -->
                 <option value="ADMIN" <?= ($user['role'] == 'ADMIN') ? 'selected' : '' ?>>ADMIN</option> <!-- [77] Choice: ADMIN. -->
             </select></div>                                              <!-- [78] End role selection. -->
-            <div class="form-group"><label>New Password (Leave blank to keep current)</label><input type="password" name="password" placeholder="Enter new password only if changing"></div> <!-- [79] Optional password field. -->
+            <div class="form-group"><label>New Password (Leave blank to keep current)</label><input type="password" name="password" id="password" placeholder="Enter new password only if changing" onmouseout="validatePassword()"></div> <!-- [79] Optional password field. -->
             <div style="display: flex; gap: 10px;"><button type="submit" name="update_user" class="button regular-button pink-background" style="flex: 1;">Update User</button><a href="view_users_sorted.php" class="button regular-button" style="background: #999; text-decoration: none; text-align: center;">Cancel</a></div> <!-- [80] Action controls. -->
         </form>                                                          <!-- [81] End form. -->
+
+        <script>
+            // Custom JavaScript validation for Admin Edit User Form
+            function validateFirstName() {
+                var val = document.getElementById("first_name").value.trim();
+                if (val.length == 0) {
+                    alert("First Name cannot be empty.");
+                    document.getElementById("first_name").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateLastName() {
+                var val = document.getElementById("last_name").value.trim();
+                if (val.length == 0) {
+                    alert("Last Name cannot be empty.");
+                    document.getElementById("last_name").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateEmail() {
+                var email = document.getElementById("email").value.trim();
+                if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+                    alert("Please enter a valid email address.");
+                    document.getElementById("email").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validatePhoneNumber() {
+                var phone = document.getElementById("phone_number").value.trim();
+                if (phone.length < 9 || isNaN(phone)) {
+                    alert("Please enter a valid phone number.");
+                    document.getElementById("phone_number").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateRole() {
+                var role = document.getElementById("role").value;
+                if (role == "") {
+                    alert("Please select a user role.");
+                    return false;
+                }
+                return true;
+            }
+
+            function validatePassword() {
+                var password = document.getElementById("password").value;
+                if (password.length > 0) {
+                    // If changing, enforce strength
+                    var strengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                    if (!strengthRegex.test(password)) {
+                        alert("The new password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character (@$!%*?&)");
+                        document.getElementById("password").focus();
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            function validateForm() {
+                if (!validateFirstName()) return false;
+                if (!validateLastName()) return false;
+                if (!validateEmail()) return false;
+                if (!validatePhoneNumber()) return false;
+                if (!validateRole()) return false;
+                if (!validatePassword()) return false;
+                return true;
+            }
+        </script>
+
     </div>                                                               <!-- [82] End modification card. -->
 
     <div style="height: 100px;"></div><script src="js/footer.js"></script> <!-- [83] Screen spacing and footer injection. -->

@@ -30,7 +30,7 @@ $sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departur
         FROM bookings b 
         JOIN routes r ON b.route_id = r.route_id 
         JOIN buses bs ON b.bus_id = bs.bus_id 
-        WHERE b.user_id = ? AND b.booking_status = 'PAID' 
+        WHERE b.user_id = ? AND b.booking_status IN ('PAID', 'CHECKED_IN') 
         ORDER BY r.departure_date DESC"; 
 
 $stmt = $conn->prepare($sql);                                        // Prepare template.
@@ -139,6 +139,33 @@ $result = $stmt->get_result();                                       // [25] Cap
             printWindow.document.write('<script>window.onload = function() { window.print(); window.close(); };<\/script></body></html>');
             printWindow.document.close(); // [10] Finalize the output stream.
         }                                                            // [L143] Close the printSelectedTicket function block.
+
+        // Custom JS Validation for Inline Updates
+        function validatePID(bookingId) {
+            var val = document.getElementById("pid-" + bookingId).value.trim();
+            if (val == "") {
+                alert("ID/PASSPORT/BIRTH CERT. NO is required");
+                document.getElementById("pid-" + bookingId).focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateAge(bookingId) {
+            var val = document.getElementById("age-" + bookingId).value.trim();
+            if (val == "" || isNaN(val) || parseInt(val) <= 0) {
+                alert("A valid numeric age is required.");
+                document.getElementById("age-" + bookingId).focus();
+                return false;
+            }
+            return true;
+        }
+
+        function validateInlineForm(bookingId) {
+            if (!validatePID(bookingId)) return false;
+            if (!validateAge(bookingId)) return false;
+            return true;
+        }
     </script>                                                        <!-- [L144] Terminate the JavaScript logic section. -->
 </head>                                                              <!-- [44] Close the document head metadata section. -->
                                                                      <!-- [L146] Blank line for readability. -->
@@ -153,7 +180,12 @@ $result = $stmt->get_result();                                       // [25] Cap
         <?php while($ticket = $result->fetch_assoc()): ?>            <!-- [L154] Start row loop to fetch individual ticket details. -->
             <div class="ticket-card" id="ticket-<?= $ticket['booking_id'] ?>"> <!-- [L155] Unique card container with dynamic ID. -->                <div class="ticket-info">                            <!-- [53] detail section. -->
                     <div class="booking-id-badge">ID: #<?= $ticket['booking_id'] ?></div>
-                    <h3><?= htmlspecialchars($ticket['from_location']) ?> → <?= htmlspecialchars($ticket['to_location']) ?></h3> 
+                    <h3>
+                        <?= htmlspecialchars($ticket['from_location']) ?> → <?= htmlspecialchars($ticket['to_location']) ?>
+                        <?php if ($ticket['booking_status'] === 'CHECKED_IN'): ?>
+                            <span style="color: #059669; font-size: 0.9rem; margin-left: 10px; background: #d1fae5; padding: 4px 10px; border-radius: 20px; font-weight: 800; border: 1px solid #10b981;">(CHECKED IN)</span>
+                        <?php endif; ?>
+                    </h3> 
                     <p><strong>📅 Departure:</strong> <?= $ticket['departure_date'] ?> | <strong>⏰ Time:</strong> <?= $ticket['departure_time'] ?></p> 
                     <p><strong>💺 Seat:</strong> <span style="color:var(--purple); font-weight:bold;"><?= $ticket['seat_number'] ?></span> | <strong>🚌 Coach:</strong> <?= htmlspecialchars($ticket['bus_name']) ?></p> 
                     <p><strong>👤 Traveler:</strong> <?= htmlspecialchars($ticket['passenger_name'] ?: $_SESSION['name']) ?></p> <!-- [L161] Display passenger name or account default. -->
@@ -161,29 +193,48 @@ $result = $stmt->get_result();                                       // [25] Cap
                         <strong>🆔 ID/Passport:</strong>             <!-- [L163] Field label for identity document. -->                        <!-- [RETROACTIVE UPDATE LOGIC] -->
                         <!-- If passenger ID is missing, provide an inline form to capture data. -->
                         <?php if (empty($ticket['passenger_id_number'])): ?>
-                            <form action="op_update_passenger_details.php" method="POST" style="display:inline-block; margin:0; vertical-align:middle;">
+                            <form action="op_update_passenger_details.php" method="POST" id="updateForm-<?= $ticket['booking_id'] ?>" style="display:inline-block; margin:0; vertical-align:middle;" onsubmit="return validateInlineForm(<?= $ticket['booking_id'] ?>)">
                                 <input type="hidden" name="booking_id" value="<?= $ticket['booking_id'] ?>">
                                 <input type="hidden" name="redirect_to" value="view_tickets.php">
                                 <!-- ID Field -->
-                                <input type="text" name="passenger_id_number" placeholder="Enter ID..." required style="width:100px; padding:2px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem;">
+                                <input type="text" name="passenger_id_number" id="pid-<?= $ticket['booking_id'] ?>" placeholder="ID/PASSPORT/BIRTH CERT. NO" style="width:100px; padding:2px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem;" onmouseout="validatePID(<?= $ticket['booking_id'] ?>)">
                                 | <strong>🎂 Age:</strong>
                                 <!-- Age Field -->
-                                <input type="number" name="passenger_age" placeholder="Age" required style="width:50px; padding:2px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem;">
+                                <input type="text" name="passenger_age" id="age-<?= $ticket['booking_id'] ?>" placeholder="Age" style="width:50px; padding:2px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem;" onmouseout="validateAge(<?= $ticket['booking_id'] ?>)">
                                 <!-- Save Button: Transmits to op_update_passenger_details.php -->
                                 <button type="submit" style="background:#48bb78; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer; font-size:0.75rem; margin-left:5px; font-weight:bold;">Save Details</button>
                             </form>
                         <?php else: ?>
+
                             <!-- Display verified saved details -->
                             <?= htmlspecialchars($ticket['passenger_id_number']) ?> | <strong>🎂 Age:</strong> <?= htmlspecialchars($ticket['passenger_age']) ?>
                         <?php endif; ?>
                     </p>                                             <!-- [L182] Close the passenger data paragraph. -->
                 </div>                                               <!-- [183] Close the ticket information text block. -->
-                <div class="ticket-qr-section">                              <!-- [L184] Open the secondary action/QR section. -->
-                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px; width: 100%;"> <!-- [L185] Action button wrapper. -->
-                        <button class="print-btn" onclick="printSelectedTicket(<?= $ticket['booking_id'] ?>)" style="background: #9a4d9a; color: white; border: none; padding: 10px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: 700; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">🖨️ Print Ticket</button> <!-- [L186] Print trigger button. -->
-                        <a href="user_cancel_ticket.php?booking_id=<?= $ticket['booking_id'] ?>" class="button" style="background-color: #f59e0b; color: white; padding: 10px; text-decoration: none; border-radius: 50px; font-size: 0.85rem; font-weight: 700; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);" onclick="return confirm('CANCEL: Proceed irreversibly?')"> ❌ Cancel </a> <!-- [L187] Ticket cancellation link. -->
-                    </div>                                           <!-- [L188] Close action button wrapper. -->
-                </div>                                               <!-- [L189] Close the QR/action section div. -->
+                <div class="ticket-qr-section">
+                    <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px; width: 100%;">
+                        <?php 
+                        // [ROLE-BASED PERMISSION CHECK]
+                        // Passengers cannot cancel or print after check-in.
+                        // Admin/Agent retain full controls for administrative overrides.
+                        $isStaff = in_array($_SESSION['role'], ['ADMIN', 'AGENT']);
+                        $isPaid = ($ticket['booking_status'] === 'PAID');
+                        
+                        // Show controls if it's just PAID, OR if Staff is viewing a CHECKED_IN ticket.
+                        if ($isPaid || ($ticket['booking_status'] === 'CHECKED_IN' && $isStaff)): 
+                        ?>
+                            <button class="print-btn" onclick="printSelectedTicket(<?= $ticket['booking_id'] ?>)" style="background: #9a4d9a; color: white; border: none; padding: 10px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: 700; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);">🖨️ Print Ticket</button>
+                            <a href="user_cancel_ticket.php?booking_id=<?= $ticket['booking_id'] ?>" class="button" style="background-color: #f59e0b; color: white; padding: 10px; text-decoration: none; border-radius: 50px; font-size: 0.85rem; font-weight: 700; text-align: center; box-shadow: 2px 2px 5px rgba(0,0,0,0.2);" onclick="return confirm('CANCEL: Proceed irreversibly?')"> ❌ Cancel </a>
+                        <?php elseif ($ticket['booking_status'] === 'CHECKED_IN' && !$isStaff): ?>
+                            <!-- Display Verification Badge to Passenger -->
+                            <div style="background: #f0fdf4; color: #166534; padding: 12px; border-radius: 12px; font-size: 0.75rem; text-align:center; font-weight: 800; border: 1px solid #10b981;">
+                                ✅ BOARDING VERIFIED <br>
+                                <span style="font-weight: 400; font-size: 0.7rem;">Please proceed to your seat.</span>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                                               <!-- [L189] Close the QR/action section div. -->
             </div>                                                   <!-- [L190] Close the entire ticket card container. -->        <?php endwhile; ?>                                           <!-- [67] Terminate the while loop that iterates through and renders the user's active ticket result set. -->
     <?php else: ?>                                                   <!-- [68] Execute this alternative block if the database returned zero active booking results for the current logged-in user. -->
         <div class="empty-state">                                    <!-- [69] Open a styled div container wrapper to display the empty state placeholder content. -->

@@ -146,6 +146,40 @@ if ($is_staff) {                                                     // [30] Che
 <div style="height: 100px;"></div>                                   <!-- [134] Scrolling buffer. -->
     <script src="js/footer.js"></script>                                 <!-- [135] site footer script. -->
     <script src="js/table_manager.js"></script>
+<script>
+// [MOD] Custom Validation Functions for Passengers
+// This function validates the passenger name field
+function validatePaxName(input) {
+    if (input.value.trim().length == 0) { // Check if name is empty
+        alert("Passenger Name is required"); // Alert user
+        input.focus(); // Focus back to input
+        return false;
+    }
+    return true;
+}
+
+// This function validates the passenger age field
+function validatePaxAge(input) {
+    var age = input.value.trim(); // Get age value
+    // Check if empty, not a number, or outside reasonable range
+    if (age.length == 0 || isNaN(age) || parseInt(age) < 0 || parseInt(age) > 120) {
+        alert("Please enter a valid age (0-120)"); // Alert user
+        input.focus(); // Focus back to input
+        return false;
+    }
+    return true;
+}
+
+// This function validates the passenger ID field
+function validatePaxId(input) {
+    if (input.value.trim().length == 0) { // Check if ID is empty
+        alert("ID/PASSPORT/BIRTH CERT. NO is required"); // Alert user
+        input.focus(); // Focus back to input
+        return false;
+    }
+    return true;
+}
+</script>
 
 <script>                                                             /* [136] Start high-orchestration Client-Side Application Logic. */
 let currentRouteId = null;                                           // [137] Track the global state: Trip currently in-focus.
@@ -233,7 +267,7 @@ function updatePassengerDataForms() {                                 // [188] U
         card.className = 'passenger-info-card';                      // [204] apply style.
         card.dataset.seat = seatId;                                  // [205] tag metadata for identification.
         const saved = draftData[seatId] || { name: '', age: '', id: '' }; // [206] hydration: restore data from memory draft if available.
-        card.innerHTML = `<h4>Reservation: Seat ${seatId}</h4><div class="info-grid"><div class="info-group"><label>Traveller Name</label><input type="text" class="p-name" value="${saved.name}" placeholder="Full Legal Name" required oninput="updateBookingButton()"></div><div class="info-group"><label>Age</label><input type="number" class="p-age" value="${saved.age}" placeholder="e.g. 25" required oninput="updateBookingButton()"></div><div class="info-group"><label>ID / Identity Number</label><input type="text" class="p-id" value="${saved.id}" placeholder="ID or Passport" required oninput="updateBookingButton()"></div></div>`; // [207] build internal HTML template.
+        card.innerHTML = `<h4>Reservation: Seat ${seatId}</h4><div class="info-grid"><div class="info-group"><label>Traveller Name</label><input type="text" class="p-name" value="${saved.name}" placeholder="Full Legal Name" onmouseout="validatePaxName(this)" oninput="updateBookingButton()"></div><div class="info-group"><label>Age</label><input type="text" class="p-age" value="${saved.age}" placeholder="e.g. 25" onmouseout="validatePaxAge(this)" oninput="updateBookingButton()"></div><div class="info-group"><label>ID / PASSPORT / BIRTH CERT. NO</label><input type="text" class="p-id" value="${saved.id}" placeholder="ID/PASSPORT/BIRTH CERT. NO" onmouseout="validatePaxId(this)" oninput="updateBookingButton()"></div></div>`; // [207] build internal HTML template.
         container.appendChild(card);                                 // [208] finalize injection: mount card into form container.
     });                                                              // [209] close rendering iteration.
 }                                                                    // [210] close function.
@@ -260,18 +294,9 @@ function submitBooking() {                                           // [225] Fu
         const ageInput = card.querySelector('.p-age');               // [229.4] Locate the age number input element within this card.
         const idInput = card.querySelector('.p-id');                 // [229.5] Locate the ID/Identity text input element within this card.
 
-        if (!nameInput.checkValidity()) {                            // [231] Check if the browser considers the name input valid (e.g., not empty).
-            nameInput.reportValidity();                              // [231.1] Trigger the browser's native validation bubble message directly on the name input box.
-            return;                                                  // [231.2] Exit the function immediately to halt submission until corrected.
-        }                                                            // [231.3] End of name validity check.
-        if (!ageInput.checkValidity()) {                             // [231.4] Check if the browser considers the age input valid.
-            ageInput.reportValidity();                               // [231.5] Trigger the native validation bubble message directly on the age input box.
-            return;                                                  // [231.6] Exit the function immediately to halt submission.
-        }                                                            // [231.7] End of age validity check.
-        if (!idInput.checkValidity()) {                              // [231.8] Check if the browser considers the identity input valid.
-            idInput.reportValidity();                                // [231.9] Trigger the native validation bubble message directly on the ID input box.
-            return;                                                  // [232.0] Exit the function immediately to halt submission.
-        }                                                            // [232.1] End of identity validity check.
+        if (!validatePaxName(nameInput)) return; 
+        if (!validatePaxAge(ageInput)) return;
+        if (!validatePaxId(idInput)) return;
 
         payloadArray.push({ seat_id: card.dataset.seat, name: nameInput.value.trim(), age: ageInput.value.trim(), id: idInput.value.trim() }); // [232.8] Construct and append a passenger data object to the payload array.
     }                                                                // [233] Terminate the passenger card validation and serialization loop.

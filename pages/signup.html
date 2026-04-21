@@ -44,30 +44,30 @@
       <!-- signup.html Form: This collects user data and sends it to the server for permanent storage. -->
       <!-- action="account2.php": Tells the browser to send data to the account processing script. -->
       <!-- method="POST": Sends data securely in the background (hidden from the URL bar). -->
-      <form class="form" action="account2.php" method="POST" autocomplete="off">
+      <form class="form" id="signupForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
 
         <!-- FIRST NAME -->
         <label for="first_name" class="label">First Name</label> <!-- UI Label. -->
-        <input type="text" name="first_name" id="first_name" class="input" required />
+        <input type="text" name="first_name" id="first_name" class="input" onmouseout="validateFirstName();" />
         <!-- Text input for personal name. -->
 
         <!-- LAST NAME -->
         <label for="last_name" class="label">Last Name</label> <!-- UI Label. -->
-        <input type="text" name="last_name" id="last_name" class="input" required />
+        <input type="text" name="last_name" id="last_name" class="input" onmouseout="validateLastName();" />
         <!-- Text input for family name. -->
 
         <!-- EMAIL ADDRESS -->
         <label for="email" class="label">Email</label> <!-- UI Label. -->
-        <input type="text" name="email" id="email" class="input" /> <!-- User's unique identification email. -->
+        <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();" /> <!-- User's unique identification email. -->
 
         <!-- PHONE NUMBER (Added for SMS notifications/contact) -->
         <label for="phone_number" class="label">Phone Number</label> <!-- UI Label. -->
-        <input type="text" name="phone_number" id="phone_number" class="input" placeholder="e.g. 0712345678" required />
+        <input type="text" name="phone_number" id="phone_number" class="input" placeholder="e.g. 0712345678" onmouseout="validatePhoneNumber();" />
         <!-- Contact phone. -->
 
         <!-- PASSWORD -->
         <label for="password" class="label">Password</label> <!-- UI Label. -->
-        <input type="password" name="password" id="password" class="input" required />
+        <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();" />
         <!-- Secure password field (dots appear). -->
         <!-- Security hint text to improve user account strength. -->
         <p style="font-size: 0.85rem; color: gray; margin-bottom: 1rem;">
@@ -80,6 +80,79 @@
           Sign up
         </button>
       </form>
+
+      <script>
+        // Custom JavaScript validation for Registration Form
+        // Validates First Name
+        function validateFirstName() {
+          var fname = document.getElementById("first_name").value; // Capture first name
+          if (fname.length == 0) { // Check if empty
+            alert("First Name is required");
+            document.getElementById("first_name").focus(); // Focus on error field
+            return false;
+          }
+          return true;
+        }
+
+        // Validates Last Name
+        function validateLastName() {
+          var lname = document.getElementById("last_name").value; // Capture last name
+          if (lname.length == 0) { // Check if empty
+            alert("Last Name is required");
+            document.getElementById("last_name").focus();
+            return false;
+          }
+          return true;
+        }
+
+        // Validates Email Format
+        function validateEmail() {
+          var email = document.getElementById("email").value;
+          if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+            alert("Please enter a valid email address");
+            document.getElementById("email").focus();
+            return false;
+          }
+          return true;
+        }
+
+        // Validates Phone Number (Assuming Kenyan format or simple 10-digit check)
+        function validatePhoneNumber() {
+          var phone = document.getElementById("phone_number").value;
+          // Check if numeric and between 9 to 13 characters (allowing for international codes)
+          if (phone.length < 9 || isNaN(phone)) {
+            alert("Please enter a valid phone number (numeric only, at least 9 digits)");
+            document.getElementById("phone_number").focus();
+            return false;
+          }
+          return true;
+        }
+
+        // Validates Password Strength (TIGHT VALIDATION)
+        function validatePassword() {
+          var password = document.getElementById("password").value;
+          // Regex for: Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+          var strengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+          if (!strengthRegex.test(password)) {
+            alert("Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character (@$!%*?&)");
+            document.getElementById("password").focus();
+            return false;
+          }
+          return true;
+        }
+
+        // Main caller function for form submission
+        function validateForm() {
+          var rtned = true;
+          rtned = validateFirstName();
+          if (rtned == true) rtned = validateLastName();
+          if (rtned == true) rtned = validateEmail();
+          if (rtned == true) rtned = validatePhoneNumber();
+          if (rtned == true) rtned = validatePassword();
+          return rtned; // Only submits if all checks pass
+        }
+      </script>
+
 
       <p class="login-prompt">
         Already have an account?

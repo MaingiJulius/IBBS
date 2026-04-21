@@ -85,20 +85,97 @@ if (isset($_POST['add_route'])) {                                    // [25] Act
 
         <div class="add-form">                                           <!-- [77] Start route creation form. -->
             <h3>🆕 Initialize New travel path</h3>                        <!-- [78] heading. -->
-            <form method="POST">                                         <!-- [79] Start form POST submission. -->
+            <form method="POST" id="routeForm" onsubmit="return validateForm()">
                 <div class="form-row">                                   <!-- [80] start grid row. -->
-                    <div class="form-group"><label>Departure City/Country</label><input type="text" name="from_location" class="input" required placeholder="Kisumu, Kenya"></div> <!-- [81] from. -->
-                    <div class="form-group"><label>Arrival Endpoint</label><input type="text" name="to_location" class="input" required placeholder="Kampala, Uganda"></div> <!-- [82] to. -->
-                    <div class="form-group"><label>Calendar date</label><input type="date" name="departure_date" class="input" required></div> <!-- [83] date. -->
-                    <div class="form-group"><label>Departure time</label><input type="time" name="departure_time" class="input" required></div> <!-- [84] time. -->
-                    <div class="form-group"><label>Ticket Price (KES)</label><input type="number" name="cost" class="input" required step="0.01"></div> <!-- [85] cost. -->
-                    <div class="form-group"><label>Fleet Assignment</label><select name="bus_id" class="input" required style="cursor: pointer;"> <!-- [86] fleet dropdown. -->
+                    <div class="form-group"><label>Departure City/Country</label><input type="text" name="from_location" id="from_location" class="input" placeholder="Kisumu, Kenya" onmouseout="validateFrom()"></div> <!-- [81] from. -->
+                    <div class="form-group"><label>Arrival Endpoint</label><input type="text" name="to_location" id="to_location" class="input" placeholder="Kampala, Uganda" onmouseout="validateTo()"></div> <!-- [82] to. -->
+                    <div class="form-group"><label>Calendar date</label><input type="text" name="departure_date" id="departure_date" class="input" placeholder="YYYY-MM-DD" onmouseout="validateDate()"></div> <!-- [83] date. -->
+                    <div class="form-group"><label>Departure time</label><input type="text" name="departure_time" id="departure_time" class="input" placeholder="HH:MM" onmouseout="validateTime()"></div> <!-- [84] time. -->
+                    <div class="form-group"><label>Ticket Price (KES)</label><input type="text" name="cost" id="cost" class="input" placeholder="0.00" onmouseout="validateCost()"></div> <!-- [85] cost. -->
+                    <div class="form-group"><label>Fleet Assignment</label><select name="bus_id" id="bus_id" class="input" style="cursor: pointer;" onmouseout="validateBusId()"> <!-- [86] fleet dropdown. -->
+                        <option value="">Select Bus...</option>
                         <?php $buses = $conn->query("SELECT bus_id, bus_name FROM buses ORDER BY bus_name ASC"); while($b = $buses->fetch_assoc()) { echo "<option value='{$b['bus_id']}'>{$b['bus_name']} (Fleet {$b['bus_id']})</option>"; } ?> <!-- [87] populate buses. -->
                     </select></div>                                      <!-- [88] close select. -->
                 </div>                                                   <!-- [89] end grid row. -->
                 <button type="submit" name="add_route" class="button regular-button pink-background" style="margin-top:25px; padding:12px 40px; font-weight:800;">COMMIT travel Path</button> <!-- [90] submit. -->
             </form>                                                      <!-- [91] end form. -->
         </div>                                                           <!-- [92] end form area. -->
+
+        <script>
+            // Custom JS Validation for Route Management
+            function validateFrom() {
+                var val = document.getElementById("from_location").value.trim();
+                if (val == "") {
+                    alert("Departure City is required.");
+                    document.getElementById("from_location").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateTo() {
+                var val = document.getElementById("to_location").value.trim();
+                if (val == "") {
+                    alert("Arrival Endpoint is required.");
+                    document.getElementById("to_location").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateDate() {
+                var val = document.getElementById("departure_date").value.trim();
+                var regex = /^\d{4}-\d{2}-\d{2}$/;
+                if (!regex.test(val)) {
+                    alert("Departure Date must be in YYYY-MM-DD format.");
+                    document.getElementById("departure_date").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateTime() {
+                var val = document.getElementById("departure_time").value.trim();
+                var regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+                if (!regex.test(val)) {
+                    alert("Departure Time must be in HH:MM (24h) format.");
+                    document.getElementById("departure_time").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateCost() {
+                var val = document.getElementById("cost").value.trim();
+                if (val == "" || isNaN(val) || parseFloat(val) <= 0) {
+                    alert("A valid numeric cost is required.");
+                    document.getElementById("cost").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateBusId() {
+                var val = document.getElementById("bus_id").value;
+                if (val == "") {
+                    alert("Please assign a fleet vehicle.");
+                    document.getElementById("bus_id").focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function validateForm() {
+                if (!validateFrom()) return false;
+                if (!validateTo()) return false;
+                if (!validateDate()) return false;
+                if (!validateTime()) return false;
+                if (!validateCost()) return false;
+                if (!validateBusId()) return false;
+                return true;
+            }
+        </script>
+
 
         <table class="crud-table">                                       <!-- [93] Open schedule inventory grid. -->
             <thead><tr><th>Ref ID</th><th>Source</th><th>Destination</th><th>Travel Date</th><th>Time</th><th>Fleet</th><th>Pricing</th><th>Moderation</th></tr></thead> <!-- [94] head labels. -->
