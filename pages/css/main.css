@@ -29,13 +29,15 @@
 }
 
 /* --- GLOBAL RESET --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
 body { /* Targeted styles for the entire page body. */
   margin: 0; /* Removes default browser margin (white space around the edges). */
   padding: 0; /* Removes default browser padding. */
-  font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Sets a playful, rounded typography style. */
-  /* Comic Sans MS is the primary choice; Chalkboard SE is the Mac fallback; sans-serif is the generic system fallback. */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* Sets a modern, premium typography style. */
   background-color: var(--body-bg); /* Applies the global pink background defined in the :root variables. */
   color: var(--text-color); /* Applies the global dark purple text color for all content. */
+  line-height: 1.6;
 }
 
 /* --- HEADER / BANNER --- */
@@ -87,34 +89,57 @@ body { /* Targeted styles for the entire page body. */
 .dropdown-content {
   display: none;
   position: absolute;
-  background-color: #f9f9f9;
-  min-width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  background-color: #ffffff;
+  min-width: 240px;
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
   z-index: 1000;
-  border-radius: 8px;
-  top: 100%;
+  border-radius: 12px;
+  top: calc(100% + 5px);
   left: 50%;
   transform: translateX(-50%);
   padding: 10px 0;
   text-align: left;
+  border: 1px solid rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+/* Show class for JS-controlled toggling */
+.dropdown-content.show {
+  display: block;
+  animation: dropdownFade 0.2s ease-out;
+}
+
+@keyframes dropdownFade {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 #nav-links .dropdown-content a {
-  color: #000000 !important; /* Force black for maximum visibility */
-  padding: 8px 16px;
+  color: #333333 !important;
+  padding: 12px 20px;
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin: 0;
-  font-size: 0.85rem;
-  transition: background-color 0.2s;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
-.dropdown-content a:hover {
-  background-color: #f1f1f1;
+/* User requirement: Darker background on hover */
+#nav-links .dropdown-content a:hover {
+  background-color: #f3f4f6;
+  color: var(--purple) !important;
   text-decoration: none !important;
+  padding-left: 25px; /* Subtle micro-animation */
 }
 
+/* Remove hover-only display */
 .dropdown:hover .dropdown-content {
+  display: none; 
+}
+.dropdown:hover .dropdown-content.show {
   display: block;
 }
 

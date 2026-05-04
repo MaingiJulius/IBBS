@@ -6,6 +6,7 @@
  */
 
 require_once 'db_connection.php';
+require_once 'logger.php';
 session_start();
 
 // Security: Only ADMIN and AGENT can reset passwords
@@ -27,6 +28,8 @@ if (isset($_GET['user_id'])) {
     $stmt->bind_param("si", $hashed_pass, $uid); // [5] Bind the hashed string and integer ID.
 
     if ($stmt->execute()) {
+        // [AUDIT LOG] Record the modification.
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Reset Password for User ID $uid to default");
         // [6] Format success message and redirect back with feedback.
         $msg = "Success: Password for User ID " . $uid . " has been reset to '123456'.";
         header("Location: view_users_sorted.php?msg=" . urlencode($msg));

@@ -5,7 +5,9 @@
 // This script is used by staff to remove a travel schedule from the database.
 
 // Include the database connection.
+session_start();
 require_once 'db_connection.php';
+require_once 'logger.php';
 
 // ACTION: This runs when staff clicks 'Delete' on a route.
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -17,6 +19,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("i", $route_id);
 
     if ($stmt->execute()) {
+        // [AUDIT LOG] Record the operation.
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Travel Route (ID: $route_id)");
         // Success!
         echo "Route deleted successfully.";
     } else {

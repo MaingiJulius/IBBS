@@ -5,6 +5,7 @@
  */
 
 require_once 'db_connection.php';
+require_once 'logger.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -57,6 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("si", $new_hashed, $user_id);
     
     if ($stmt->execute()) {
+        // [AUDIT LOG] Record the self-service password update.
+        logActivity($user_id, $_SESSION['name'], 'UPDATE', "Self-service password change successful.");
+
         // [9] Feedback: Redirect with success status on completion.
         header("Location: profile.php?status=success");
     } else {

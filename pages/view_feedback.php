@@ -10,6 +10,7 @@
  */                                                                  // [10] Close multi-line documentation block.
 
 require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
+require_once 'logger.php';                                           // [11.5] Import logging utility for audit trail.
 session_start();                                                    // [12] Initialize or resume user session to identify the administrative officer.
 
 if (!isset($_SESSION['role']) || ($_SESSION['role'] != 'ADMIN' && $_SESSION['role'] != 'AGENT')) { // [13] Restrict access to authenticated STAFF (Admin/Agent) only.
@@ -20,6 +21,10 @@ if (isset($_GET['delete_feedback'])) {                               // [16] Act
     $fid = $_GET['delete_feedback'];                                 // [17] Map the targeted feedback ID to a local variable.
     $stmt = $conn->prepare("DELETE FROM feedback WHERE feedback_id = ?"); // [18] Prepare a secure SQL template for record removal.
     $stmt->bind_param("i", $fid);                                    // [19] Safely inject the ID integer into the query template.
+    
+    // [AUDIT LOG] Record the deletion before execution.
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Customer Feedback (FID: $fid)");
+
     $stmt->execute();                                                // [20] Commit the destructive command to the database engine.
     $stmt->close();                                                  // [21] Release database resources.
     header("Location: view_feedback.php?msg=Success: Customer sentiment entry has been permanently DELETED."); // [22] Redirect with confirmation message.

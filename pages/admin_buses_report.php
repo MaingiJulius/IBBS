@@ -10,6 +10,7 @@
  */                                                                  // [10] Close multi-line documentation block.
 
 require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
+require_once 'logger.php';                                           // [11.5] Import logging utility for audit trail.
 session_start();                                                    // [12] Initialize or resume user session to identify the administrative officer.
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {      // [13] Security Barrier: Verify requester identity and 'ADMIN' credential.
@@ -32,6 +33,10 @@ if (isset($_GET['remove_bus'])) {                                    // [27] Act
     $bus_id = $_GET['remove_bus'];                                   // [28] Capture: Target vehicle ID from URL parameter.
     $stmt_del = $conn->prepare("DELETE FROM buses WHERE bus_id = ?"); // [29] Prepare secure SQL deletion statement.
     $stmt_del->bind_param("i", $bus_id);                             // [30] Bind target ID to statement.
+    
+    // [AUDIT LOG] Record the deletion.
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Bus from Fleet (ID: $bus_id)");
+
     if($stmt_del->execute()) { $msg = "Success: Bus record permanently removed from fleet."; } // [31] Attempt execution and log success.
     else { $msg = "Error: Database Integrity Violation. This bus is still assigned to active routes. Please delete or re-assign those routes before removing the vehicle."; } // [32] Log failure (likely active route dependencies).
     $stmt_del->close();                                              // [33] Release resource memory.
@@ -44,6 +49,10 @@ if (isset($_POST['assign_driver'])) {                                // [37] Act
     $driver_id = !empty($_POST['driver_id']) ? $_POST['driver_id'] : null; // [39] Logik: Map selection to ID or NULL for de-assignment.
     $stmt_upd = $conn->prepare("UPDATE buses SET driver_id = ? WHERE bus_id = ?"); // [40] Prepare secure SQL update command.
     $stmt_upd->bind_param("ii", $driver_id, $bus_id);                // [41] Bind integers to statement placeholders.
+    
+    // [AUDIT LOG] Record the assignment update.
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Updated Driver Assignment for Bus ID: $bus_id");
+
     $stmt_upd->execute();                                            // [42] Commit staff change to the fleet ledger.
     $stmt_upd->close();                                              // [43] Release statement resource.
     header('Location: admin_buses_report.php?msg=Staff Update: Driver assignment refreshed.'); // [44] Refresh page with update status.

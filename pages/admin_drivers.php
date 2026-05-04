@@ -8,6 +8,7 @@
  */                                                                  // [8] Close multi-line documentation block.
 
 require_once 'db_connection.php';                                    // [9] Import database bridge object ($conn) for MySQL communication.
+require_once 'logger.php';                                           // [9.5] Import logging utility for audit trail.
 session_start();                                                    // [10] Initialize or resume user session to identify the administrative officer.
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {      // [11] Security Barrier: Verify requester identity and 'ADMIN' credential.
@@ -31,6 +32,10 @@ if (isset($_GET['remove_driver'])) {                                 // [26] Act
     $driver_id = $_GET['remove_driver'];                             // [27] Capture: Target driver ID from URL parameter.
     $stmt_rem = $conn->prepare("DELETE FROM drivers WHERE driver_id = ?"); // [28] Prepare secure SQL deletion statement.
     $stmt_rem->bind_param("i", $driver_id);                          // [29] Bind target ID to statement.
+    
+    // [AUDIT LOG] Record the deletion.
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Driver Record (DID: $driver_id)");
+
     if($stmt_rem->execute()) { $msg = "Success: Driver has been removed from the registry."; } // [30] Attempt execution and log success.
     else { $msg = "Error: This driver is currently assigned to a bus. Please update the bus fleet before deletion."; } // [31] Log failure (likely FK constraint).
     $stmt_rem->close();                                              // [32] Release memory.

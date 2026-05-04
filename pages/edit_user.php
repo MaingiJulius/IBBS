@@ -6,6 +6,7 @@
  */                                                                  // [6] Close multi-line documentation block.
 
 require_once 'db_connection.php';                                    // [7] Import database bridge object ($conn) for MySQL communication.
+require_once 'logger.php';                                           // [7.5] Import the logging utility for auditing operations.
 session_start();                                                    // [8] Initialize or resume user session to identify the administrative officer.
 
 if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) { // [9] Security Barrier: Verify requester identity and staff role.
@@ -49,6 +50,8 @@ if (isset($_POST['update_user'])) {                                  // [26] Act
     }                                                                // [42] End logic branch.
 
     if ($stmt_upd->execute()) {                                      // [43] Attempt to commit the modified record to the database.
+        // [AUDIT LOG] Record the modification.
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Modified User Profile (UID: $target_id)");
         header("Location: view_users_sorted.php?msg=System: User profile updated successfully."); // [44] Case: Success. Redirect to list.
         exit();                                                      // [45] Halt further execution.
     } else { $err = "Critical Database Failure: " . $conn->error; } // [46] Case: Failure. Log the technical error.

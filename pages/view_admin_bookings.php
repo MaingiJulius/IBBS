@@ -10,6 +10,7 @@
  */                                                                  // [10] Close multi-line documentation block.
 
 require_once 'db_connection.php';                                    // [11] Import the database bridge object ($conn) for MySQL communication.
+require_once 'logger.php';                                           // [11.5] Import logging utility for audit trail.
 session_start();                                                    // [12] Initialize or resume the user session to identify the requester.
 
 /* --- [3] ACCESS WALL: STAFF ONLY area --- */                       // [13] Marker for the primary security access control check.
@@ -22,6 +23,10 @@ if (isset($_GET['cancel_booking'])) {                                // [18] Det
     $bid = $_GET['cancel_booking'];                                  // [19] Capture the target booking ID from the GET global array.
     $stmt = $conn->prepare("UPDATE bookings SET booking_status = 'CANCELLED' WHERE booking_id = ?"); // [20] Prepare SQL command.
     $stmt->bind_param("i", $bid);                                    // [21] Safely bind the integer ID to prevent SQL injection.
+    
+    // [AUDIT LOG] Record the cancellation.
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Cancelled Ticket Booking (BID: $bid)");
+
     $stmt->execute();                                                // [22] Execute the status update on the database server.
     $stmt->close();                                                  // [23] Release the statement resource to save server memory.
     header("Location: view_admin_bookings.php?msg=Ticket sequence has been successfully CANCELLED."); // [24] Redirect with success message.
@@ -33,6 +38,10 @@ if (isset($_GET['delete_booking'])) {                                // [28] Det
     $bid = $_GET['delete_booking'];                                  // [29] Capture the target booking ID for hard destruction.
     $stmt = $conn->prepare("DELETE FROM bookings WHERE booking_id = ?"); // [30] Prepare the destructive SQL DELETE command.
     $stmt->bind_param("i", $bid);                                    // [31] Safely bind the integer ID to the prepared statement.
+    
+    // [AUDIT LOG] Record the deletion.
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Permanently Deleted Booking Record (BID: $bid)");
+
     $stmt->execute();                                                // [32] Execute the deletion on the database server.
     $stmt->close();                                                  // [33] Reach completion and close the statement resource.
     header("Location: view_admin_bookings.php?msg=Historical record permanently DELETED."); // [34] Redirect with success alert.

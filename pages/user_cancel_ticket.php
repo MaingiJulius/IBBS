@@ -10,7 +10,7 @@
  */                                                                  // [10] Close the multi-line documentation block.
                                                                      // [11] Empty line for code readability.
 require_once 'db_connection.php';                                    // [12] Import the database connection code to allow interaction with the MySQL server.
-                                                                     // [13] Empty line for code readability.
+require_once 'logger.php';                                           // [12.5] Import the activity logging utility.
 session_start();                                                     // [14] Initialize or resume the current session to access the active user's credentials.
                                                                      // [15] Empty line for code readability.
 /* --- [3] AUTHENTICATION DEFENSE --- */                             // [16] Section marker: Enforcing access control and user authentication rules.
@@ -35,6 +35,9 @@ if (isset($_GET['booking_id'])) {                                    // [27] Che
                                                                      // [35] Empty line for code readability.
     if ($stmt->execute()) {                                          // [36] Execute the prepared SQL statement against the database and check if execution succeeded.
         if ($stmt->affected_rows > 0) {                              // [37] Evaluate if any database rows were actually changed (meaning the ticket was found and belonged to the user).
+            // [AUDIT LOG] Record the user-initiated cancellation.
+            logActivity($user_id, $_SESSION['name'], 'UPDATE', "User-initiated Ticket Cancellation (BID: $booking_id)");
+
             $msg = "Success: Your travel ticket has been voided successfully."; // [38] Set the success notification message variable since rows were updated.
         } else {                                                     // [39] Otherwise, if no rows were updated, it means either the ticket doesn't exist or it doesn't belong to this user.
             $msg = "Security Error: Ticket not found or access denied for this record."; // [40] Set a security error message notifying that the operation failed ownership validation.

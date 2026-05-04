@@ -11,6 +11,7 @@
 
 // [1] DATABASE BRIDGE: Import the $conn connection configuration.   // [11] Documentation for the database integration step.
 require_once 'db_connection.php';                                    // [12] Import the database bridge object ($conn) for MySQL communication.
+require_once 'logger.php';                                           // [12.5] Import the logging utility for auditing operations.
 
 // [2] SESSION STATE: Start the engine to track who is currently accessing the page. // [13] Documentation for session handling.
 session_start();                                                    // [14] Initialize or resume the user session to identify the requester.
@@ -46,8 +47,9 @@ if (isset($_GET['delete_user'])) {                                   // [27] Det
         // BIND: Inject the user ID safely as an integer ('i').        // [39] Documentation for binding.
         $stmt->bind_param("i", $uid);                                // [40] Bind the target ID to the placeholder as an integer.
         // EXECUTE: Command the database to remove the matching record. // [41] Documentation for execution.
-        $stmt->execute();                                            // [42] Commit the deletion on the database server.
-        // TEARDOWN: Close the statement instance.                    // [43] Documentation for cleanup.
+        // [AUDIT LOG] Record the deletion before final teardown.
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed User Record (UID: $uid)");
+
         $stmt->close();                                              // [44] Release the statement resource.
         
         // Success Redirection: Refresh the list with a confirmation note. // [45] Documentation for success redirect.

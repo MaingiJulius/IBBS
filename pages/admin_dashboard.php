@@ -49,20 +49,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {      // [9] Ac
             <p>Authorized access granted to: <strong><?= htmlspecialchars($_SESSION['name']) ?></strong></p> 
         </div>                                                           
 
-        <div class="admin-options">                                      <!-- [46] Start operational grid. -->
-            <div class="card" style="border: 2px solid var(--purple); background: #fdfaff;"><h3>Ticket Verification</h3><p>Real-time boarding control. Scan or enter Booking IDs to authorize passenger entry.</p><a href="admin_verify_ticket.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white;">Open Verification Hub</a></div> <!-- [46.1] verification. -->
-            <div class="card"><h3>Walk-in Booking</h3><p>Register tickets for customers who arrive at the station without a mobile account.</p><a href="book.php" class="button regular-button green-background" style="text-decoration:none;">Open Booking Desk</a></div> <!-- [47] Booking. -->
-            <div class="card"><h3>User Accounts</h3><p>Full control over passengers, agents, and other administrators.</p><a href="view_users_sorted.php" class="button regular-button pink-background" style="text-decoration:none;">Manage Identities</a></div> <!-- [48] Auth. -->
-            <div class="card"><h3>Trip Routes</h3><p>Define departure cities, destinations, and adjust ticket prices dynamically.</p><a href="view_routes.php" class="button regular-button pink-background" style="text-decoration:none;">Manage Network</a></div> <!-- [49] Logistics. -->
-            <div class="card"><h3>Global Bookings</h3><p>Audit every ticket sold and process manual cancellations if requested.</p><a href="view_admin_bookings.php" class="button regular-button pink-background" style="text-decoration:none;">Audit Tickets</a></div> <!-- [50] ledger. -->
-            <div class="card"><h3>Crew Management</h3><p>Maintain the official registry of licensed bus drivers and their contacts.</p><a href="admin_drivers.php" class="button regular-button pink-background" style="text-decoration:none;">Manage Crew</a></div> <!-- [51] HR. -->
-            <div class="card"><h3>Fleet Assets</h3><p>Register new physical buses and assign specific drivers to vehicles.</p><a href="admin_buses_report.php" class="button regular-button pink-background" style="text-decoration:none;">Manage Assets</a></div> <!-- [52] fleet. -->
-            <div class="card"><h3>User Feedback</h3><p>Read customer reviews and moderate any inappropriate content.</p><a href="view_feedback.php" class="button regular-button pink-background" style="text-decoration:none;">Review Ratings</a></div> <!-- [53] feedback. -->
-            <div class="card"><h3>Revenue Insights</h3><p>High-level report of income generated across all routes and time periods.</p><a href="view_revenue_report.php" class="button regular-button pink-background" style="text-decoration:none;">View Cashflow</a></div> <!-- [54] fiscal. -->
-            <div class="card"><h3>Vehicle Occupancy</h3><p>Real-time look at how full each bus is to optimize departure schedules.</p><a href="view_bus_occupancy.php" class="button regular-button pink-background" style="text-decoration:none;">Check Capacity</a></div> <!-- [55] occupancy. -->
-            <div class="card"><h3>Agent Sales</h3><p>Leaderboard and performance metrics for ticket agents in the field.</p><a href="view_agent_sales.php" class="button regular-button pink-background" style="text-decoration:none;">Sales Metrics</a></div> <!-- [56] sales. -->
-            <div class="card"><h3>Insights</h3><p>View detailed, time-bound reports on ticket sales and booking trends.</p><a href="admin_insights.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white;">View Analytics</a></div> <!-- [57] analytics. -->
-        </div>                                                           <!-- [58] End grid. -->
+        <div style="text-align: center; padding: 40px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #e1e8ed;">
+            <h3 style="color: var(--purple);">Welcome to the Control Center</h3>
+            <p style="color: #5a6b7d;">All administrative tools and reports are now organized in the navigation bar above.</p>
+            <p style="color: #5a6b7d;">Select a category (<strong>Manage Actors</strong>, <strong>Logistics</strong>, or <strong>Reports</strong>) to begin your operations.</p>
+        </div>
     </div>                                                               <!-- [59] End container. -->
 
     <div style="height: 100px;"></div>                                   <!-- [60] buffer. -->

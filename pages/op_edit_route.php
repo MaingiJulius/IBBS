@@ -10,7 +10,9 @@
  */
 
 // [1] ARCHITECTURE: Establish the database communication handle ($conn).
+session_start();
 require_once 'db_connection.php';
+require_once 'logger.php';
 
 /* --- [2] TRANSACTIONAL LOGIC: UPDATE HANDLER --- */
 
@@ -62,6 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
      * Transmit the finalized and sanitized update command to the MySQL engine.
      */
     if ($stmt->execute()) {
+        // [AUDIT LOG] Record the modification.
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Modified Travel Route (ID: $route_id)");
         /**
          * SUCCESS CALLBACK:
          * Informs the client-side UI of a successful database write operation.
