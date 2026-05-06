@@ -1,30 +1,38 @@
 <?php
-// =================================================================
-// OPERATION: REMOVE DRIVER
-// =================================================================
-// This script is used by Admins to delete a driver from the system.
+/**
+ * ADMINISTRATIVE OPERATION: REMOVE DRIVER (op_remove_driver.php)
+ * Purpose: This script allows the admin to delete a driver from the system.
+ * It ensures the driver is removed from the database based on their ID.
+ */
 
-// Include the database connection.
+// [1] Include the database connection so we can talk to the 'drivers' table.
 require_once 'db_connection.php';
 
-// ACTION: This runs when an Admin clicks 'Delete' on a driver.
-// It receives the 'driver_id' via a POST request.
+// [2] Check if the request is a POST submission (from a management form).
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // [3] Capture the unique ID of the driver that needs to be deleted.
     $driver_id = $_POST['driver_id'];
 
-    // We use a DELETE command in SQL.
-    // NOTE: If this driver is currently assigned to a bus, this will fail for safety.
+    // [4] Prepare the SQL DELETE command.
+    // Using a '?' (Prepared Statement) is a key security feature to prevent hacking.
     $stmt = $conn->prepare("DELETE FROM drivers WHERE driver_id = ?");
+    
+    // [5] Bind the captured driver ID as an integer ('i').
     $stmt->bind_param("i", $driver_id);
 
+    // [6] Run the command.
     if ($stmt->execute()) {
-        // If it worked, send a success message.
-        echo "Driver removed successfully.";
+        // SUCCESS: The driver was deleted. Show a confirmation message.
+        echo "Success: The driver record has been removed from the system.";
     } else {
-        // If it failed (usually because they are assigned to a bus), send an error.
-        echo "Error: Cannot remove driver. They might be assigned to a bus.";
+        // FAIL: Usually happens if the driver is 'In Use' (e.g., assigned to a bus).
+        // This is a safety feature of the database.
+        echo "Error: Could not remove driver. They may still be assigned to an active bus.";
     }
-    // Clean up.
+    
+    // [7] Close the statement and clean up server resources.
     $stmt->close();
 }
 ?>
+

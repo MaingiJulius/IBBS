@@ -1,20 +1,30 @@
 <?php
-// This is a simple script used to log a user out of the system.
+/**
+ * SYSTEM LOGOUT SCRIPT (logout.php)
+ * Purpose: This script is used to securely end a user's session.
+ * It clears all saved data so that no one else can use the same browser to access the account.
+ */
 
-// First, we need to access the current session (our virtual notebook).
+// [1] ACCESS SESSION: We must first call session_start() to access the current 'User Notebook'.
+// You cannot clear a session if you haven't opened it first.
 session_start();
 
-// session_unset() clears all the information we stored in the session variables.
-// It's like erasing everything written in the notebook.
+// [2] CLEAR VARIABLES: session_unset() removes all the keys we stored (like user_id, role, name).
+// This makes the 'Notebook' blank, so the system no longer knows who the user is.
 session_unset();
 
-// session_destroy() completely throws away the session.
-// It's like shredding the notebook so no one can read it later.
+// [3] DESTROY SESSION: session_destroy() completely deletes the session file from the server.
+// This is the final step to ensure the login session is totally killed.
 session_destroy();
 
-// After cleaning up, we send the user back to the login page.
+/**
+ * [4] REDIRECT: Now that the user is officially logged out, we send them back 
+ * to the landing page (login.html) so they can log in again if they want.
+ */
 header("Location: login.html");
 
-// We use exit() to make sure the script stops running immediately.
+// [5] HALT EXECUTION: We use exit() to make sure no more code runs after the redirect.
+// This is a security best practice.
 exit();
 ?>
+
