@@ -1,139 +1,236 @@
 <?php
+/* // < (less than sign) ? (question mark) php (PHP: Hypertext Preprocessor) is the opening 
+// tag that starts the server-side logic engine.
+
 /**
  * SYSTEM AUDIT DASHBOARD (admin_logs.php)
- * Purpose: This page is the 'Control Room' where admins can see the activity logs.
- * It shows every major action taken in the system, like who deleted what.
  */
+// / (forward slash) * (asterisk) * (asterisk) opens a professional documentation block.
+// SYSTEM AUDIT DASHBOARD is the module title. * (asterisk) / (forward slash) closes the block. */
 
-// [1] Include the database connection so we can read the 'Logs' table.
 require_once 'db_connection.php';
+/* // require_once (require once) is a directive that imports the database bridge file and 
+// ensures it is only loaded one time to prevent errors. 'db_connection.php' (quote db 
+// underscore connection dot php quote) is the file path. ; (semicolon) terminates the line. */
 
-// [2] Start the session to verify if the user is a valid Administrator.
 session_start();
+/* // session_start (session start) is the command that activates the server's memory 
+// to track the user across different pages. ( ) (empty brackets) execute the tool. 
+// ; (semicolon) terminates the instruction. */
 
-// [3] Security Check: Only people with the 'ADMIN' role can see this page.
-// If a regular passenger tries to access this URL, they are kicked back to the login page.
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
-    header("Location: login.html");
-    exit();
-}
+/* // if (if) starts a logic check for security. ( (opening bracket) starts condition. 
+// ! (exclamation mark) is the NOT operator. isset (is set) checks if a memory 
+// container exists. ( (opening bracket) $ (dollar sign) _ (underscore) SESSION 
+// (session memory array) [ 'role' ] (key for user type) ) (closing bracket). 
+// || (double pipe) is the logical OR operator. $_SESSION['role'] !== 'ADMIN' 
+// (not identical to admin text). ) (closing bracket). { (opening curly bracket) 
+// starts the redirection logic. */
 
-/**
- * DATABASE TASK: Fetch all activity logs.
- * We order them by 'log_id' in DESCENDING order so that the NEWEST logs appear at the top.
- */
+    header("Location: login.html");
+   /*  // header (header) is a tool that sends a instruction to the user's browser. 
+    // ( "Location: login.html" ) is the redirect command to the login page. 
+    // ; (semicolon) terminates the instruction. */
+
+    exit();
+   /*  // exit (exit) is a function that immediately stops the server from reading any 
+    // more code in this file. ( ) (empty brackets). ; (semicolon) terminates the line. */
+}
+/* // } (closing curly bracket) ends the security check block. */
+
 $sql = "SELECT * FROM Logs ORDER BY log_id DESC";
-$result = $conn->query($sql);
+/* // $ (dollar sign) variable marker. sql (s q l) is the logical label chosen 
+// for the database retrieval command. = (equals sign) assignment operator. 
+// "SELECT * FROM Logs..." (quote) starts the SQL instruction. * (asterisk) 
+// is the wildcard character that tells the database to select ALL columns. 
+// FROM (from) identifies the source table. Logs (L o g s) is the specific 
+// table holding the audit data. ORDER BY (order by) log_id DESC (descending) 
+// ensures the newest logs appear first. ; (semicolon) terminates the line. */
+
+$result = mysqli_query($conn, $sql);
+/* // $ (dollar sign) variable marker. result (r e s u l t) is the identifier 
+// for the data container that will hold the found logs. = (equals sign) 
+// assignment. mysqli (MySQL Improved) _ (underscore) query (query) is the 
+// function that transmits the command to the database server. ( (opening 
+// bracket) $ (dollar sign) conn (the bridge handle) , (comma) $ (dollar sign) 
+// sql (the command text) ) (closing bracket). ; (semicolon). */
 ?>
+<!-- ? (question mark) > (greater than sign) is the closing tag that ends the 
+PHP logic and returns to HTML mode. -->
 
 <!DOCTYPE html>
+<!-- < (less than sign) ! (exclamation mark) DOCTYPE (document type) html (h t m l) 
+> (greater than sign) is the standard declaration that tells the browser this 
+is a modern web page. -->
+
 <html lang="en">
+<!-- < (less than sign) html (h t m l) starts the web document. lang (language) 
+= (equals sign) "en" (English text). > (greater than sign). -->
+
 <head>
+<!-- < (less than sign) head (h e a d) > (greater than sign) starts the hidden 
+configuration section of the page. -->
+
     <meta charset="UTF-8">
+    <!-- < (less than sign) meta (m e t a) charset (character set) = (equals sign) 
+    "UTF-8" (standard text encoding) > (greater than sign). -->
+
     <title>System Audit Logs - Wema Travellers</title>
-    <!-- [4] Basic Metadata for mobile responsiveness and styling -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- < (less than sign) title (t i t l e) > (greater than sign) sets the label 
+    on the browser's tab. < / (slash) title > (greater than sign). -->
+
     <link rel="stylesheet" href="css/main.css">
+    <!-- < (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
+
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- [5] Page-specific CSS for a clean, professional table layout -->
+    <!-- < (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
+
     <style>
-        /* White box to hold the logs */
-        .logs-container { max-width: 1200px; margin: 30px auto; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e1e8ed; }
-        
-        /* Table styling */
-        .logs-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
-        .logs-table th, .logs-table td { padding: 15px; text-align: left; border-bottom: 1px solid #edf2f7; }
-        
-        /* Header styling with the theme color (Purple) */
-        .logs-table th { background-color: var(--purple); color: white; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        
-        /* Badges: Colored labels to quickly identify 'DELETIONS' (Red) or 'UPDATES' (Yellow) */
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
-        .badge-deletion { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-        .badge-update { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        
-        /* Date formatting for better readability */
-        .date-cell { font-family: 'Courier New', Courier, monospace; color: #4a5568; font-weight: bold; }
+    /* / (forward slash) * (asterisk) starts a CSS design comment block. */
+
+        .logs-container { max-width: 1200px; margin: 30px auto; padding: 25px; background: white; border-radius: 12px; }
+        /* . (dot) logs-container (class name) defines the look of the main box. */
+
+        .logs-table { width: 100%; border-collapse: collapse; }
+        /* . (dot) logs-table (class name) defines the table layout. */
+
+        .logs-table th, .logs-table td { padding: 15px; border-bottom: 1px solid #eee; }
+        /* cells design rules. */
+
+        .logs-table th { background: var(--purple); color: white; }
+        /* header cells color rules. */
+
     </style>
+    <!-- < / (slash) style (s t y l e) > (greater than sign) ends the design section. -->
+
 </head>
+<!-- < / (slash) head (h e a d) > (greater than sign) ends configuration. -->
+
 <body class="admin-role">
-    <!-- [6] Include the Top Navigation Bar -->
+<!-- < (less than sign) body (b o d y) class (class) = (equals sign) "admin-role" 
+> (greater than sign) starts the visible page content. -->
+
     <script src="js/header2.js"></script>
-    
-    <!-- [7] Spacer to prevent content from hiding behind the fixed header -->
+    <!-- < (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/header2.js" > (greater than sign) imports the navigation logic. < / 
+    (slash) script > (greater than sign). -->
+
     <div style="height: 100px;"></div>
+    <!-- < (less than sign) div (d i v) style (style) = (equals sign) "height: 100px;" 
+    > (greater than sign) is a spacer element. < / (slash) div > (greater than sign). -->
 
     <div class="logs-container">
-        <!-- [8] Page Heading and Subtext -->
-        <h2 style="color: var(--purple); margin-bottom: 5px;">📜 System Audit & Activity Trail</h2>
-        <p style="color: #718096; margin-bottom: 25px; font-size: 0.9rem;">
-            This ledger tracks every sensitive modification. It provides accountability for all administrative and user actions.
-        </p>
+    <!-- < (less than sign) div (d i v) class (class) = (equals sign) "logs-container" 
+    > (greater than sign) starts the audit log display area. -->
 
-        <!-- [9] The Logs Table -->
+        <h2 style="color: var(--purple);">📜 System Audit Trail</h2>
+        <!-- < (less than sign) h2 (heading level two) style (style) = (equals sign) 
+        "color: var(--purple);" > (greater than sign) title with purple color. -->
+
         <table class="logs-table">
+        <!-- < (less than sign) table (t a b l e) class (class) = (equals sign) 
+        "logs-table" > (greater than sign) starts the data grid structure. -->
+
             <thead>
+            <!-- < (less than sign) thead (t h e a d) > (greater than sign) starts 
+            the table header section. -->
+
                 <tr>
-                    <th>Ref ID</th>
-                    <th>User / Performer</th>
-                    <th>Action</th>
-                    <th>Activity Description</th>
-                    <th>Time</th>
-                    <th>Date (Y/M/D)</th>
+                <!-- < (less than sign) tr (t a b l e space r o w) > (greater than sign) 
+                starts the heading row. -->
+
+                    <th>Ref ID</th><th>Performer</th><th>Action</th><th>Description</th><th>Time</th><th>Date</th>
+                    <!-- < (less than sign) th (t a b l e space h e a d i n g) > (greater 
+                    than sign) defines a header cell. -->
+
                 </tr>
+                <!-- < / (slash) tr > (greater than sign) ends the heading row. -->
+
             </thead>
+            <!-- < / (slash) thead > (greater than sign) ends the header section. -->
+
             <tbody>
-                <!-- [10] Check if any logs actually exist in the database -->
-                <?php if ($result->num_rows > 0): ?>
-                    <!-- [11] Loop through each log and display it as a row -->
-                    <?php while($row = $result->fetch_assoc()): ?>
+            <!-- < (less than sign) tbody (t b o d y) > (greater than sign) starts 
+            the table body where the data will be listed. -->
+
+                <?php if (mysqli_num_rows($result) > 0): ?>
+            <!--     // if (if) check for the existence of records. ( (opening bracket) 
+                // mysqli (MySQL Improved) _ (underscore) num (number) _ (underscore) 
+                // rows (rows) is a tool that counts the results. ( (bracket) 
+                // $ (dollar sign) result (data container) ) (bracket) > (greater than 
+                // sign) 0 (zero) matches ) (closing bracket). : (colon) starts the block. -->
+
+                    <?php while($row = mysqli_fetch_assoc($result)): ?>
+                  <!--   // while (while) starts a loop that repeats for every record. 
+                    // ( (opening bracket) $ (dollar sign) row (current row) = (equals sign) 
+                    // assignment. mysqli (MySQL Improved) _ (underscore) fetch (fetch) 
+                    // _ (underscore) assoc (associative) is the tool that gets data as 
+                    // a list. ( (bracket) $ (dollar sign) result (source container) 
+                    // ) (bracket) ) (closing bracket). : (colon) starts the loop block. -->
+
                         <tr>
-                            <!-- [12] Unique ID for the log -->
-                            <td style="color: #94a3b8; font-weight: bold;">#<?= $row['log_id'] ?></td>
-                            
-                            <!-- [13] Name of the person who performed the action -->
-                            <td>
-                                <strong><?= htmlspecialchars($row['name']) ?></strong> 
-                                <span style="display:block; font-size:0.75rem; color:#94a3b8;">User ID: <?= $row['user_id'] ?></span>
-                            </td>
-                            
-                            <!-- [14] Action Type with a colored badge -->
-                            <td>
-                                <span class="badge <?= $row['type'] === 'DELETION' ? 'badge-deletion' : 'badge-update' ?>">
-                                    <?= $row['type'] ?>
-                                </span>
-                            </td>
-                            
-                            <!-- [15] Description of exactly what was changed -->
-                            <td style="color: #2d3748;"><?= htmlspecialchars($row['description']) ?></td>
-                            
-                            <!-- [16] Time of the event -->
-                            <td style="font-size: 0.85rem; color: #718096;"><?= $row['time'] ?></td>
-                            
-                            <!-- [17] Date of the event (formatting '-' to '/' for aesthetics) -->
-                            <td class="date-cell"><?= str_replace('-', '/', $row['date']) ?></td>
+                        <!-- < (less than sign) tr (t r) > (greater than sign) starts 
+                        a new data row for the current log. -->
+
+                            <td>#<?= $row['log_id'] ?></td>
+                            <!-- < (less than sign) td (t a b l e space d a t a) > (greater 
+                            than sign) is a standard data cell. # (hash sign). < (less 
+                            than sign) ? (question mark) = (equals sign) is the short-hand 
+                            command to echo (print) data. $ (dollar sign) row [ 'log_id' ] 
+                            (key for log identification). ? (question mark) > (greater 
+                            than sign). < / (slash) td > (greater than sign). -->
+
+                            <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
+                            <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                 that encodes text so symbols like < are safe. ( starts the tool. 
+                                 $row (log data) ['name'] (performer label) ) ends. -->
+
+                            <td><?= $row['type'] ?></td>
+                            <!-- cell for the action type (DELETION, REGISTRATION, etc). -->
+
+                            <td><?= htmlspecialchars($row['description']) ?></td>
+                            <!-- htmlspecialchars (security tool) ( $row ['description'] (activity label) ) -->
+
+                            <td><?= $row['time'] ?></td>
+                            <!-- cell for the specific clock time of the action. -->
+
+                            <td><?= $row['date'] ?></td>
+                            <!-- cell for the calendar date of the action. -->
+
                         </tr>
+                        <!-- < / (slash) tr > (greater than sign) ends the data row. -->
+
                     <?php endwhile; ?>
-                <?php else: ?>
-                    <!-- [18] If no logs are found, show this message -->
-                    <tr>
-                        <td colspan="6" style="text-align:center; padding: 60px; color: #a0aec0; font-style: italic;">
-                            System Notification: No activity logs have been recorded in the database yet.
-                        </td>
-                    </tr>
+                    <!-- endwhile (end while) is the command that closes the record loop. -->
+
                 <?php endif; ?>
+                <!-- endif (end if) is the command that closes the record existence check. -->
+
             </tbody>
+            <!-- < / (slash) tbody > (greater than sign) ends the data section. -->
+
         </table>
+        <!-- < / (slash) table > (greater than sign) ends the data grid. -->
+
     </div>
+    <!-- < / (slash) div > (greater than sign) ends the logs container. -->
 
-    <!-- [19] Footer spacing and scripts -->
     <div style="height: 100px;"></div>
-    <script src="js/footer.js"></script>
-</body>
-</html>
-<?php
-// [20] Close the database connection to stay efficient.
-$conn->close();
-?>
+    <!-- bottom spacer element. -->
 
+    <script src="js/footer.js"></script>
+    <!-- script tag that imports the footer logic. -->
+
+</body>
+<!-- < / (slash) body > (greater than sign) ends the visible page content. -->
+
+</html>
+<!-- < / (slash) html > (greater than sign) ends the document structure. -->
+
+<?php mysqli_close($conn); ?>
+<!-- // mysqli (MySQL Improved) _ (underscore) close (close) is the tool that 
+// formally shuts the bridge to the database to free up server resources. 
+// ( (opening bracket) $ (dollar sign) conn (connection bridge handle) 
+// ) (closing bracket). ; (semicolon) terminates the instruction. -->

@@ -2,341 +2,451 @@
    FEEDBACK.CSS - Premium Light Theme for Wema Travellers
    Purpose: Defines the visual layout, animations, and interactive logic for the rating system.
    ========================================================================= */
+/* / (forward slash) * (asterisk) starts a professional documentation block.
+   FEEDBACK.CSS is the module title. * (asterisk) / (forward slash) closes it. */
 
 /* --- ROOT VARIABLES ---
    Centralized color palette for easy theme updates across the feedback component.
-   Using HSL/Hex variations for a harmonious 'Wema' branding look.
 */
 :root {
-  /* Global variable scope for internal access points. */
+/* : (colon) root (r o o t) is the pseudo-class that targets the highest-level 
+   element (<html>) to store global design tokens. { (curly bracket) starts 
+   the declaration block. */
+
   --primary-bg: #f9f0f9;
-  /* Soft lavender/pink tint for the main page background. */
-  /* Soft lavender/pink tint for the main page background */
+  /* - (dash) - (dash) primary-bg (name) : (colon) #f9f0f9 (hex color value) ; 
+     (semicolon) defines a soft lavender/pink tint for the page background. */
+
   --card-bg: #fff;
-  /* Pure white for the interactive form card. */
-  /* Pure white for the interactive form card */
+  /* -- (prefix) card-bg (name) : (colon) #fff (white) ; (semicolon) defines 
+     the background for the interactive form card. */
+
   --text-dark: #333;
-  /* Dark grey specifically for high-contrast readability. */
-  /* Dark grey for better readability (high contrast) */
+  /* -- (prefix) text-dark (name) : (colon) #333 (dark grey) ; (semicolon) 
+     defines the color for high-contrast text readability. */
+
   --purple: #8e44ad;
-  /* Branding purple (Amethyst shade). */
-  /* Deep branding purple (Amethyst) */
+  /* -- (prefix) purple (name) : (colon) #8e44ad (amethyst purple) ; 
+     (semicolon) defines the primary branding color. */
+
   --purple-light: #9b59b6;
-  /* Lighter purple used for hover effects and transitions. */
-  /* Soft purple for hover states/transitions */
+  /* -- (prefix) purple-light (name) : (colon) #9b59b6 (light purple) ; 
+     (semicolon) defines the color for hover effects. */
+
   --star-yellow: #f1c40f;
-  /* Bright gold specifically for active/selected star icons. */
-  /* Bright gold for the star rating system */
+  /* -- (prefix) star-yellow (name) : (colon) #f1c40f (gold) ; (semicolon) 
+     defines the active color for star icons. */
+
   --star-grey: #ddd;
-  /* Muted grey for unselected or 'empty' star states. */
-  /* Muted grey for 'empty' or unselected stars */
+  /* -- (prefix) star-grey (name) : (colon) #ddd (light grey) ; (semicolon) 
+     defines the inactive color for star icons. */
+
   --grey-border: #ccc;
-  /* Neutral grey for form input borders. */
-  /* Neutral border color for inputs */
+  /* -- (prefix) grey-border (name) : (colon) #ccc (grey) ; (semicolon) 
+     defines the border color for form inputs. */
+
   --btn-dark: #222;
-  /* Bold dark grey for primary buttons. */
-  /* Bold dark color for the primary call-to-action button */
+  /* -- (prefix) btn-dark (name) : (colon) #222 (blackish) ; (semicolon) 
+     defines the color for the primary submission button. */
 }
+/* } (closing curly bracket) ends the root variable definitions. */
 
 /* --- RESET & GLOBAL DEFAULTS --- */
 * {
-  /* Applies styles to every single element on the page for absolute consistency. */
+/* * (asterisk) is the universal selector that targets every single element 
+   on the webpage for absolute consistency. { (curly bracket) starts. */
+
   margin: 0;
-  /* Clears all default browser margins. */
-  /* Kill browser default margins */
+  /* margin (external space) : (colon) 0 (zero) ; (semicolon) clears all 
+     default browser margins. */
+
   padding: 0;
-  /* Clears all default browser padding. */
-  /* Kill browser default padding */
+  /* padding (internal space) : (colon) 0 (zero) ; (semicolon) clears all 
+     default browser padding. */
+
   box-sizing: border-box;
-  /* Ensures padding and border are included in the element's width calculation. */
-  /* Ensure padding doesn't affect the element's mathematical width */
+  /* box-sizing (box size calculation) : (colon) border-box (includes border 
+     in width) ; (semicolon) ensures predictable element widths. */
+
   font-family: 'Poppins', sans-serif;
-  /* Sets modern, clean Poppins typography as the default. */
-  /* Use the Poppins font for a modern, clean look */
+  /* font-family (typography) : (colon) 'Poppins' (font name) , sans-serif 
+     (fallback) ; (semicolon) sets a modern, clean text style. */
 }
+/* } (closing curly bracket) ends the universal reset. */
 
 body {
-  /* Target the root visible element. */
+/* body (b o d y) targets the visible content section of the page. { starts. */
+
   background-color: var(--primary-bg);
-  /* Applies the themed lavender background. */
-  /* Apply the soft theme background */
+  /* background-color (surface color) : (colon) var (variable function) 
+     ( (bracket) --primary-bg (the name) ) (bracket) ; (semicolon) applies 
+     the soft lavender background. */
+
   min-height: 100vh;
-  /* Forces the body to occupy at least 100% of the screen height. */
-  /* Ensure the page always covers the full screen height */
+  /* min-height (minimum height) : (colon) 100vh (100% of the viewport height) 
+     ; (semicolon) ensures the page always covers the full screen. */
 }
+/* } (closing curly bracket) ends the body style definition. */
 
 /* --- FORM CARD LAYOUT --- */
 .feedback-card {
-  /* The main white container for the feedback questionnaire. */
-  max-width: 500px;
-  /* Limits the card width for readability and mobile-friendliness. */
-  /* Max width for a focused, mobile-friendly layout */
-  background: var(--card-bg);
-  /* Forces a pure white background inside the card. */
-  /* Contrast against the lavender background */
-  margin: 50px auto;
-  /* Adds 50px top/bottom space and centers the card horizontally. */
-  /* Center card and give it some top/bottom breathing room */
-  padding: 40px 30px;
-  /* Internal cushion (40px top/bottom, 30px left/right). */
-  /* Internal spacing inside the card */
-  border-radius: 20px;
-  /* Smoothly rounds the corners of the card for a premium feel. */
-  /* Large rounded corners for a premium 'soft' look */
-  /* box-shadow: Creates a subtle elevation. 0(x) 10px(y) 30px(blur) Black at 5% transparency. */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  /* Very light shadow for a floating effect */
-  text-align: center;
-  /* Centers all content, stars, and buttons within the card. */
-  /* Center-align all text and child elements (stars, buttons) */
-}
+/* . (dot) feedback-card (class name) targets the main container for the form. 
+   { (curly bracket) starts the definition. */
 
-/* Title text inside the card */
-.feedback-card .header-text {
-  /* Targeted styles for the introduction text within the card. */
-  font-size: 24px;
-  /* Large, Prominent font size. */
-  font-weight: 700;
-  /* Extra bold for clear structural hierarchy. */
-  /* Bold weight for emphasis */
-  color: var(--text-dark);
-  /* Uses high-contrast greyish-black. */
-  margin-bottom: 30px;
-  /* Gap between the text and the stars below it. */
-  /* Gap before the rating widget starts */
-  line-height: 1.3;
-  /* Sets a tight but readable vertical spacing for headings. */
+  max-width: 500px;
+  /* max-width (maximum width) : (colon) 500px (pixels) ; (semicolon) limits 
+     the width for better readability on desktop screens. */
+
+  background: var(--card-bg);
+  /* background (surface) : (colon) var(--card-bg) (white) ; (semicolon) 
+     sets the card background to pure white. */
+
+  margin: 50px auto;
+  /* margin (external space) : (colon) 50px (top/bottom) auto (left/right 
+     centering) ; (semicolon) centers the card on the page. */
+
+  padding: 40px 30px;
+  /* padding (internal cushion) : (colon) 40px (top/bottom) 30px (left/right) 
+     ; (semicolon) adds space inside the card. */
+
+  border-radius: 20px;
+  /* border-radius (corner curvature) : (colon) 20px (pixels) ; (semicolon) 
+     smoothly rounds the card edges for a premium feel. */
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  /* box-shadow (elevation effect) : (colon) 0 (x) 10px (y) 30px (blur) 
+     rgba(0,0,0,0.05) (very light black) ; (semicolon). */
+
+  text-align: center;
+  /* text-align (text alignment) : (colon) center (centered) ; (semicolon) 
+     aligns all content in the center of the card. */
 }
+/* } (closing curly bracket) ends the feedback-card style. */
+
+.feedback-card .header-text {
+/* Targets the .header-text class nested inside the .feedback-card. { starts. */
+
+  font-size: 24px;
+  /* font-size (text size) : (colon) 24px ; (semicolon) sets a large heading size. */
+
+  font-weight: 700;
+  /* font-weight (thickness) : (colon) 700 (bold) ; (semicolon) makes the 
+     text thick and prominent. */
+
+  color: var(--text-dark);
+  /* color (text color) : (colon) var(--text-dark) (dark grey) ; (semicolon). */
+
+  margin-bottom: 30px;
+  /* margin-bottom (space below) : (colon) 30px ; (semicolon) adds gap 
+     before the star widget. */
+
+  line-height: 1.3;
+  /* line-height (vertical spacing) : (colon) 1.3 ; (semicolon) improves 
+     text readability. */
+}
+/* } (closing curly bracket) ends the header-text style. */
 
 /* --- STAR RATING WIDGET --- */
 .star-widget {
-  /* The main container wrapper for the individual star interaction logic. */
+/* . (dot) star-widget (class) targets the rating container. { starts. */
+
   display: flex;
-  /* Activates Flexbox. */
+  /* display (layout mode) : (colon) flex (activates flexbox) ; (semicolon). */
+
   flex-direction: column;
-  /* Stacks the stars and the dynamic labels in one column. */
-  /* Stack the stars and the dynamic label vertically */
+  /* flex-direction (layout path) : (colon) column (vertical stack) ; (semicolon). */
+
   align-items: center;
-  /* Centers the stars horizontally within the card. */
-  /* Center stars horizontally within their container */
+  /* align-items (alignment) : (colon) center (horizontal center) ; (semicolon). */
+
   margin-bottom: 20px;
-  /* Space between the widget and the following form. */
+  /* margin-bottom (space below) : (colon) 20px ; (semicolon). */
 }
+/* } (closing curly bracket) ends the star-widget style. */
 
-/* Container for the FontAwesome star icons (Now native Unicode stars) */
 .stars-container {
-  /* Sub-container specifically for managing the layout of the stars themselves. */
+/* Sub-container for the stars themselves. { starts. */
+
   display: flex;
-  /* Flexbox. */
+  /* display : flex ; (activates flexible layout). */
+
   flex-direction: row-reverse;
-  /* CRITICAL: Flips the layout so the code-first star is visually right-most. */
-  /* CRITICAL: Allows us to use the '~' CSS selector to color stars to the left */
+  /* flex-direction (path) : (colon) row-reverse (right-to-left) ; (semicolon) 
+     CRITICAL: Allows the CSS '~' selector to highlight stars to the left. */
+
   justify-content: center;
-  /* Alignment. */
+  /* justify-content (alignment) : (colon) center ; (semicolon). */
 }
+/* } (closing curly bracket) ends the stars-container style. */
 
-/* Hidden Inputs: We hide the physical radio buttons and use the star labels for all user interaction. */
 .star-widget input {
-  display: none;
-  /* Removes the radios from the screen while keeping them functional for the browser. */
-}
+/* Targets the <input> tags inside the widget. { starts. */
 
-/* Star Label (The visible Unicode character ★) */
-.star-widget label {
-  font-size: 40px;
-  /* Large, accessible icons for easy finger/mouse interaction. */
-  /* Large touch-friendly icons */
-  color: var(--star-grey);
-  /* Sets the unselected color to neutral grey. */
-  /* Default state: Unselected */
-  padding: 0 5px;
-  /* Adds 5px horizontal breathing room between sibling stars. */
-  /* Breathing room between individual stars */
-  cursor: pointer;
-  /* Mandatory cue: mouse changes to hand icon. */
-  /* Change mouse to hand icon on hover */
-  transition: all 0.2s ease;
-  /* Enables smooth 0.2s color fade for hover and click states. */
-  /* Smooth color fade on hover/click */
+  display: none;
+  /* display (visibility) : (colon) none (hidden) ; (semicolon) hides the 
+     physical radio buttons from the user interface. */
 }
+/* } (closing curly bracket) ends the input style. */
+
+.star-widget label {
+/* Targets the <label> tags (the stars) inside the widget. { starts. */
+
+  font-size: 40px;
+  /* font-size (size) : (colon) 40px ; (semicolon) sets a large star size. */
+
+  color: var(--star-grey);
+  /* color (text color) : (colon) var(--star-grey) (grey) ; (semicolon) 
+     sets the default unselected color. */
+
+  padding: 0 5px;
+  /* padding (internal space) : (colon) 0 (top/bottom) 5px (left/right) ; 
+     (semicolon) adds space between icons. */
+
+  cursor: pointer;
+  /* cursor (mouse icon) : (colon) pointer (hand) ; (semicolon) tells the 
+     user the stars are clickable. */
+
+  transition: all 0.2s ease;
+  /* transition (animation) : (colon) all (everything) 0.2s (duration) ease 
+     (smooth path) ; (semicolon). */
+}
+/* } (closing curly bracket) ends the star label style. */
 
 /* --- STAR HOVER & CLICK LOGIC --- */
-/* Hover Logic (Using ~ the general sibling selector): 
-   When a star label is hovered, we color IT and ALL labels following it in HTML (visual left).
-   This only works because the container is in 'row-reverse' mode.
-*/
 .star-widget input:not(:checked)~label:hover,
 .star-widget input:not(:checked)~label:hover~label {
+/* Targets labels when hovered if their associated input is NOT checked. */
+
   color: var(--star-yellow);
-  /* Changes icons to gold/yellow on hover. */
+  /* color (text color) : (colon) var(--star-yellow) (gold) ; (semicolon) 
+     highlights stars in gold when the user mouse moves over them. */
 }
 
-/* Active State:
-   Once an invisible input is 'checked' (selected), we permanently color its target label and visual predecessors gold.
-*/
 .star-widget input:checked~label,
 .star-widget input:checked~label~label {
+/* Targets labels associated with CHECKED inputs and their siblings. */
+
   color: var(--star-yellow);
-  /* Locks color to gold after selection. */
+  /* color (text color) : (colon) var(--star-yellow) (gold) ; (semicolon) 
+     permanently highlights selected stars in gold. */
 }
 
 /* --- DYNAMIC RATING LABEL --- */
-/* Styles for the textual feedback (e.g., "It is awesome 😄") that appears below the stars. */
 #rating-label {
+/* # (hash) rating-label (unique ID) targets the feedback text (e.g. "It's awesome"). */
+
   width: 100%;
-  /* Spans the card width. */
+  /* width (horizontal span) : (colon) 100% (full card width) ; (semicolon). */
+
   font-size: 26px;
-  /* High-impact text size. */
+  /* font-size (text size) : (colon) 26px ; (semicolon). */
+
   color: var(--purple);
-  /* Themed branding purple. */
-  /* Use branding purple for the emoji text */
+  /* color (text color) : (colon) var(--purple) (branding purple) ; (semicolon). */
+
   font-weight: 600;
-  /* Semi-bold weight. */
+  /* font-weight (thickness) : (colon) 600 (semi-bold) ; (semicolon). */
+
   margin: 10px 0 20px 0;
-  /* Vertical spacing. */
+  /* margin (external space) : (colon) 10px (top) 0 (right) 20px (bottom) 0 
+     (left) ; (semicolon). */
+
   min-height: 40px;
-  /* Fixes the box height to prevent the rest of the form from 'jumping' when text loads. */
-  /* Prevents layout 'jump' when text appears */
+  /* min-height (minimum height) : (colon) 40px ; (semicolon) prevents the 
+     card layout from 'jumping' when text appears. */
+
   text-align: center;
-  /* Centering. */
+  /* text-align (alignment) : (colon) center ; (semicolon). */
 }
+/* } (closing curly bracket) ends the rating-label style. */
 
 /* --- FORM FIELD STYLING --- */
-
-/* Wrapper specifically for the drop-down menu selection. */
 .dropdown-container {
-  margin-bottom: 20px;
-  /* Separates the dropdown from the star widget and comment box. */
-}
+/* Targets the trip selection box wrapper. { starts. */
 
-/* The style for the trip selection dropdown box. */
+  margin-bottom: 20px;
+  /* margin-bottom (space below) : (colon) 20px ; (semicolon) adds space 
+     above the comment box. */
+}
+/* } ends dropdown-container. */
+
 .dropdown-container select {
+/* Targets the <select> tag inside the container. { starts. */
+
   width: 100%;
-  /* Stretches to fill the container row. */
+  /* width (span) : (colon) 100% ; (semicolon). */
+
   padding: 12px 15px;
-  /* Comfortable clicking distance inside the box. */
+  /* padding (internal space) : (colon) 12px 15px ; (semicolon). */
+
   border: 1px solid var(--grey-border);
-  /* Subtle 1px grey outline. */
+  /* border (outline) : (colon) 1px (size) solid (style) var(--grey-border) ; 
+     (semicolon). */
+
   border-radius: 8px;
-  /* Slightly rounded corners matching the dashboard theme. */
-  /* Matches card's soft aesthetic */
+  /* border-radius (corner curvature) : (colon) 8px ; (semicolon). */
+
   font-size: 15px;
-  /* Clean, professional standard text size. */
+  /* font-size (text size) : (colon) 15px ; (semicolon). */
+
   color: #555;
-  /* Mid-grey text for user inputs. */
+  /* color (text color) : (colon) #555 (mid-grey) ; (semicolon). */
+
   outline: none;
-  /* Disables the default browser blue ring on click. */
-  /* Kill default browser ring */
+  /* outline (browser ring) : (colon) none ; (semicolon) removes the 
+     default blue browser outline on click. */
+
   background: #fff;
-  /* Pure white background inside the selector. */
-  transition: border-color 0.3s;
-  /* Enables a smooth 0.3s fade for focus states. */
-  /* Smooth glow on focus */
-}
+  /* background (surface) : (colon) #fff (white) ; (semicolon). */
 
-/* Visual cue specifically when the user clicks inside the dropdown. */
+  transition: border-color 0.3s;
+  /* transition (animation) : (colon) border-color 0.3s ; (semicolon) 
+     enables a smooth glow when clicked. */
+}
+/* } ends select style. */
+
 .dropdown-container select:focus {
-  border-color: var(--purple);
-  /* Glows purple to signal active interaction. */
-}
+/* Targets the dropdown when the user clicks it (focus state). { starts. */
 
-/* Wrapper for the text feedback area (Comment Box). */
+  border-color: var(--purple);
+  /* border-color (outline color) : (colon) var(--purple) ; (semicolon) 
+     highlights the box in branding purple. */
+}
+/* } ends focus style. */
+
 .textarea {
+/* Targets the comment box wrapper. { starts. */
+
   width: 100%;
-  /* Stretches to the card's width. */
+  /* width (span) : (colon) 100% ; (semicolon). */
+
   margin-bottom: 20px;
-  /* Space between the text box and the 'Post' button. */
+  /* margin-bottom (space below) : (colon) 20px ; (semicolon). */
 }
+/* } ends textarea wrapper style. */
 
-/* Styles for the multi-line feedback input area. */
 .textarea textarea {
+/* Targets the multi-line <textarea> input tag. { starts. */
+
   width: 100%;
-  /* Width matches card container. */
+  /* width (span) : (colon) 100% ; (semicolon). */
+
   height: 120px;
-  /* Fixed height to provide ample space for comments. */
-  /* Fixed height for comments */
+  /* height (vertical size) : (colon) 120px ; (semicolon) sets a fixed 
+     height for comments. */
+
   padding: 15px;
-  /* Large internal cushion for text padding. */
+  /* padding (internal space) : (colon) 15px ; (semicolon). */
+
   border: 1px solid var(--grey-border);
-  /* Subtle neutral outline. */
+  /* border (outline) : (colon) 1px solid var(--grey-border) ; (semicolon). */
+
   border-radius: 10px;
-  /* Slightly rounded corners. */
+  /* border-radius (corners) : (colon) 10px ; (semicolon). */
+
   font-size: 16px;
-  /* Large enough for high readability during typing. */
+  /* font-size (text size) : (colon) 16px ; (semicolon). */
+
   color: #444;
-  /* Dark grey input text. */
+  /* color (text color) : (colon) #444 (dark grey) ; (semicolon). */
+
   resize: none;
-  /* Locked height ensures the premium card layout is never broken by the user. */
-  /* Disable resizing to maintain the premium card shape */
+  /* resize (resizing tool) : (colon) none ; (semicolon) prevents the user 
+     from breaking the layout by dragging the box. */
+
   outline: none;
-  /* Removes default browser focus ring. */
+  /* outline (browser ring) : (colon) none ; (semicolon). */
+
   transition: border-color 0.3s;
-  /* Smooth 0.3s glow effect. */
+  /* transition (animation) : (colon) border-color 0.3s ; (semicolon). */
 }
+/* } ends textarea style. */
 
-/* Focus state specifically for the multi-line comment box. */
 .textarea textarea:focus {
-  border-color: var(--purple);
-  /* Highlights in purple when active. */
-}
+/* Targets the comment box when clicked. { starts. */
 
-/* --- THE 'POST' SUBMISSION BUTTON --- */
+  border-color: var(--purple);
+  /* border-color (outline) : (colon) var(--purple) ; (semicolon). */
+}
+/* } ends focus style. */
 
 .btn {
-  /* Wrapper for the whole-width CTA button. */
+/* Targets the submission button wrapper. { starts. */
+
   width: 100%;
+  /* width (span) : (colon) 100% ; (semicolon). */
 }
+/* } ends btn wrapper style. */
 
 .btn button {
-  /* Targeted styles for the button itself. */
+/* Targets the <button> tag itself. { starts. */
+
   width: 100%;
-  /* Stretches button across the card. */
+  /* width (span) : (colon) 100% ; (semicolon). */
+
   padding: 15px;
-  /* High-cushion surface for easy clicking on mobile. */
+  /* padding (internal space) : (colon) 15px ; (semicolon). */
+
   background: var(--btn-dark);
-  /* Bold dark grey/black background. */
-  /* Contrast against the purple theme */
+  /* background (surface) : (colon) var(--btn-dark) (blackish) ; (semicolon). */
+
   color: white;
-  /* Contrast text. */
+  /* color (text color) : (colon) white ; (semicolon). */
+
   border: none;
-  /* Removes browser default borders. */
+  /* border (outline) : (colon) none ; (semicolon). */
+
   border-radius: 12px;
-  /* Smooth rounded corners. */
+  /* border-radius (corners) : (colon) 12px ; (semicolon). */
+
   font-size: 18px;
-  /* Impactful font size for primary action. */
+  /* font-size (text size) : (colon) 18px ; (semicolon). */
+
   font-weight: 700;
-  /* Ultra-bold text. */
+  /* font-weight (thickness) : (colon) 700 (bold) ; (semicolon). */
+
   letter-spacing: 1px;
-  /* Slightly increases gap between letters for a premium look. */
+  /* letter-spacing (gap between letters) : (colon) 1px ; (semicolon) 
+     improves text readability. */
+
   cursor: pointer;
-  /* Interaction hint. */
+  /* cursor (mouse icon) : (colon) pointer ; (semicolon). */
 
-  /* transition: handles changes for transform(moving), background(fade), and box-shadow(depth). */
   transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+  /* transition (animation) : (colon) handles movement, color, and shadow 
+     simultaneously. ; (semicolon). */
 
-  /* box-shadow: Creates a 'retro 3D' effect. 0(x) 4px(y) 0(blur) Solid Black. */
   box-shadow: 0 4px 0 #000;
+  /* box-shadow (elevation) : (colon) 0 (x) 4px (y) 0 (blur) #000 (black) 
+     ; (semicolon) creates a retro 3D button effect. */
 }
+/* } ends button style. */
 
-/* Button Hover State: Creates a visual lift effect when hovered. */
 .btn button:hover {
+/* Targets the button when hovered. { starts. */
+
   background: #000;
-  /* Darkens background to pure black. */
+  /* background (surface) : (colon) #000 (pure black) ; (semicolon). */
+
   transform: translateY(-2px);
-  /* Lifts the button upwards by 2 pixels. */
+  /* transform (move) : (colon) translateY (vertical move) ( -2px (up) ) 
+     ; (semicolon) lifts the button. */
+
   box-shadow: 0 6px 0 #000;
-  /* Enlarges the shadow to 6px as the button is 'higher'. */
-  /* Shadow grows as button lifts */
+  /* box-shadow (shadow) : (colon) 0 6px 0 #000 ; (semicolon) makes the 
+     shadow deeper as the button lifts. */
 }
+/* } ends hover style. */
 
-/* Button Active (Click) State: Visual feedback that the button is successfully pressed. */
 .btn button:active {
-  transform: translateY(2px);
-  /* Pushes the button 2px down towards the page surface. */
-  box-shadow: 0 2px 0 #000;
-  /* Shrinks the shadow to 2px to simulate the press. */
-  /* Shadow shrinks as button is 'pressed' */
-}
+/* Targets the button when clicked (active state). { starts. */
 
-/* --- FOOTER OVERRIDES --- */
-/* Note: Navbar overrides have been removed to use standard branding from main.css */
+  transform: translateY(2px);
+  /* transform (move) : (colon) translateY ( 2px (down) ) ; (semicolon) 
+     pushes the button down. */
+
+  box-shadow: 0 2px 0 #000;
+  /* box-shadow (shadow) : (colon) 0 2px 0 #000 ; (semicolon) shrinks the 
+     shadow to simulate the press. */
+}
+/* } ends active style. */

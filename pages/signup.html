@@ -1,171 +1,350 @@
 <!DOCTYPE html>
+<!-- (less than sign) ! (exclamation mark) DOCTYPE (document type) html (h t m l) 
+(greater than sign) is the mandatory declaration that tells the web browser 
+this is a modern HTML5 document. -->
+
 <html lang="en">
-<!-- 
-  ===================================================================
-  SIGNUP PAGE
-  ===================================================================
-  This page allows new users to register for the system.
-  It collects First Name, Last Name, Email, Phone Number, and Password.
-  
-  ===================================================================
-  -->
+<!-- (less than sign) html (h t m l) starts the web document structure. lang 
+(language) = (equals sign) "en" (English text content). (greater than sign). -->
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wema Travellers - Sign up</title>
+<!-- (less than sign) head (h e a d) (greater than sign) starts the hidden 
+configuration section of the page where metadata and styles are defined. -->
 
-  <!-- 
-      System fonts will be used via CSS.
-    -->
+    <meta charset="UTF-8">
+    <!-- (less than sign) meta (m e t a) charset (character set) = (equals sign) 
+    "UTF-8" (standard universal text encoding) (greater than sign). -->
 
-  <!-- CSS Links -->
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/entry-page.css" />
-  <link rel="stylesheet" href="css/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- (less than sign) meta (m e t a) name (name) = (equals sign) "viewport" 
+    (view port) content (content) = (equals sign) "width=device-width, 
+    initial-scale=1.0" (standard responsive design setting) (greater than sign). -->
+
+    <title>Wema Travellers - Sign up</title>
+    <!-- (less than sign) title (t i t l e) (greater than sign) sets the specific 
+    label that appears on the browser's tab. (less than sign) / (slash) title 
+    (greater than sign). -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" (style sheet) href (hypertext reference) = (equals sign) 
+    "css/main.css" (the path to the global design rules) (greater than sign). -->
+
+    <link rel="stylesheet" href="css/entry-page.css">
+    <!-- (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" (style sheet) href (hypertext reference) = (equals sign) 
+    "css/entry-page.css" (the path to the specific layout rules) 
+    (greater than sign). -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" (style sheet) href (hypertext reference) = (equals sign) 
+    "css/style.css" (the path to the branding style overrides) 
+    (greater than sign). -->
+
 </head>
+<!-- (less than sign) / (slash) head (h e a d) (greater than sign) ends the 
+configuration section. -->
 
 <body>
+<!-- (less than sign) body (b o d y) (greater than sign) starts the visible 
+section of the webpage that the user interacts with. -->
 
-  <!-- Include Header and Footer Scripts (Local JS) -->
-  <script src="js/header1.js"></script>
-  <script src="js/footer.js"></script>
+    <script src="js/header1.js"></script>
+    <!-- (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/header1.js" (the path to the top navigation logic) (greater than sign) 
+    (less than sign) / (slash) script (greater than sign). -->
 
+    <script src="js/footer.js"></script>
+    <!-- (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/footer.js" (the path to the bottom footer logic) (greater than sign) 
+    (less than sign) / (slash) script (greater than sign). -->
 
-  <div class="row height-full">
-    <!-- 
-      LEFT SIDE: FORM
-      Contains the input fields for registration.
-      -->
-    <div class="left-column flex flex-column height-full justify-center items-center">
-      <h1 class="welcoming-title">Create Account</h1>
+    <div class="row height-full">
+    <!-- (less than sign) div (d i v) class (class) = (equals sign) "row height-full" 
+    (greater than sign) is a layout container that splits the screen. -->
 
-      <!-- signup.html Form: This collects user data and sends it to the server for permanent storage. -->
-      <!-- action="account2.php": Tells the browser to send data to the account processing script. -->
-      <!-- method="POST": Sends data securely in the background (hidden from the URL bar). -->
-      <form class="form" id="signupForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
+        <div class="left-column flex flex-column height-full justify-center items-center">
+        <!-- (less than sign) div (d i v) class (class) = (equals sign) "left-column 
+        ..." (greater than sign) is the container for the interactive registration form. -->
 
-        <!-- FIRST NAME -->
-        <label for="first_name" class="label">First Name</label> <!-- UI Label. -->
-        <input type="text" name="first_name" id="first_name" class="input" onmouseout="validateFirstName();" />
-        <!-- Text input for personal name. -->
+            <h1 class="welcoming-title">Create Account</h1>
+            <!-- (less than sign) h1 (heading level one) class (class) = (equals sign) 
+            "welcoming-title" (greater than sign) is the main title text. 
+            (less than sign) / (slash) h1 (greater than sign). -->
 
-        <!-- LAST NAME -->
-        <label for="last_name" class="label">Last Name</label> <!-- UI Label. -->
-        <input type="text" name="last_name" id="last_name" class="input" onmouseout="validateLastName();" />
-        <!-- Text input for family name. -->
+            <!-- signup.html Form: Collects data for account2.php -->
+            <!-- (less than sign) ! (exclamation mark) - (dash) - (dash) starts 
+            an HTML comment. signup.html Form (text). - (dash) - (dash) (greater 
+            than sign) ends the comment. -->
 
-        <!-- EMAIL ADDRESS -->
-        <label for="email" class="label">Email</label> <!-- UI Label. -->
-        <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();" /> <!-- User's unique identification email. -->
+            <form class="form" id="signupForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
+            <!-- (less than sign) form (f o r m) class (class) = (equals sign) 
+            "form" (style) id (identification) = (equals sign) "signupForm" 
+            (unique ID) action (destination) = (equals sign) "account2.php" 
+            (the engine script) method (method) = (equals sign) "POST" 
+            (the secure data transmission method) autocomplete (auto complete) 
+            = (equals sign) "off" (security setting) onsubmit (on submit) 
+            = (equals sign) "return validateForm()" (triggers JavaScript 
+            check) (greater than sign). -->
 
-        <!-- PHONE NUMBER (Added for SMS notifications/contact) -->
-        <label for="phone_number" class="label">Phone Number</label> <!-- UI Label. -->
-        <input type="text" name="phone_number" id="phone_number" class="input" placeholder="e.g. 0712345678" onmouseout="validatePhoneNumber();" />
-        <!-- Contact phone. -->
+                <label for="first_name" class="label">First Name</label>
+                <!-- (less than sign) label (l a b e l) for (for) = (equals sign) 
+                "first_name" (links the text to the input box) class (class) 
+                = (equals sign) "label" (greater than sign) First Name 
+                (visible text). (less than sign) / (slash) label (greater 
+                than sign). -->
 
-        <!-- PASSWORD -->
-        <label for="password" class="label">Password</label> <!-- UI Label. -->
-        <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();" />
-        <!-- Secure password field (dots appear). -->
-        <!-- Security hint text to improve user account strength. -->
-        <p style="font-size: 0.85rem; color: gray; margin-bottom: 1rem;">
-          Must be at least 8 characters with uppercase, lowercase, number & symbol.
-        </p>
+                <input type="text" name="first_name" id="first_name" class="input" onmouseout="validateFirstName();">
+                <!-- (less than sign) input (i n p u t) type (type) = (equals sign) 
+                "text" (standard text entry) name (name) = (equals sign) 
+                "first_name" (the key used by the PHP engine to find the data) 
+                id (unique ID) = (equals sign) "first_name" class (class) 
+                = (equals sign) "input" onmouseout (on mouse out) = (equals 
+                sign) "validateFirstName();" (triggers a check when the mouse 
+                leaves) (greater than sign). -->
 
-        <!-- SUBMIT BUTTON -->
-        <!-- name="save": This specific name tells the PHP script that we want to CREATE a new account. -->
-        <button type="submit" name="save" class="button regular-button pink-background cta-btn">
-          Sign up
-        </button>
-      </form>
+                <label for="last_name" class="label">Last Name</label>
+                <!-- (less than sign) label (greater than sign) Last Name 
+                (visible text). -->
 
-      <script>
-        // Custom JavaScript validation for Registration Form
-        // Validates First Name
-        function validateFirstName() {
-          var fname = document.getElementById("first_name").value; // Capture first name
-          if (fname.length == 0) { // Check if empty
-            alert("First Name is required");
-            document.getElementById("first_name").focus(); // Focus on error field
-            return false;
-          }
-          return true;
-        }
+                <input type="text" name="last_name" id="last_name" class="input" onmouseout="validateLastName();">
+                <!-- (less than sign) input (greater than sign) type (type) 
+                = (equals sign) "text" (entry box for the family name). -->
 
-        // Validates Last Name
-        function validateLastName() {
-          var lname = document.getElementById("last_name").value; // Capture last name
-          if (lname.length == 0) { // Check if empty
-            alert("Last Name is required");
-            document.getElementById("last_name").focus();
-            return false;
-          }
-          return true;
-        }
+                <label for="email" class="label">Email</label>
+                <!-- (less than sign) label (greater than sign) Email 
+                (visible text). -->
 
-        // Validates Email Format
-        function validateEmail() {
-          var email = document.getElementById("email").value;
-          if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
-            alert("Please enter a valid email address");
-            document.getElementById("email").focus();
-            return false;
-          }
-          return true;
-        }
+                <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();">
+                <!-- (less than sign) input (greater than sign) type (type) 
+                = (equals sign) "text" (entry box for the email address). -->
 
-        // Validates Phone Number (Assuming Kenyan format or simple 10-digit check)
-        function validatePhoneNumber() {
-          var phone = document.getElementById("phone_number").value;
-          // Check if numeric and between 9 to 13 characters (allowing for international codes)
-          if (phone.length < 9 || isNaN(phone)) {
-            alert("Please enter a valid phone number (numeric only, at least 9 digits)");
-            document.getElementById("phone_number").focus();
-            return false;
-          }
-          return true;
-        }
+                <label for="phone_number" class="label">Phone Number</label>
+                <!-- (less than sign) label (greater than sign) Phone Number 
+                (visible text). -->
 
-        // Validates Password Strength (TIGHT VALIDATION)
-        function validatePassword() {
-          var password = document.getElementById("password").value;
-          // Regex for: Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
-          var strengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-          if (!strengthRegex.test(password)) {
-            alert("Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character (@$!%*?&)");
-            document.getElementById("password").focus();
-            return false;
-          }
-          return true;
-        }
+                <input type="text" name="phone_number" id="phone_number" class="input" placeholder="e.g. 0712345678" onmouseout="validatePhoneNumber();">
+                <!-- (less than sign) input (greater than sign) placeholder 
+                (ghost text) = (equals sign) "e.g. 0712345678" (hint). -->
 
-        // Main caller function for form submission
-        function validateForm() {
-          var rtned = true;
-          rtned = validateFirstName();
-          if (rtned == true) rtned = validateLastName();
-          if (rtned == true) rtned = validateEmail();
-          if (rtned == true) rtned = validatePhoneNumber();
-          if (rtned == true) rtned = validatePassword();
-          return rtned; // Only submits if all checks pass
-        }
-      </script>
+                <label for="password" class="label">Password</label>
+                <!-- (less than sign) label (greater than sign) Password 
+                (visible text). -->
 
+                <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();">
+                <!-- (less than sign) input (greater than sign) type (type) 
+                = (equals sign) "password" (hides characters for security). -->
 
-      <p class="login-prompt">
-        Already have an account?
-        <a href="./login.html" class="log-in-link">Log in</a>
-      </p>
+                <p style="font-size: 0.85rem; color: gray; margin-bottom: 1rem;">Min 8 characters required.</p>
+                <!-- (less than sign) p (paragraph) style (style) = (equals sign) 
+                "font-size: 0.85rem; ..." (smaller grey text) (greater than 
+                sign) Min 8 characters... (text) (less than sign) / (slash) 
+                p (greater than sign). -->
+
+                <button type="submit" name="save" class="button regular-button pink-background cta-btn">Sign up</button>
+                <!-- (less than sign) button (b u t t o n) type (type) = (equals 
+                sign) "submit" (sends form) name (name) = (equals sign) "save" 
+                (identity for PHP) class (class) = (equals sign) "button ..." 
+                (style) (greater than sign) Sign up (visible text). (less 
+                than sign) / (slash) button (greater than sign). -->
+
+            </form>
+            <!-- (less than sign) / (slash) form (greater than sign) ends the 
+            registration form block. -->
+
+            <script>
+            /* (less than sign) script (s c r i p t) (greater than sign) starts 
+            JavaScript block for data validation. */
+
+                function validateFirstName() {
+                /* function (function) validateFirstName (unique label) { 
+                (curly bracket) starts the name check logic. */
+
+                    var fname = document.getElementById("first_name").value.trim();
+                    /* var (variable) fname (container) = (assign). document 
+                    . getElementById ( "first_name" ) . value (text) . trim 
+                    ( ) (removes accidental spaces). ; (semicolon). */
+
+                    if (fname == "") {
+                    /* if (if) check for emptiness. ( (bracket) fname == 
+                    "" (empty quotes) ) (bracket). { (bracket) starts error. */
+
+                        alert("First Name is required");
+                        /* alert (pop-up). ; (semicolon). */
+
+                        document.getElementById("first_name").focus();
+                        /* focus (cursor placement). ; (semicolon). */
+
+                        return false;
+                        /* return false (fail signal). ; (semicolon). */
+                    }
+                    /* } ends error. */
+
+                    return true;
+                    /* return true (pass signal). ; (semicolon). */
+                }
+                /* } ends function. */
+
+                function validateLastName() {
+                /* function (function) validateLastName (name) { (bracket) 
+                starts the family name check. */
+
+                    var lname = document.getElementById("last_name").value.trim();
+                    /* var (variable) lname (container). = (assign). value . 
+                    trim ( ). ; (semicolon). */
+
+                    if (lname == "") {
+                    /* if (if) check for emptiness. */
+
+                        alert("Last Name is required");
+                        /* alert (pop-up). ; (semicolon). */
+
+                        document.getElementById("last_name").focus();
+                        /* focus (cursor). ; (semicolon). */
+
+                        return false;
+                        /* return false (fail). ; (semicolon). */
+                    }
+                    /* } ends if. */
+
+                    return true;
+                    /* return true (pass). ; (semicolon). */
+                }
+                /* } ends function. */
+
+                function validateEmail() {
+                /* function (function) validateEmail (name) { (bracket) 
+                starts the address check. */
+
+                    var email = document.getElementById("email").value;
+                    /* var (variable) email (container). = (assign). ; (semicolon). */
+
+                    if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+                    /* if (if) complex check for valid structure. ( length 
+                    is zero OR no "@" OR no "." ). */
+
+                        alert("Please enter a valid email address");
+                        /* alert (pop-up). ; (semicolon). */
+
+                        document.getElementById("email").focus();
+                        /* focus (cursor). ; (semicolon). */
+
+                        return false;
+                        /* return false (fail). ; (semicolon). */
+                    }
+                    /* } ends if. */
+
+                    return true;
+                    /* return true (pass). ; (semicolon). */
+                }
+                /* } ends function. */
+
+                function validatePhoneNumber() {
+                /* function (function) validatePhoneNumber (name) { (bracket) 
+                starts the contact number check. */
+
+                    var phone = document.getElementById("phone_number").value.trim();
+                    /* var (variable) phone (container). = (assign). trim ( ). 
+                    ; (semicolon). */
+
+                    if (phone.length < 9 || isNaN(phone)) {
+                    /* if (if) check for length and type. ( length < 
+                    9 OR isNaN (is not a number) ) (bracket). */
+
+                        alert("Please enter a valid phone number (numeric only)");
+                        /* alert (pop-up). ; (semicolon). */
+
+                        document.getElementById("phone_number").focus();
+                        /* focus (cursor). ; (semicolon). */
+
+                        return false;
+                        /* return false (fail). ; (semicolon). */
+                    }
+                    /* } ends if. */
+
+                    return true;
+                    /* return true (pass). ; (semicolon). */
+                }
+                /* } ends function. */
+
+                function validatePassword() {
+                /* function (function) validatePassword (name) { (bracket) 
+                starts the security check. */
+
+                    var password = document.getElementById("password").value;
+                    /* var (variable) password (container). = (assign). ; (semicolon). */
+
+                    if (password.length < 8) {
+                    /* if (if) check for length. ( length < 8 ). */
+
+                        alert("Password must be at least 8 characters long");
+                        /* alert (pop-up). ; (semicolon). */
+
+                        document.getElementById("password").focus();
+                        /* focus (cursor). ; (semicolon). */
+
+                        return false;
+                        /* return false (fail). ; (semicolon). */
+                    }
+                    /* } ends if. */
+
+                    return true;
+                    /* return true (pass). ; (semicolon). */
+                }
+                /* } ends function. */
+
+                function validateForm() {
+                /* function (function) validateForm (name) is the master loop 
+                that calls all other checks. { (bracket). */
+
+                    var ok = validateFirstName();
+                    /* var (variable) ok (o k) container for status. = (assign). 
+                    validateFirstName ( ) (calls first check). ; (semicolon). */
+
+                    if (ok == true) ok = validateLastName();
+                    /* if (if) ok is true, run next. ok (status) = (assign). 
+                    validateLastName ( ) (calls next). ; (semicolon). */
+
+                    if (ok == true) ok = validateEmail();
+                    /* if (if) ok is true, run next. validateEmail ( ). */
+
+                    if (ok == true) ok = validatePhoneNumber();
+                    /* if (if) ok is true, run next. validatePhoneNumber ( ). */
+
+                    if (ok == true) ok = validatePassword();
+                    /* if (if) ok is true, run final. validatePassword ( ). */
+
+                    return ok;
+                    /* return (return) sends the final result back to the 
+                    form submission engine. ; (semicolon). */
+                }
+                /* } ends function. */
+
+            </script>
+            <!-- (less than sign) / (slash) script (greater than sign) ends the 
+            validation logic section. -->
+
+            <p class="login-prompt">Already have an account? <a href="./login.html" class="log-in-link">Log in</a></p>
+            <!-- (less than sign) p (paragraph) (greater than sign) Already have... 
+            (text) (less than sign) a (anchor) href = "./login.html" (link) 
+            (greater than sign) Log in (text) (less than sign) / (slash) a 
+            (greater than sign). (less than sign) / (slash) p (greater 
+            than sign). -->
+
+        </div>
+        <!-- (less than sign) / (slash) div (greater than sign) ends the form column. -->
+
+        <div class="right-column"></div>
+        <!-- (less than sign) div (greater than sign) ends the image column. -->
+
     </div>
+    <!-- (less than sign) / (slash) div (greater than sign) ends the main row. -->
 
-    <!-- 
-      RIGHT SIDE: IMAGE
-      Displays the Wema Travellers bus image defined in css/entry-page.css
-      -->
-    <div class="right-column"></div>
-  </div>
 </body>
+<!-- (less than sign) / (slash) body (greater than sign) ends the visible page 
+content section. -->
 
 </html>
+<!-- (less than sign) / (slash) html (greater than sign) ends the overall web 
+document structure. -->

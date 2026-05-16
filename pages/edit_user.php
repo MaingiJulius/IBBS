@@ -20,10 +20,15 @@ if (!isset($_GET['user_id'])) {                                      // [12] Par
 $target_id = $_GET['user_id'];                                       // [15] Map the URL-provided user ID to a local variable.
 $err = "";                                                           // [16] Initialize error string for database feedback display.
 $stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");     // [17] Prepare secure SQL search template with defensive placeholder.
-$stmt->bind_param("i", $target_id);                                  // [18] Safely inject the ID variable into the prepared statement.
+$stmt->bind_param("i", $target_id);                                  /* $stmt (statement tool) -> (connector) bind_param (bind parameter) 
+                                                                        is the security function that attaches the data to the query blueprint. 
+                                                                        ( starts. "i" (integer number type) , (comma) $target_id (the data) 
+                                                                        ) ends. ; (semicolon). */
 $stmt->execute();                                                    // [19] Execute data retrieval command on the MySQL server.
 $result = $stmt->get_result();                                       // [20] Capture the resulting database outcome.
-$user = $result->fetch_assoc();                                      // [21] Associative array mapping for record manipulation.
+$user = $result->fetch_assoc();                                      /* $user (container) = (assignment). $result (the found list) -> (connector) 
+                                                                        fetch_assoc (fetch associative) pulls one row and converts it into 
+                                                                        labeled pieces. ( ) (empty brackets). ; (semicolon). */
 $stmt->close();                                                      // [22] Release statement resource memory.
 
 if (!$user) {                                                        // [23] Integrity Check: Verify if the ID corresponds to an actual record.
@@ -82,8 +87,10 @@ if (isset($_POST['update_user'])) {                                  // [26] Act
         <?php if($err): ?><p style="color: red; text-align: center;"><?= $err ?></p><?php endif; ?> <!-- [68] Conditional error display. -->
 
         <form method="POST" id="editUserForm" onsubmit="return validateForm()">                                             <!-- [69] Start update form definition. -->
-            <div class="form-group"><label>First Name</label><input type="text" name="first_name" id="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" onmouseout="validateFirstName()"></div> <!-- [70] Pre-filled first name. -->
-            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" id="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" onmouseout="validateLastName()"></div> <!-- [71] Pre-filled last name. -->
+            <div class="form-group"><label>First Name</label><input type="text" name="first_name" id="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" onmouseout="validateFirstName()"></div> <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                                                                                                                                                                                         that encodes text for safety. ( starts the tool. $user (data list) 
+                                                                                                                                                                                                         ['first_name'] (label) ) ends. -->
+            <div class="form-group"><label>Last Name</label><input type="text" name="last_name" id="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" onmouseout="validateLastName()"></div> <!-- htmlspecialchars (security tool) ( $user ['last_name'] ) -->
             <div class="form-group"><label>Email Address</label><input type="text" name="email" id="email" value="<?= htmlspecialchars($user['email']) ?>" onmouseout="validateEmail()"></div> <!-- [72] Pre-filled email. -->
             <div class="form-group"><label>Phone Number</label><input type="text" name="phone_number" id="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" onmouseout="validatePhoneNumber()"></div> <!-- [73] Pre-filled phone. -->
             <div class="form-group"><label>Role</label><select name="role" id="role" onmouseout="validateRole()"> <!-- [74] Role state selection logic. -->

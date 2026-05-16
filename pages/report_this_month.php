@@ -1,84 +1,226 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * ================================================================= // [3] Visual header for administrative documentation clarity.
- * AUDIT REPORT: MONTHLY BOOKING ANALYTICS (report_this_month.php)   // [4] Title identifying this script as the monthly sales audit.
- * ================================================================= // [5] Visual header for administrative documentation clarity.
- * Purpose: This script generates a detailed document of all passenger // [6] Main objective: mid-term financial planning.
- * bookings made within the current calendar month.                // [7] Task: aggregate ticketing data by month.
- * It is used for mid-term financial planning and sales tracking.    // [8] Goal: business sales tracking.
- * ================================================================= // [9] Visual header for administrative documentation clarity.
- */                                                                  // [10] Close multi-line documentation block.
+<?php
+// [1] <?php (opening tag) tells the machine to activate the PHP interpreter for server-side logic.
+// [1.1] < (less than) ? (question mark) php (p h p) is the opening signal that all following code is in the PHP language.
 
-require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
-session_start();                                                    // [12] Initialize or resume user session to identify the administrative officer.
+/**
+ * =================================================================
+ * AUDIT REPORT: MONTHLY BOOKING ANALYTICS (report_this_month.php)
+ * [2] /** (star star) opens a professional multi-line documentation block for explaining script intent.
+ * =================================================================
+ */
+// [3] */ (star slash) closes the documentation block.
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {      // [13] Access Control: Verify if requester possesses the 'ADMIN' credential.
-    header("Location: login.html");                                  // [14] Security Redirect: Kick unauthorized visitors to the login gate.
-    exit();                                                          // [15] Halt Execution: Ensure no fiscal metrics are leaked to guests.
-}                                                                    // [16] Close security barrier.
+require_once 'db_connection.php';
+// [4] require_once imports the database bridge. ; (semicolon).
+// [4.1] require_once is a directive that pulls in the 'db_connection.php' file; it ensures the database link is established once to prevent errors. ; (semicolon) terminates the line.
+
+session_start();
+// [5] session_start initializes the user memory system. ; (semicolon).
+// [5.1] session_start is a built-in function that tells the server to retrieve the user's persistent data (like roles). ( ) executes it. ; (semicolon) stops the line.
+
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
+// [6] if (i f) starts the security check. ( contains logic. ! (not). isset checks if the key exists. || (or). !== (not identical). 'ADMIN' (text). ) ends check. { starts block.
+// [6.1] if (i f) starts a conditional choice. ( (bracket) contains the condition. ! (exclamation) means NOT. isset verifies if the memory key exists. $_SESSION is the memory array. || (double pipe) means OR. !== means NOT EQUAL to. 'ADMIN' (quote) is the required role. ) (bracket) ends check. { (curly bracket) starts the logic to run if the user is not an admin.
+
+    header("Location: login.html");
+    // [7] header redirects the user. ; (semicolon).
+    // [7.1] header is a function that sends a raw HTTP command to the browser to navigate to a new page. "Location: login.html" (quote) is the target. ; (semicolon) ends the command.
+
+    exit();
+    // [8] exit stops the machine. ; (semicolon).
+    // [8.1] exit is a terminal command that immediately stops the script execution to prevent unauthorized access. ( ) executes it. ; (semicolon) ends it.
+}
+// [9] } ends the security block.
 
 $sql = "SELECT b.booking_id, b.booking_time, CONCAT(u.first_name, ' ', u.last_name) AS passenger_name, r.from_location, r.to_location, b.seat_number, b.booking_status, r.cost 
         FROM bookings b 
         JOIN users u ON b.user_id = u.user_id 
         JOIN routes r ON b.route_id = r.route_id 
         WHERE MONTH(b.booking_time) = MONTH(CURDATE()) AND YEAR(b.booking_time) = YEAR(CURDATE()) 
-        ORDER BY b.booking_time DESC"; 
-$result = $conn->query($sql);                                        
-$total_revenue = 0;                                                  
-?>                                                                   
+        ORDER BY b.booking_time DESC";
+// [10] $sql (variable). = (assign). "SELECT..." (SQL command). ; (semicolon).
+// [10.1] $ (dollar) variable indicator. sql is the name of the memory box. = (equals) is the assignment operator. "SELECT..." (quote) is a complex SQL command that filters for the current month using the MONTH() and YEAR() database tools. ; (semicolon) terminates the assignment.
 
-<!DOCTYPE html>                                                         <!-- [20] Define standard HTML5 document type for modern browsers. -->
-<html lang="en">                                                     <!-- [21] Root element identifying English as layout language. -->
-<head>                                                               <!-- [22] Metadata and resource header section. -->
-    <meta charset="UTF-8">                                           <!-- [23] Declare UTF-8 for international character support. -->
-    <title>Monthly Performance Analysis - Wema Travellers</title>        <!-- [24] Website title for browser selection. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- [25] Responsive scaling for mobile device compatibility. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [26] Load global project branding variables. -->
-    <link rel="stylesheet" href="css/main.css">                      <!-- [27] Load shared component style assets. -->
-    <style>                                                          /* [28] Page-specific internal CSS architecture. */
-        .report-container { width: 95%; max-width: 1200px; margin: 40px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); } /* [29] main card. */
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 35px; } /* [30] audit grid. */
-        .data-table th, .data-table td { border-bottom: 1px solid #f1f5f9; padding: 18px; text-align: left; } /* [31] cell layout. */
-        .data-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; } /* [32] branding. */
-        .data-table tr:nth-child(even) { background-color: #fbfcfe; } /* [33] zebra striping. */
-    </style>                                                         <!-- [34] Terminate internal CSS block. -->
-</head>                                                              <!-- [35] Close head section. -->
+$result = mysqli_query($conn, $sql);
+// [11] $result (variable). = (assign). mysqli_query runs the command. ; (semicolon).
+// [11.1] $result (dollar r e s u l t) is a variable handle that holds the outcome of the query. = (assigns) the value. mysqli_query is the function that talks to the database. $conn is the bridge variable. $sql is the command string. ; (semicolon) stops the line.
+
+$total_revenue = 0;
+// [12] $total_revenue (variable). = (assign). 0 (number). ; (semicolon).
+// [12.1] $total_revenue is a numeric variable for calculating the sum. = (assigns). 0 (zero) is the start value. ; (semicolon).
+?>
+<!-- [13] [?] stops PHP and starts HTML. -->
+
+<!DOCTYPE html>
+<!-- [14] <!DOCTYPE html> defines a modern HTML5 web document for the browser. -->
+
+<html lang="en">
+<!-- [15] <html lang="en"> starts the English web page structure. -->
+
+<head>
+<!-- [16] <head> starts the metadata section. -->
+
+    <meta charset="UTF-8">
+    <!-- [17] <meta charset="UTF-8"> ensures characters display correctly. -->
+
+    <title>Monthly Performance Analysis - Wema Travellers</title>
+    <!-- [18] <title> sets the browser tab label. -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- [19] <meta> name="viewport" ensures the report scales correctly on mobile phones. -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- [20] <link> connects to the 'style.css' branding file. -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- [21] <link> connects to the 'main.css' layout file. -->
+
+    <style>
+    /* [22] <style> starts internal CSS design rules. */
+
+        .report-container { width: 95%; max-width: 1200px; margin: 40px auto; background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); }
+        /* [23] .report-container design. centers the box and adds a premium shadow effect. */
+
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 35px; }
+        /* [24] .data-table grid design for clean row display. */
+
+        .data-table th, .data-table td { border-bottom: 1px solid #f1f5f9; padding: 18px; text-align: left; }
+        /* [25] th and td cell design. adds lines between rows and creates space. */
+
+        .data-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; }
+        /* [26] th header style. uses the purple theme variable and makes text all caps. */
+
+        .data-table tr:nth-child(even) { background-color: #fbfcfe; }
+        /* [27] tr:nth-child(even) adds zebra striping for easier reading of data. */
+
+        @media print { .no-print { display: none; } }
+        /* [28] @media print hides buttons when the report is sent to the printer. */
+
+    </style>
+    <!-- [29] </style> ends internal CSS. -->
+
+</head>
+<!-- [30] </head> ends metadata. -->
 
 <body class="<?= strtolower($_SESSION['role']) ?>-role">
-    <script src="js/header2.js"></script>                                <!-- [37] Inject the unified administrative header. -->
-    <div style="height: 100px;"></div>                                   <!-- [38] Fixed header offset buffer. -->
+<!-- [31] <body> starts the visible page. class="[echo] ... [?]" [echo] adds the user role to the page class. -->
 
-    <div class="report-container">                                       <!-- [39] Open analytical card. -->
-        <div class="back-btn-container" style="text-align: left; margin-bottom: 30px;"><a href="admin_insights.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; display: inline-block; width: auto; padding: 12px 35px; font-weight: 700;">← Back to Insights Hub</a></div> <!-- [40] Exit. -->
-        <h2 style="color: var(--purple); margin-bottom: 5px;">📅 Monthly Sales Audit</h2> <!-- [41] Title. -->
-        <p style="color: #64748b; font-size: 1.05rem; margin-bottom: 10px;">Aggregating every passenger transaction completed within the current calendar cycle.</p> <!-- [42] Desc. -->
+    <script src="js/header2.js"></script>
+    <!-- [32] <script> pulls in the navigation header logic. -->
 
-        <table class="data-table">                                       <!-- [43] Start audit grid. -->
-            <thead><tr><th>Ref ID</th><th>Stamp</th><th>Full Name</th><th>Journey Segment</th><th>Seat Map</th><th>Price</th><th>Status Record</th></tr></thead> 
-            <tbody>                                                      <!-- [45] Records start. -->
-                <?php if ($result->num_rows > 0): while($row = $result->fetch_assoc()): ?> <!-- [46] Loop through monthly records. -->
-                <tr><td><strong style="color: #94a3b8;"><?= $row['booking_id'] ?></strong></td> 
-                    <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #475569;"><?= $row['booking_time'] ?></td> 
-                    <td style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['passenger_name']) ?></td> 
-                    <td style="color: #64748b;"><?= htmlspecialchars($row['from_location'] . ' → ' . $row['to_location']) ?></td> 
-                    <td><span style="background: #f8fafc; color: #475569; padding: 5px 10px; border-radius: 6px; font-weight: 800; border: 1px solid #e2e8f0;"><?= $row['seat_number'] ?></span></td> 
-                    <td style="font-weight: 700; color: #0f172a;">$<?= number_format($row['cost'], 2) ?></td>
-                    <td style="color: <?= ($row['booking_status'] == 'CANCELLED') ? '#ef4444' : '#10b981' ?>; font-weight: 900; text-transform: uppercase; font-size: 0.85rem;"><?= $row['booking_status'] ?></td> 
-                </tr>                                                    
-                <?php 
-                    if($row['booking_status'] !== 'CANCELLED') { $total_revenue += $row['cost']; }
-                endwhile; ?>
-                <tr style="background-color: #f8fafc; font-size: 1.1rem; border-top: 2px solid var(--purple);">
-                    <td colspan="5" style="text-align: right; font-weight: 800; color: var(--purple);">TOTAL REVENUE:</td>
-                    <td colspan="2" style="font-weight: 900; color: #10b981; font-size: 1.3rem;">$<?= number_format($total_revenue, 2) ?></td>
-                </tr>
-                <?php else: ?>                                 
-                <tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 100px;"><div style="font-size: 1.25rem; font-style: italic;">No ticketing data initialized for the current month cycle.</div></td></tr> <!-- [55] empty. -->
-                <?php endif; ?>                                          <!-- [56] end check. -->
-            </tbody>                                                     <!-- [57] end table body. -->
-        </table>                                                         <!-- [58] end grid. -->
-    </div>                                                               <!-- [59] end card. -->
-    <div style="height: 120px;"></div>                                   <!-- [60] buffer. -->
-    <script src="js/footer.js"></script>                                 <!-- [61] inject footer. -->
-</body>                                                              <!-- [62] end body. -->
-</html>                                                              <!-- [63] end document. -->
+    <div style="height: 100px;"></div>
+    <!-- [33] <div> is a spacer box to push the content down. -->
+
+    <div class="report-container">
+    <!-- [34] <div class="report-container"> is the white card holding the report content. -->
+
+        <div class="no-print" style="margin-bottom: 30px;">
+            <a href="admin_insights.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; display: inline-block; width: auto; padding: 12px 35px; font-weight: 700;">← Back to Insights Hub</a>
+            <!-- (less than sign) ! (exclamation mark) - (dash) - (dash) starts an HTML comment explaining the print logic.
+                 window (w i n d o w) is the browser object.
+                 . (dot) access operator.
+                 print (p r i n t) is the command to open the print dialog.
+                 ( (bracket) ) (bracket) executes the command.
+                 - (dash) - (dash) (greater than sign) ends the logic explanation. -->
+            <button onclick="window.print()" class="button regular-button" style="text-decoration:none; background-color: #64748b; color: white; border-radius: 50px; border: none; padding: 12px 35px; margin-left: 10px; font-weight: 700; cursor: pointer;">Print Report</button>
+        </div>
+        <!-- [38] </div> ends the button box. -->
+
+        <h2 style="color: var(--purple); margin-bottom: 5px;">📅 Monthly Sales Audit</h2>
+        <!-- [39] <h2> heading with an emoji icon 📅. -->
+
+        <p style="color: #64748b; font-size: 1.05rem; margin-bottom: 10px;">Aggregating every passenger transaction completed within the current calendar cycle.</p>
+        <!-- [40] <p> paragraph providing report description. -->
+
+        <table class="data-table">
+        <!-- [41] <table> starts the sales data grid. -->
+
+            <thead><tr><th>Ref ID</th><th>Stamp</th><th>Full Name</th><th>Journey Segment</th><th>Seat Map</th><th>Price</th><th>Status Record</th></tr></thead>
+            <!-- [42] <thead> table head containing column titles. -->
+
+            <tbody>
+            <!-- [43] <tbody> starts the dynamic data section. -->
+
+                <?php if (mysqli_num_rows($result) > 0): ?>
+                <!-- [44] [php] if check. mysqli_num_rows (m y s q l i underscore n u m underscore r o w s) counts the results in $result. > 0 checks if not empty. : starts block. [?] -->
+
+                    <?php while($row = mysqli_fetch_assoc($result)): ?>
+                    <!-- [45] while (loop). $row variable holds one record. mysqli_fetch_assoc (m y s q l i underscore f e t c h underscore a s s o c) retrieves the next row. : starts block. [?] -->
+
+                        <tr>
+                        <!-- [46] <tr> starts a new table row. -->
+
+                            <td><strong style="color: #94a3b8;"><?= $row['booking_id'] ?></strong></td>
+                            <!-- [47] <td> cell for ID. [echo] [echo] prints the booking_id. -->
+
+                            <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #475569;"><?= $row['booking_time'] ?></td>
+                            <!-- [48] <td> cell for time. Courier New font makes it look like a system timestamp. -->
+
+                            <td style="font-weight: 700; color: #1e293b;"><?= htmlspecialchars($row['passenger_name']) ?></td>
+                            <!-- [49] <td> cell for Name. htmlspecialchars (h t m l s p e c i a l c h a r s) ensures names are shown safely. -->
+
+                            <td style="color: #64748b;"><?= htmlspecialchars($row['from_location'] . ' → ' . $row['to_location']) ?></td>
+                            <!-- [50] <td> cell for journey details. . (dot) is the string connector. -->
+
+                            <td><span style="background: #f8fafc; color: #475569; padding: 5px 10px; border-radius: 6px; font-weight: 800; border: 1px solid #e2e8f0;"><?= $row['seat_number'] ?></span></td>
+                            <!-- [51] <td> cell for seat number inside a styled <span> box. -->
+
+                            <td style="font-weight: 700; color: #0f172a;">$<?= number_format($row['cost'], 2) ?></td>
+                            <!-- [52] <td> cell for price. number_format (n u m b e r underscore f o r m a t) ensures 2 decimals. -->
+
+                            <td style="color: <?= ($row['booking_status'] == 'CANCELLED') ? '#ef4444' : '#10b981' ?>; font-weight: 900; text-transform: uppercase; font-size: 0.85rem;"><?= $row['booking_status'] ?></td>
+                            <!-- [53] <td> cell for status. ? (ternary) choice makes CANCELLED red (#ef4444) and others green (#10b981). -->
+
+                        </tr>
+                        <!-- [54] </tr> ends the row. -->
+
+                        <?php if($row['booking_status'] !== 'CANCELLED') { $total_revenue += $row['cost']; } ?>
+                        <!-- [55] [php] if check. if status is NOT (!) CANCELLED. $total_revenue is the sum variable. += adds the cost. ; ends. [?] -->
+
+                    <?php endwhile; ?>
+                    <!-- [56] [php] endwhile; [?] ends the loop. -->
+
+                    <tr style="background-color: #f8fafc; font-size: 1.1rem; border-top: 2px solid var(--purple);">
+                    <!-- [57] <tr> starts the summary row for total revenue. -->
+
+                        <td colspan="5" style="text-align: right; font-weight: 800; color: var(--purple);">TOTAL REVENUE:</td>
+                        <!-- [58] <td> label for total. colspan="5" merges 5 cells. -->
+
+                        <td colspan="2" style="font-weight: 900; color: #10b981; font-size: 1.3rem;">$<?= number_format($total_revenue, 2) ?></td>
+                        <!-- [59] <td> final sum. prints the calculated total in green bold text. -->
+
+                    </tr>
+                    <!-- [60] </tr> ends summary. -->
+
+                <?php else: ?>
+                <!-- [61] [php] else: [?] runs if zero records found. -->
+
+                    <tr><td colspan="7" style="text-align: center; color: #94a3b8; padding: 100px;"><div style="font-size: 1.25rem; font-style: italic;">No ticketing data initialized for the current month cycle.</div></td></tr>
+                    <!-- [62] <tr> centered empty state message. -->
+
+                <?php endif; ?>
+                <!-- [63] [php] endif; [?] ends the logic. -->
+
+            </tbody>
+            <!-- [64] </tbody> ends data section. -->
+
+        </table>
+        <!-- [65] </table> ends data grid. -->
+
+    </div>
+    <!-- [66] </div> ends report card. -->
+
+    <div style="height: 120px;"></div>
+    <!-- [67] <div> spacer box. -->
+
+    <script src="js/footer.js"></script>
+    <!-- [68] <script> footer logic. -->
+
+</body>
+<!-- [69] </body> ends visible content. -->
+
+</html>
+<!-- [70] </html> ends document structure. -->
+
+<?php mysqli_close($conn); ?>
+<!-- [71] [php] starts PHP. mysqli_close (m y s q l i underscore c l o s e) shuts down the database bridge $conn to save resources. ; terminates. [?] ends PHP. -->

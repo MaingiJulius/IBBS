@@ -28,8 +28,20 @@ try {                                                                // [1.2] Wr
     }                                                                    // [30] Close requirements check.
 
     /* --- [7] TRIP DATA RETRIEVAL --- */                               // [31] Marker for fetching trip context from the database registry.
-    $stmt = $conn->prepare("SELECT r.*, b.max_passengers FROM routes r JOIN buses b ON r.bus_id = b.bus_id WHERE r.route_id = ?"); // [32] Query to fetch route data and vehicle capacity.
-    $stmt->bind_param("i", $route_id);                                   // [33] Safely bind the integer route identifier to the prepared statement.
+    $stmt = $conn->prepare("SELECT r.*, b.max_passengers FROM routes r JOIN buses b ON r.bus_id = b.bus_id WHERE r.route_id = ?"); 
+    /* $stmt (handle) = (assignment). 
+       $conn (bridge) -> prepare (prepare) is the security tool that pre-compiles 
+       the command blueprint. "prepare" is used because it supports secure 
+       "Prepared Statements" using placeholders like ? to prevent SQL Injection. 
+       ( starts. "SELECT..." (blueprint) ) ends. ; (semicolon). */
+
+    $stmt->bind_param("i", $route_id);
+    /* $stmt (handle) -> bind (bind) _ (underscore) param (parameter) is the 
+       function that securely pours the data into the ? placeholders. 
+       The ? (Question Mark) is a safety hole that ensures user data 
+       is never treated as a command, blocking SQL Injection. 
+       ( starts. "i" (integer number type) , (comma) $route_id (trip identity data) 
+       ) ends. ; (semicolon). */
     $stmt->execute();                                                    // [34] Command the database to lookup the specific travel segment.
     $route = $stmt->get_result()->fetch_assoc();                         // [35] Capture the trip record into a descriptive associative array.
     $stmt->close();                                                      // [36] Release the statement resource to prevent memory leaks.
@@ -40,7 +52,11 @@ try {                                                                // [1.2] Wr
     }                                                                    // [40] Close route lookup boundary.
 
     /* --- [8] ATOMIC TRANSACTION COMMENCEMENT --- */                   // [41] Marker for starting the multi-step data write operation.
-    $conn->begin_transaction();                                          // [42] Disable auto-commit to ensure "All or Nothing" record writing.
+    $conn->begin_transaction();
+    /* $conn (bridge) -> begin (start) _ (underscore) transaction (transaction) 
+       is a security protocol that groups many database changes together. 
+       It ensures that if one booking fails, NONE of them are saved (All or Nothing). 
+       ; (semicolon). */
 
     foreach ($passengersData as $p) {                                // [44] Iterate through each individual passenger seat reservation.
         $seat_id = $p['seat_id'];                                    // [45] Assign the specific seat marker (e.g. S12) to a variable.
@@ -74,7 +90,10 @@ try {                                                                // [1.2] Wr
     }                                                                // [68] End of the passenger data loop.
 
     /* --- [9] FINALIZATION --- */                                   // [69] Marker for committing the entire data cluster to disk.
-    $conn->commit();                                                 // [70] Apply all changes made in the try block permanently.
+    $conn->commit();
+    /* $conn (bridge) -> commit (commit) is the final command that permanently 
+       saves all the grouped bookings to the database after checking for errors. 
+       ; (semicolon). */
 
     ob_get_clean();                                                  // [70.1] Discard any accidental output (like warnings) before JSON emission.
     echo json_encode(['success' => true, 'message' => 'Success! All seats reserved.', 'ticket_count' => count($passengersData)]); // [71] Emit success.

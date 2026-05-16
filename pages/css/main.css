@@ -3,262 +3,673 @@
 /* This is the primary CSS file that defines the global look and feel of the application. */
 /* ========================================================================== */
 /* CORE STYLES & VARIABLES */
-/* We define global design tokens here (colors, spacing) to ensure consistency across all pages. */
 /* ========================================================================== */
+/* / (forward slash) * (asterisk) starts a professional documentation block.
+   MAIN STYLESHEET is the module title. * (asterisk) / (forward slash) closes. */
 
-:root { /* The :root pseudo-class represents the <html> element and is used to store global CSS variables. */
-  /* --- COLOR PALETTE (Based on Branding requirements) --- */
-  --header-bg: #9a4d9a; /* Defines a Medium Purple color for the top header section. */
-  /* Medium Purple (Header Background) */
-  --nav-bg: #d06dd0; /* Defines a Lighter Purple for the navigation link area. */
-  /* Lighter Purple (Nav Bar Background) */
-  --body-bg: #ffccf9; /* Defines a soft Light Pink for the main page background. */
-  /* Light Pink (Main Background) */
-  --input-bg: #ffe6ff; /* Defines an even lighter pink/white tint for the backgrounds of input boxes. */
-  /* Very Light Pink (Input Fields) */
-  --text-color: #5a2a5a; /* Defines a high-contrast Dark Purple specifically for text readability. */
-  /* Dark Purple (Text) */
-  --button-color: #ff9999; /* Defines a 'Peachy Pink' shade used for primary interaction buttons. */
-  /* Peachy Pink (Buttons) */
-  --button-border: #000000; /* Defines Solid Black for borders to give a bold, defined look. */
-  /* Black Border for Buttons/Inputs */
+:root {
+/* : (colon) root (r o o t) is the pseudo-class representing the <html> element 
+   used to store global CSS variables. { (curly bracket) starts the block. */
 
-  /* --- BRAND COLORS (Used in new dashboard components) --- */
-  --purple: #9a4d9a; /* Re-declaring branding purple for specific component usage. */
-  --pink: #d06dd0; /* Re-declaring branding pink for specific component usage. */
+  /* --- COLOR PALETTE --- */
+  --header-bg: #9a4d9a;
+  /* -- (prefix) header-bg (name) : (colon) #9a4d9a (hex color) ; (semicolon) 
+     defines a Medium Purple for the header section. */
+
+  --nav-bg: #d06dd0;
+  /* -- (prefix) nav-bg (name) : (colon) #d06dd0 (hex color) ; (semicolon) 
+     defines a Lighter Purple for the navigation area. */
+
+  --body-bg: #ffccf9;
+  /* -- (prefix) body-bg (name) : (colon) #ffccf9 (hex color) ; (semicolon) 
+     defines a soft Light Pink for the main background. */
+
+  --input-bg: #ffe6ff;
+  /* -- (prefix) input-bg (name) : (colon) #ffe6ff (hex color) ; (semicolon) 
+     defines a very light pink for input backgrounds. */
+
+  --text-color: #5a2a5a;
+  /* -- (prefix) text-color (name) : (colon) #5a2a5a (hex color) ; (semicolon) 
+     defines high-contrast Dark Purple for text readability. */
+
+  --button-color: #ff9999;
+  /* -- (prefix) button-color (name) : (colon) #ff9999 (hex color) ; 
+     (semicolon) defines Peachy Pink for primary buttons. */
+
+  --button-border: #000000;
+  /* -- (prefix) button-border (name) : (colon) #000000 (black) ; (semicolon) 
+     defines Solid Black for borders to give a defined look. */
+
+  --purple: #9a4d9a;
+  --pink: #d06dd0;
+  /* Re-declaring branding colors for specific component usage. */
 }
+/* } (closing curly bracket) ends the root variable definitions. */
 
-/* --- GLOBAL RESET --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
-body { /* Targeted styles for the entire page body. */
-  margin: 0; /* Removes default browser margin (white space around the edges). */
-  padding: 0; /* Removes default browser padding. */
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; /* Sets a modern, premium typography style. */
-  background-color: var(--body-bg); /* Applies the global pink background defined in the :root variables. */
-  color: var(--text-color); /* Applies the global dark purple text color for all content. */
+body {
+/* body (b o d y) targets the entire webpage content. { (curly bracket) starts. */
+
+  margin: 0;
+  /* margin (external space) : (colon) 0 (zero) ; (semicolon) removes 
+     default browser margins. */
+
+  padding: 0;
+  /* padding (internal space) : (colon) 0 (zero) ; (semicolon) removes 
+     default browser padding. */
+
+  font-family: 'Inter', sans-serif;
+  /* font-family (typography) : (colon) 'Inter' (font name) ; (semicolon) 
+     sets a modern typography style. */
+
+  background-color: var(--body-bg);
+  /* background-color (surface) : (colon) var(--body-bg) (pink) ; (semicolon). */
+
+  color: var(--text-color);
+  /* color (text) : (colon) var(--text-color) (dark purple) ; (semicolon). */
+
   line-height: 1.6;
+  /* line-height (vertical gap) : (colon) 1.6 ; (semicolon). */
 }
+/* } (closing curly bracket) ends the body style. */
 
 /* --- HEADER / BANNER --- */
-#banner { /* Styles for the unique element with ID 'banner' (usually at the very top). */
-  background-color: var(--header-bg); /* Sets background to the branding purple. */
-  color: white; /* Forces text inside the banner to be pure white. */
-  text-align: center; /* Centers any text or child elements horizontally. */
-  padding: 15px; /* Adds 15 pixels of internal cushion space. */
-  font-size: 1.5rem; /* Makes the banner text 50% larger than the base font (1.5x size). */
-  font-weight: bold; /* Makes the text thick/heavy. */
-  font-style: italic; /* Slants the text to the right for a stylized look. */
-  /* text-shadow: Adds a drop shadow. 1px(right) 1px(down) 2px(blur) rgba(black at 20% opacity). */
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
+#banner {
+/* # (hash) banner (unique ID) targets the top branding bar. { starts. */
 
-#banner h1 { /* Targeted styles for any <h1> tag nested inside the banner. */
-  margin: 0; /* Removes default heading margins to keep the banner height compact and predictable. */
+  background-color: var(--header-bg);
+  /* background-color (surface) : (colon) var(--header-bg) (purple) ; (semicolon). */
+
+  color: white;
+  /* color (text) : (colon) white ; (semicolon). */
+
+  text-align: center;
+  /* text-align (alignment) : (colon) center ; (semicolon) centers the title. */
+
+  padding: 15px;
+  /* padding (internal space) : (colon) 15px ; (semicolon). */
+
+  font-size: 1.5rem;
+  /* font-size (size) : (colon) 1.5rem (large) ; (semicolon). */
+
+  font-weight: bold;
+  /* font-weight (thickness) : (colon) bold ; (semicolon). */
+
+  font-style: italic;
+  /* font-style (slant) : (colon) italic ; (semicolon). */
+
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  /* text-shadow (drop shadow) : (colon) adds a subtle depth effect. ; (semicolon). */
 }
+/* } (closing curly bracket) ends the banner style. */
+
+#banner h1 {
+/* Targets <h1> tags inside the banner. { starts. */
+
+  margin: 0;
+  /* margin (space) : (colon) 0 ; (semicolon) removes default spacing. */
+}
+/* } ends h1 style. */
 
 /* --- NAVIGATION BAR --- */
-#nav-links { /* Container for the site's primary menu links. */
-  background-color: var(--nav-bg); /* Sets the lighter purple background. */
-  padding: 10px; /* Internal cushion. */
-  text-align: center; /* Centers content for browsers that don't support flexbox. */
-  display: flex; /* Activates Flexbox layout mode. */
-  justify-content: center; /* Centers the menu links horizontally. */
-  align-items: center; /* Aligns the links vertically within the 10px padding. */
-  position: relative; /* Allows child elements to be positioned relative to this bar if needed. */
-}
+#nav-links {
+/* # (hash) nav-links (unique ID) targets the menu bar. { starts. */
 
-#nav-links a { /* Styles for the links (anchors) inside the navigation bar. */
-  color: white; /* Forces links to be white. */
-  text-decoration: none; /* Removes the default blue underline from links. */
-  font-size: 1.2rem; /* Sets a clear, readable size. */
-  margin: 0 15px; /* Adds 15px gap on the left and right of EACH link to separate them. */
-  font-weight: bold; /* Makes the menu items stand out. */
-}
+  background-color: var(--nav-bg);
+  /* background-color (surface) : (colon) var(--nav-bg) (light purple) ; 
+     (semicolon). */
 
-#nav-links a:hover { /* Visual feedback when the user's mouse is over a link. */
-  text-decoration: underline; /* Briefly adds an underline to signal that the item is clickable. */
+  padding: 10px;
+  /* padding (space) : (colon) 10px ; (semicolon). */
+
+  display: flex;
+  /* display (layout) : (colon) flex (activates flexbox) ; (semicolon). */
+
+  justify-content: center;
+  /* justify-content (horizontal alignment) : (colon) center ; (semicolon). */
+
+  align-items: center;
+  /* align-items (vertical alignment) : (colon) center ; (semicolon). */
+
+  position: relative;
+  /* position (coordinate system) : (colon) relative ; (semicolon). */
 }
+/* } ends nav-links style. */
+
+#nav-links a {
+/* Targets links inside the navigation bar. { starts. */
+
+  color: white;
+  /* color (text) : (colon) white ; (semicolon). */
+
+  text-decoration: none;
+  /* text-decoration (line) : (colon) none ; (semicolon) removes underline. */
+
+  font-size: 1.2rem;
+  /* font-size (size) : (colon) 1.2rem ; (semicolon). */
+
+  margin: 0 15px;
+  /* margin (external space) : (colon) 0 (top) 15px (sides) ; (semicolon). */
+
+  font-weight: bold;
+  /* font-weight (thickness) : (colon) bold ; (semicolon). */
+}
+/* } ends link style. */
+
+#nav-links a:hover {
+/* Targets links when the mouse is over them. { starts. */
+
+  text-decoration: underline;
+  /* text-decoration (line) : (colon) underline ; (semicolon) adds a line 
+     to show interactivity. */
+}
+/* } ends hover style. */
 
 /* --- DROPDOWN NAVIGATION --- */
 .dropdown {
+/* . (dot) dropdown (class) targets the menu container. { starts. */
+
   position: relative;
+  /* position (coordinate system) : (colon) relative ; (semicolon). */
+
   display: inline-block;
+  /* display (flow) : (colon) inline-block ; (semicolon). */
 }
+/* } ends dropdown style. */
 
 .dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #ffffff;
-  min-width: 240px;
-  box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
-  z-index: 1000;
-  border-radius: 12px;
-  top: calc(100% + 5px);
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 0;
-  text-align: left;
-  border: 1px solid rgba(0,0,0,0.05);
-  overflow: hidden;
-}
+/* . (dot) dropdown-content (class) targets the hidden menu box. { starts. */
 
-/* Show class for JS-controlled toggling */
-.dropdown-content.show {
-  display: block;
-  animation: dropdownFade 0.2s ease-out;
+  display: none;
+  /* display (visibility) : (colon) none (hidden) ; (semicolon). */
+
+  position: absolute;
+  /* position (layering) : (colon) absolute ; (semicolon) pulls it out 
+     of the normal flow. */
+
+  background-color: #ffffff;
+  /* background-color (surface) : (colon) #ffffff (white) ; (semicolon). */
+
+  min-width: 240px;
+  /* min-width (minimum width) : (colon) 240px ; (semicolon). */
+
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+  /* box-shadow (depth) : (colon) creates a floating effect. ; (semicolon). */
+
+  z-index: 1000;
+  /* z-index (layer height) : (colon) 1000 ; (semicolon) ensures it stays 
+     on top of other content. */
+
+  border-radius: 12px;
+  /* border-radius (corners) : (colon) 12px ; (semicolon). */
+
+  top: calc(100% + 5px);
+  /* top (vertical position) : (colon) calculated to be below the button. 
+     ; (semicolon). */
+
+  left: 50%;
+  /* left (horizontal position) : (colon) 50% ; (semicolon). */
+
+  transform: translateX(-50%);
+  /* transform (shift) : (colon) centers the menu box. ; (semicolon). */
+
+  padding: 10px 0;
+  /* padding (space) : (colon) 10px (top) 0 (sides) ; (semicolon). */
+
+  border: 1px solid rgba(0,0,0,0.05);
+  /* border (outline) : (colon) subtle 1px line ; (semicolon). */
 }
+/* } ends dropdown-content style. */
+
+.dropdown-content.show {
+/* Targets the menu when the 'show' instruction is active. { starts. */
+
+  display: block;
+  /* display (visibility) : (colon) block (visible) ; (semicolon). */
+
+  animation: dropdownFade 0.2s ease-out;
+  /* animation (movement) : (colon) runs the fade-in effect. ; (semicolon). */
+}
+/* } ends show style. */
 
 @keyframes dropdownFade {
+/* @keyframes (animation blueprint) dropdownFade (name) defines the transition. */
     from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 #nav-links .dropdown-content a {
+/* Targets links inside the dropdown box. { starts. */
+
   color: #333333 !important;
+  /* color (text) : (colon) #333333 (dark) !important (force) ; (semicolon). */
+
   padding: 12px 20px;
-  text-decoration: none;
+  /* padding (space) : (colon) 12px 20px ; (semicolon). */
+
   display: flex;
+  /* display (layout) : (colon) flex ; (semicolon). */
+
   align-items: center;
+  /* align-items (alignment) : (colon) center ; (semicolon). */
+
   gap: 10px;
+  /* gap (spacing) : (colon) 10px ; (semicolon). */
+
   margin: 0;
+  /* margin (space) : (colon) 0 ; (semicolon). */
+
   font-size: 0.9rem;
+  /* font-size (size) : (colon) 0.9rem ; (semicolon). */
+
   font-weight: 500;
+  /* font-weight (thickness) : (colon) 500 ; (semicolon). */
+
   transition: all 0.2s;
+  /* transition (animation) : (colon) 0.2s ; (semicolon). */
 }
+/* } ends link style. */
 
-/* User requirement: Darker background on hover */
 #nav-links .dropdown-content a:hover {
+/* Targets dropdown links when hovered. { starts. */
+
   background-color: #f3f4f6;
+  /* background-color (surface) : (colon) #f3f4f6 (light grey) ; (semicolon). */
+
   color: var(--purple) !important;
-  text-decoration: none !important;
-  padding-left: 25px; /* Subtle micro-animation */
-}
+  /* color (text) : (colon) var(--purple) !important ; (semicolon). */
 
-/* Remove hover-only display */
-.dropdown:hover .dropdown-content {
-  display: none; 
+  padding-left: 25px;
+  /* padding-left (indent) : (colon) 25px ; (semicolon) subtle micro-animation. */
 }
-.dropdown:hover .dropdown-content.show {
-  display: block;
-}
+/* } ends hover style. */
 
-/* Role-based Visibility Control - ENSURING DROPDOWNS SHOW UP */
+/* Role-based Visibility Control */
 .admin-only, .user-only, .agent-only { display: none !important; }
+/* Hides specific elements by default using !important (force). */
 
-body.admin-role .admin-only { 
-    display: inline-block !important; 
-}
-
-body.agent-role .agent-only { 
-    display: inline-block !important; 
-}
-
-body.passenger-role .user-only { 
-    display: inline-block !important; 
-}
+body.admin-role .admin-only { display: inline-block !important; }
+body.agent-role .agent-only { display: inline-block !important; }
+body.passenger-role .user-only { display: inline-block !important; }
+/* Reveals elements based on the role class added to the <body>. */
 
 /* --- INPUT FIELDS (Pill Shape) --- */
-input.input { /* Styles for <input> elements with the class 'input'. */
-  width: 100%; /* Forces the field to stretch to the full width of its container. */
-  padding: 12px 20px; /* 12px top/bottom and 20px left/right for comfortable typing space. */
-  margin: 8px 0; /* adds vertical spacing to separate fields. */
-  display: inline-block; /* Allows the element to respect width/padding while staying in the flow. */
-  border: 2px solid var(--button-border); /* Applies a solid 2px black border. */
-  border-radius: 25px; /* Curves the edges significantly to create a smooth 'pill' shape. */
-  box-sizing: border-box; /* Ensures padding and border are included in the 100% width calculation. */
-  background-color: var(--input-bg); /* Applies the light pink background color. */
-  font-family: inherit; /* Inherits the playful 'Comic Sans' font from the body. */
-  font-size: 1rem; /* Standard text size for inputs. */
+input.input {
+/* Targets <input> tags with the 'input' class. { starts. */
+
+  width: 100%;
+  /* width (horizontal span) : (colon) 100% (full) ; (semicolon). */
+
+  padding: 12px 20px;
+  /* padding (internal space) : (colon) 12px 20px ; (semicolon). */
+
+  margin: 8px 0;
+  /* margin (external space) : (colon) 8px (top/bottom) 0 (sides) ; 
+     (semicolon). */
+
+  display: inline-block;
+  /* display (flow) : (colon) inline-block ; (semicolon). */
+
+  border: 2px solid var(--button-border);
+  /* border (outline) : (colon) 2px solid var(--button-border) (black) ; 
+     (semicolon). */
+
+  border-radius: 25px;
+  /* border-radius (corner curvature) : (colon) 25px ; (semicolon) 
+     creates the 'pill' shape. */
+
+  box-sizing: border-box;
+  /* box-sizing (calculation) : (colon) border-box ; (semicolon). */
+
+  background-color: var(--input-bg);
+  /* background-color (surface) : (colon) var(--input-bg) (light pink) ; 
+     (semicolon). */
+
+  font-size: 1rem;
+  /* font-size (size) : (colon) 1rem ; (semicolon). */
 }
+/* } ends input style. */
 
 /* --- BUTTONS (Pill Shape + Shadow) --- */
 .button,
-button { /* Shared styles for links styled as buttons (.button) and actual <button> elements. */
-  background-color: var(--button-color); /* The signature peach color. */
-  color: black; /* Dark text for high contrast. */
-  padding: 12px 20px; /* Comfortable clicking area. */
-  margin: 10px 0; /* Vertical spacing. */
-  border: 2px solid var(--button-border); /* Strong black border. */
-  border-radius: 25px; /* Pill shape matching the inputs. */
-  cursor: pointer; /* Mandatory visual cue: changes cursor to pointer (hand). */
-  width: 100%; /* Full-width buttons for a bold mobile-friendly UI. */
-  font-size: 1.1rem; /* Slightly larger text for calls to action. */
-  font-weight: bold; /* Bold text for importance. */
-  /* box-shadow: Creates a 'retro' hard shadow. 3px(right) 3px(down) 0px(no blur) Black at 100% opacity. */
+button {
+/* Targets .button class and <button> tags. { starts. */
+
+  background-color: var(--button-color);
+  /* background-color (surface) : (colon) var(--button-color) (peach) ; 
+     (semicolon). */
+
+  color: black;
+  /* color (text) : (colon) black ; (semicolon). */
+
+  padding: 12px 20px;
+  /* padding (space) : (colon) 12px 20px ; (semicolon). */
+
+  margin: 10px 0;
+  /* margin (space) : (colon) 10px 0 ; (semicolon). */
+
+  border: 2px solid var(--button-border);
+  /* border (outline) : (colon) 2px solid black ; (semicolon). */
+
+  border-radius: 25px;
+  /* border-radius (corners) : (colon) 25px ; (semicolon) pill shape. */
+
+  cursor: pointer;
+  /* cursor (mouse) : (colon) pointer (hand) ; (semicolon). */
+
+  width: 100%;
+  /* width (span) : (colon) 100% ; (semicolon). */
+
+  font-size: 1.1rem;
+  /* font-size (size) : (colon) 1.1rem ; (semicolon). */
+
+  font-weight: bold;
+  /* font-weight (thickness) : (colon) bold ; (semicolon). */
+
   box-shadow: 3px 3px 0px rgba(0, 0, 0, 1);
-  transition: transform 0.1s, box-shadow 0.1s; /* Enables quick 0.1s animation when clicked. */
+  /* box-shadow (elevation) : (colon) 3px 3px 0px black ; (semicolon) 
+     creates a hard retro shadow. */
+
+  transition: transform 0.1s, box-shadow 0.1s;
+  /* transition (animation) : (colon) handles quick movement. ; (semicolon). */
 }
+/* } ends button style. */
 
 .button:active,
-button:active { /* State triggered while the button is being held down by the user's mouse/finger. */
-  transform: translate(2px, 2px); /* Physically shifts the button 2px right and 2px down. */
-  /* Shrinks the shadow to 1px to simulate the button being 'pressed' into the page. */
+button:active {
+/* Targets the button when pressed. { starts. */
+
+  transform: translate(2px, 2px);
+  /* transform (move) : (colon) shifts the button down and right. ; (semicolon). */
+
   box-shadow: 1px 1px 0px rgba(0, 0, 0, 1);
+  /* box-shadow (shadow) : (colon) shrinks the shadow to simulate a press. 
+     ; (semicolon). */
 }
+/* } ends active style. */
 
-/* Specific Button Colors override */
-.cta-btn { /* 'Call To Action' specific class. */
-  background-color: #ff9999 !important; /* !important ensures the peachy peach color is always used regardless of other cascade rules. */
+.cta-btn {
+/* . (dot) cta-btn (class) targets Call To Action buttons. { starts. */
+
+  background-color: #ff9999 !important;
+  /* background-color (surface) : (colon) #ff9999 !important (force) ; 
+     (semicolon). */
 }
+/* } ends cta-btn style. */
 
-/* "Action Buttons" - Smaller buttons used inside table rows or detail views. */
 .action-btn {
-  display: inline-block; /* Allows buttons to sit side-by-side. */
-  width: auto; /* Does not stretch to 100%. */
-  padding: 8px 18px; /* Slightly larger for better touch/click targets. */
-  font-size: 0.85rem; /* Smaller text for secondary actions. */
-  color: white !important; /* Forces text to white. */
-  text-decoration: none; /* Removes underlines. */
-  border-radius: 50px; /* Modern Pill Shape for all action buttons. */
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Subtle elevation. */
-  border: none; /* Removes the heavy border. */
+/* Targets smaller action buttons in tables. { starts. */
+
+  display: inline-block;
+  /* display (flow) : (colon) inline-block ; (semicolon). */
+
+  width: auto;
+  /* width (horizontal span) : (colon) auto (content-based) ; (semicolon). */
+
+  padding: 8px 18px;
+  /* padding (space) : (colon) 8px 18px ; (semicolon). */
+
+  font-size: 0.85rem;
+  /* font-size (size) : (colon) 0.85rem ; (semicolon). */
+
+  color: white !important;
+  /* color (text) : (colon) white !important ; (semicolon). */
+
+  text-decoration: none;
+  /* text-decoration (line) : (colon) none ; (semicolon). */
+
+  border-radius: 50px;
+  /* border-radius (corners) : (colon) 50px ; (semicolon) modern pill shape. */
+
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+  /* box-shadow (shadow) : (colon) adds subtle elevation. ; (semicolon). */
+
+  border: none;
+  /* border (outline) : (colon) none ; (semicolon). */
+
   font-weight: 700;
+  /* font-weight (thickness) : (colon) 700 (bold) ; (semicolon). */
+
   transition: all 0.2s;
+  /* transition (animation) : (colon) 0.2s ; (semicolon). */
 }
+/* } ends action-btn style. */
 
 .action-btn:hover {
+/* Targets action buttons when hovered. { starts. */
+
     transform: scale(1.05);
+    /* transform (scale) : (colon) grows the button by 5%. ; (semicolon). */
+
     opacity: 0.9;
+    /* opacity (transparency) : (colon) 0.9 (slight fade) ; (semicolon). */
 }
+/* } ends hover style. */
 
-.btn-view { /* Stylized specifically for viewing records. */
-  background-color: #9a4d9a; /* Deep purple background. */
-}
-
-.btn-delete { /* Color-coding specifically for destructive/permanent actions. */
-  background-color: #ff4d4d; /* Bright red signals 'Danger' or 'Delete'. */
-}
-
-.btn-cancel { /* Color-coding for non-destructive removals (cancellations). */
-  background-color: #f59e0b; /* Vibrant Orange for Warning/Cancel. */
-}
-
-.btn-print { /* Purple Print Button as requested. */
-    background-color: #9a4d9a;
-}
-
-.print-btn { /* Alias for compatibility. */
-    background-color: #9a4d9a;
-    color: white !important;
-    border-radius: 50px;
-}
+.btn-view { background-color: #9a4d9a; }
+.btn-delete { background-color: #ff4d4d; }
+.btn-cancel { background-color: #f59e0b; }
+.btn-print { background-color: #9a4d9a; }
+/* Color overrides for specific action types (View, Delete, Cancel, Print). */
 
 /* --- LABELS --- */
-label { /* Styles for the text descriptive tags above input fields. */
-  font-weight: bold; /* Bold labels for clarity and professional structure. */
-  display: block; /* Moves the label to its own line so the input field follows below it. */
-  margin-top: 10px; /* Gap above the label. */
-  margin-bottom: 5px; /* Gap between the label and its input field. */
-  color: var(--text-color); /* Uses branding dark purple. */
+label {
+/* Targets <label> tags. { starts. */
+
+  font-weight: bold;
+  /* font-weight (thickness) : (colon) bold ; (semicolon). */
+
+  display: block;
+  /* display (flow) : (colon) block (moves to own line) ; (semicolon). */
+
+  margin-top: 10px;
+  /* margin-top (space above) : (colon) 10px ; (semicolon). */
+
+  margin-bottom: 5px;
+  /* margin-bottom (space below) : (colon) 5px ; (semicolon). */
+
+  color: var(--text-color);
+  /* color (text color) : (colon) var(--text-color) ; (semicolon). */
 }
+/* } ends label style. */
 
 /* --- LINKS --- */
-a { /* Global styles for hyperlink tags. */
-  color: var(--header-bg); /* Sets links to branding purple by default. */
-  text-decoration: none; /* Removes underlines to keep the UI clean. */
-}
+a {
+/* Targets global link <a> tags. { starts. */
 
-a:hover { /* Visual feedback. */
-  text-decoration: underline; /* Re-adds underline to show interaction. */
+  color: var(--header-bg);
+  /* color (text color) : (colon) var(--header-bg) ; (semicolon). */
+
+  text-decoration: none;
+  /* text-decoration (line) : (colon) none ; (semicolon). */
 }
+/* } ends link style. */
+
+a:hover {
+/* Targets links when hovered. { starts. */
+
+  text-decoration: underline;
+  /* text-decoration (line) : (colon) underline ; (semicolon). */
+}
+/* } ends hover style. */
+
+/* --- PRINT CONTROL --- */
+@media print {
+/* @ (at symbol) media (m e d i a) print (p r i n t) { (curly bracket) starts 
+   a special set of rules that only apply when the user is printing the 
+   document or saving it as a PDF. */
+
+    .no-print {
+    /* . (dot) no-print (n o - p r i n t) is the utility class selector used 
+       to mark elements that should not appear on paper. { starts. */
+
+        display: none !important;
+        /* display (visibility) : (colon) none (hidden) ! (exclamation mark) 
+           important (priority keyword) ; (semicolon) forces the browser 
+           to remove the element from the printed layout. */
+    }
+    /* } ends the class definition. */
+
+    body {
+    /* body (b o d y) { starts rules for the printed page background. */
+
+        background-color: white !important;
+        /* background-color (surface) : (colon) white (white) !important ; 
+           (semicolon) ensures that no pink or purple background patterns 
+           waste printer ink. */
+    }
+    /* } ends body print rules. */
+
+}
+/* } (closing curly bracket) ends the @media print block. */
+
+/* --- REPORT TABLES & CONTAINERS --- */
+/* This section defines the layout for all data reports to ensure they fit properly. */
+
+.view-container {
+/* . (dot) view-container (class name) targets the main white box for reports. { starts. */
+
+  max-width: 1600px;
+  /* max-width (maximum horizontal span) : (colon) 1600px (pixels) ; (semicolon) 
+     ensures the box is wider but does not go edge-to-edge on huge screens. */
+
+  width: 92%;
+  /* width (standard span) : (colon) 92% (percentage of screen) ; (semicolon) 
+     gives the box a comfortable width with breathing room on the sides. */
+
+  margin: 30px auto;
+  /* margin (external space) : (colon) 30px (top/bottom) auto (centers it) ; 
+     (semicolon). */
+
+  padding: 30px;
+  /* padding (internal space) : (colon) 30px ; (semicolon) keeps content 
+     away from the box edges. */
+
+  background-color: rgba(255, 255, 255, 0.7);
+  /* background-color (surface) : (colon) white with 70% opacity ; (semicolon) 
+     creates a glass-like effect. */
+
+  border: 2px solid var(--header-bg);
+  /* border (outline) : (colon) 2px purple line ; (semicolon). */
+
+  border-radius: 15px;
+  /* border-radius (corners) : (colon) 15px ; (semicolon) rounded aesthetic. */
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  /* box-shadow (shadow) : (colon) adds a soft depth effect. ; (semicolon). */
+}
+/* } ends view-container style. */
+
+.crud-table {
+/* . (dot) crud-table (class name) targets the data grid itself. { starts. */
+
+  width: 100%;
+  /* width (horizontal span) : (colon) 100% ; (semicolon) forces the table 
+     to fit perfectly inside its parent section. */
+
+  border-collapse: collapse;
+  /* border-collapse (line style) : (colon) collapse ; (semicolon) merges 
+     cell borders into single clean lines. */
+
+  margin-top: 20px;
+  /* margin-top (top gap) : (colon) 20px ; (semicolon) separates the table 
+     from headings above. */
+
+  background-color: white;
+  /* background-color (surface) : (colon) white ; (semicolon) ensures 
+     data readability. */
+}
+/* } ends crud-table style. */
+
+.crud-table th, 
+.crud-table td {
+/* Targets both headings (th) and data cells (td). { starts. */
+
+  padding: 12px 15px;
+  /* padding (cell space) : (colon) 12px (top/bottom) 15px (sides) ; (semicolon). */
+
+  border-bottom: 1px solid #edf2f7;
+  /* border-bottom (line below) : (colon) 1px light grey line ; (semicolon). */
+
+  text-align: left;
+  /* text-align (alignment) : (colon) left ; (semicolon). */
+}
+/* } ends cell style. */
+
+.crud-table th {
+/* Targets only the header row cells. { starts. */
+
+  background-color: var(--purple);
+  /* background-color (surface) : (colon) purple ; (semicolon). */
+
+  color: white;
+  /* color (text) : (colon) white ; (semicolon). */
+
+  font-weight: bold;
+  /* font-weight (thickness) : (colon) bold ; (semicolon). */
+
+  text-transform: uppercase;
+  /* text-transform (casing) : (colon) uppercase (all caps) ; (semicolon). */
+
+  font-size: 0.85rem;
+  /* font-size (size) : (colon) 0.85rem (slightly smaller) ; (semicolon). */
+
+  letter-spacing: 1px;
+  /* letter-spacing (gap) : (colon) 1px ; (semicolon) improves readability. */
+}
+/* } ends th style. */
+
+.back-btn-container {
+/* . (dot) back-btn-container (class name) for the return navigation area. { starts. */
+
+  padding: 20px 0;
+  /* padding (internal space) : (colon) 20px (vertical) 0 (horizontal) ; (semicolon). */
+
+  max-width: 1600px;
+  /* max-width (horizontal limit) : (colon) 1600px ; (semicolon) matches report box. */
+
+  margin: 0 auto;
+  /* margin (external space) : (colon) 0 (top) auto (centers it) ; (semicolon). */
+}
+/* } ends back-btn-container style. */
+
+.action-btn {
+/* . (dot) action-btn (class name) for small command buttons in tables. { starts. */
+
+  padding: 6px 14px;
+  /* padding (button size) : (colon) 6px (tall) 14px (wide) ; (semicolon). */
+
+  border-radius: 6px;
+  /* border-radius (corners) : (colon) 6px ; (semicolon) rounded look. */
+
+  text-decoration: none;
+  /* text-decoration (line) : (colon) none ; (semicolon) removes link underline. */
+
+  color: white;
+  /* color (text) : (colon) white ; (semicolon). */
+
+  font-size: 0.85rem;
+  /* font-size (size) : (colon) 0.85rem ; (semicolon) compact text. */
+
+  font-weight: bold;
+  /* font-weight (thickness) : (colon) bold ; (semicolon). */
+
+  display: inline-block;
+  /* display (layout type) : (colon) inline-block ; (semicolon) allows spacing. */
+
+  cursor: pointer;
+  /* cursor (mouse pointer) : (colon) pointer (hand icon) ; (semicolon). */
+
+  border: none;
+  /* border (outline) : (colon) none ; (semicolon) removes default button edge. */
+}
+/* } ends action-btn style. */
+
+.btn-delete { background-color: #ef4444; }
+/* Red color for delete buttons. */
+
+.btn-update, .btn-save { background-color: #3182ce; }
+/* Blue color for update and save buttons. */
+
+.btn-cancel { background-color: #718096; }
+/* Grey color for cancel buttons. */

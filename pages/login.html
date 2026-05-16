@@ -1,111 +1,263 @@
 <!DOCTYPE html>
+<!-- (less than sign) ! (exclamation mark) DOCTYPE (document type) html (h t m l) 
+(greater than sign) is the mandatory declaration that tells the web browser 
+this is a modern HTML5 document. -->
+
 <html lang="en">
-<!-- 
-  ===================================================================
-  LOGIN PAGE
-  ===================================================================
-  This page allows existing users to log in.
-  
-  ===================================================================
-  -->
+<!-- (less than sign) html (h t m l) starts the web document structure. lang 
+(language) = (equals sign) "en" (English text content). (greater than sign). -->
 
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wema Travellers - Login</title>
+<!-- (less than sign) head (h e a d) (greater than sign) starts the hidden 
+configuration section of the page where metadata and styles are defined. -->
 
-  <!-- CSS Links -->
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/entry-page.css" />
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <!-- (less than sign) meta (m e t a) charset (character set) = (equals sign) 
+    "UTF-8" (standard universal text encoding) (greater than sign). -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- (less than sign) meta (m e t a) name (name) = (equals sign) "viewport" 
+    (view port) content (content) = (equals sign) "width=device-width, 
+    initial-scale=1.0" (standard responsive design setting) (greater than sign). -->
+
+    <title>Wema Travellers - Login</title>
+    <!-- (less than sign) title (t i t l e) (greater than sign) sets the specific 
+    label that appears on the browser's tab. (less than sign) / (slash) title 
+    (greater than sign). -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" (style sheet) href (hypertext reference) = (equals sign) 
+    "css/main.css" (the path to the global design rules) (greater than sign). -->
+
+    <link rel="stylesheet" href="css/entry-page.css">
+    <!-- (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" (style sheet) href (hypertext reference) = (equals sign) 
+    "css/entry-page.css" (the path to the specific login layout rules) 
+    (greater than sign). -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" (style sheet) href (hypertext reference) = (equals sign) 
+    "css/style.css" (the path to the branding style overrides) 
+    (greater than sign). -->
+
 </head>
+<!-- (less than sign) / (slash) head (h e a d) (greater than sign) ends the 
+configuration section. -->
 
 <body>
+<!-- (less than sign) body (b o d y) (greater than sign) starts the visible 
+section of the webpage that the user interacts with. -->
 
-  <!-- Include Header and Footer Scripts -->
-  <script src="js/header1.js"></script>
-  <script src="js/footer.js"></script>
+    <script src="js/header1.js"></script>
+    <!-- (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/header1.js" (the path to the top navigation logic) (greater than sign) 
+    (less than sign) / (slash) script (greater than sign). -->
 
+    <script src="js/footer.js"></script>
+    <!-- (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/footer.js" (the path to the bottom footer logic) (greater than sign) 
+    (less than sign) / (slash) script (greater than sign). -->
 
-  <div class="row height-full">
-    <!-- 
-      LEFT SIDE: FORM
-      Contains email and password fields for login.
-      -->
-    <div class="left-column flex flex-column height-full justify-center items-center">
-      <h1 class="welcoming-title">Welcome back</h1>
+    <div class="row height-full">
+    <!-- (less than sign) div (d i v) class (class) = (equals sign) "row height-full" 
+    (greater than sign) is a layout container that splits the screen. -->
 
-      <!-- login.html Form: Sends credentials to the backend for verification. -->
-      <!-- action="account2.php": Points to the central login/signup processing script. -->
-      <!-- method="POST": Hides user passwords from the URL log. -->
-      <form class="form" id="loginForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
+        <div class="left-column flex flex-column height-full justify-center items-center">
+        <!-- (less than sign) div (d i v) class (class) = (equals sign) "left-column 
+        ..." (greater than sign) is the container for the interactive login form. -->
 
-        <!-- EMAIL INPUT -->
-        <label for="email" class="label">Email</label> <!-- Instructional label. -->
-        <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();" /> <!-- The unique user email address. -->
+            <h1 class="welcoming-title">Welcome back</h1>
+            <!-- (less than sign) h1 (heading level one) class (class) = (equals sign) 
+            "welcoming-title" (greater than sign) is the main welcoming text. 
+            (less than sign) / (slash) h1 (greater than sign). -->
 
-        <!-- PASSWORD INPUT -->
-        <label for="password" class="label">Password</label> <!-- Instructional label. -->
-        <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();" />
-        <!-- Masked password field for privacy. -->
+            <!-- login.html Form: Sends credentials to account2.php -->
+            <!-- (less than sign) ! (exclamation mark) - (dash) - (dash) starts 
+            an HTML comment. login.html Form (text). - (dash) - (dash) (greater 
+            than sign) ends the comment. -->
 
-        <!-- LOGIN ACTION -->
-        <!-- name="login": Tells the PHP code to perform the 'Authentication' check instead of 'Registration'. -->
-        <button type="submit" name="login" class="button regular-button pink-background cta-btn">
-          Log in
-        </button>
-      </form>
+            <form class="form" id="loginForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
+            <!-- (less than sign) form (f o r m) class (class) = (equals sign) 
+            "form" (style) id (identification) = (equals sign) "loginForm" 
+            (unique ID) action (destination) = (equals sign) "account2.php" 
+            (the engine script) method (method) = (equals sign) "POST" 
+            (the secure data transmission method) autocomplete (auto complete) 
+            = (equals sign) "off" (security setting) onsubmit (on submit) 
+            = (equals sign) "return validateForm()" (triggers JavaScript 
+            check) (greater than sign). -->
 
-      <script>
-        // Custom JavaScript validation for Login Form
-        // This function validates the email field
-        function validateEmail() {
-          var email = document.getElementById("email").value; // Get the email value from the input field
-          // Check if email is empty or lacks '@' or '.' characters
-          if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
-            alert("You must enter a valid email address"); // Alert the user of the error
-            document.getElementById("email").focus(); // Set focus back to the email field
-            return false; // Return false to indicate validation failed
-          }
-          return true; // Return true if valid
-        }
+                <label for="email" class="label">Email</label>
+                <!-- (less than sign) label (l a b e l) for (for) = (equals sign) 
+                "email" (links the text to the input box) class (class) = (equals sign) 
+                "label" (greater than sign) Email (visible text). (less than 
+                sign) / (slash) label (greater than sign). -->
 
-        // This function validates the password field
-        function validatePassword() {
-          var password = document.getElementById("password").value; // Get the password value
-          if (password.length == 0) { // Check if password is empty
-            alert("Password cannot be empty"); // Alert the user
-            document.getElementById("password").focus(); // Focus on the password field
-            return false; // Validation failed
-          }
-          return true; // Valid
-        }
+                <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();">
+                <!-- (less than sign) input (i n p u t) type (type) = (equals sign) 
+                "text" (standard text entry) name (name) = (equals sign) "email" 
+                (the key used by the PHP engine to find the data) id (unique ID) 
+                = (equals sign) "email" class (class) = (equals sign) "input" 
+                onmouseout (on mouse out) = (equals sign) "validateEmail();" 
+                (triggers a check when the mouse leaves) (greater than sign). -->
 
-        // Main validation function called on form submission
-        function validateForm() {
-          var rtned = true; // Initialize return variable as true
-          rtned = validateEmail(); // Call email validation
-          if (rtned == true) { // If email is valid, proceed to password validation
-            rtned = validatePassword();
-          }
-          return rtned; // Return final boolean to allow or block form submission
-        }
-      </script>
+                <label for="password" class="label">Password</label>
+                <!-- (less than sign) label (greater than sign) Password 
+                (visible text). -->
 
+                <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();">
+                <!-- (less than sign) input (greater than sign) type (type) 
+                = (equals sign) "password" (hides text with dots for security). -->
 
-      <p class="sign-up-prompt">
-        Don’t have an account?
-        <a href="./signup.html" class="sign-up-link">Sign up</a>
-      </p>
+                <button type="submit" name="login" class="button regular-button pink-background cta-btn">Log in</button>
+                <!-- (less than sign) button (b u t t o n) type (type) = (equals 
+                sign) "submit" (sends the form data) name (name) = (equals sign) 
+                "login" (the button's identity) class (class) = (equals sign) 
+                "button ..." (styling) (greater than sign) Log in (visible 
+                text). (less than sign) / (slash) button (greater than sign). -->
+
+            </form>
+            <!-- (less than sign) / (slash) form (greater than sign) ends the 
+            interactive form block. -->
+
+            <script>
+            /* (less than sign) script (s c r i p t) (greater than sign) starts a 
+            JavaScript block for browser-side validation logic. */
+
+                function validateEmail() {
+                /* function (function) starts a logical instruction set. 
+                validateEmail (v a l i d a t e E m a i l) is the unique name 
+                of this logic. ( (bracket) ) (bracket) ( (curly bracket) 
+                starts the instruction block. */
+
+                    var email = document.getElementById("email").value;
+                    /* var (variable) starts a data container. email (e m a i l) 
+                    is the container label. = (equals sign) assignment operator. 
+                    document (the web page) . (dot) getElementById (find the 
+                    element by its unique ID) ( (bracket) "email" (the ID) ) 
+                    (bracket) . (dot) value (the text typed by the user). 
+                    ; (semicolon) terminates the line. */
+
+                    if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+                    /* if (if) starts a logic check. ( (bracket) email . length 
+                    (number of characters) == (is equal to) 0 (zero) || 
+                    (double pipe) is the logical OR operator. email . indexOf 
+                    (find character position) ( (bracket) "@" (quote at quote) 
+                    ) (bracket) == (is equal to) -1 (minus one means not found). 
+                    || (or). email . indexOf ( (bracket) "." (quote dot quote) 
+                    ) (bracket) == -1 (not found). ) (bracket) ends the check. 
+                    { (curly bracket) starts the error path. */
+
+                        alert("You must enter a valid email address");
+                        /* alert (a l e r t) is a browser tool that shows a 
+                        pop-up message. ( (bracket) "You must..." (quote) ) 
+                        (bracket). ; (semicolon). */
+
+                        document.getElementById("email").focus();
+                        /* document . getElementById ( "email" ) . focus (focus) 
+                        is the tool that places the flashing text cursor back 
+                        inside the email box. ( ) (bracket). ; (semicolon). */
+
+                        return false;
+                        /* return (return) sends a result back. false (f a l s e) 
+                        is the logic signal meaning "Failed" or "No". 
+                        ; (semicolon). */
+                    }
+                    /* } (closing curly bracket) ends the error path. */
+
+                    return true;
+                    /* return (return) true (t r u e) is the logic signal 
+                    meaning "Passed" or "Yes". ; (semicolon). */
+                }
+                /* } (closing curly bracket) ends the email validation logic. */
+
+                function validatePassword() {
+                /* function (function) validatePassword (name) ( ) (brackets) 
+                { (bracket) starts the logic for checking the secret secret. */
+
+                    var password = document.getElementById("password").value;
+                    /* var (variable) password (container). = (assign). 
+                    document . getElementById ( "password" ) . value (the 
+                    typed secret). ; (semicolon). */
+
+                    if (password.length == 0) {
+                    /* if (if) check for emptiness. ( (bracket) password . 
+                    length == 0 ) (bracket). { (bracket) starts the error. */
+
+                        alert("Password cannot be empty");
+                        /* alert (pop-up). ; (semicolon). */
+
+                        document.getElementById("password").focus();
+                        /* focus (cursor placement). ; (semicolon). */
+
+                        return false;
+                        /* return false (fail). ; (semicolon). */
+                    }
+                    /* } ends error. */
+
+                    return true;
+                    /* return true (pass). ; (semicolon). */
+                }
+                /* } ends function. */
+
+                function validateForm() {
+                /* function (function) validateForm (name) is the master check 
+                called when the "Log in" button is pressed. { (bracket). */
+
+                    var rtned = validateEmail();
+                    /* var (variable) rtned (r t n e d) container for the 
+                    result. = (assign). validateEmail ( ) (calls the first 
+                    check). ; (semicolon). */
+
+                    if (rtned == true) {
+                    /* if (if) the first check passed. ( (bracket) rtned == 
+                    true ) (bracket). { (bracket). */
+
+                        rtned = validatePassword();
+                        /* rtned (container) = (assign). validatePassword ( ) 
+                        (calls the second check). ; (semicolon). */
+                    }
+                    /* } ends if. */
+
+                    return rtned;
+                    /* return (return) sends the final "true" or "false" result 
+                    to the browser to decide if the form should be sent to 
+                    the server. ; (semicolon). */
+                }
+                /* } ends function. */
+
+            </script>
+            <!-- (less than sign) / (slash) script (greater than sign) ends the 
+            JavaScript validation logic section. -->
+
+            <p class="sign-up-prompt">Don’t have an account? <a href="./signup.html" class="sign-up-link">Sign up</a></p>
+            <!-- (less than sign) p (paragraph) class (class) = (equals sign) 
+            "sign-up-prompt" (greater than sign) Don't have... (text) (less 
+            than sign) a (anchor/link) href (hypertext reference) = (equals 
+            sign) "./signup.html" (the destination page) class (class) 
+            = (equals sign) "sign-up-link" (greater than sign) Sign up 
+            (visible link text) (less than sign) / (slash) a (greater than 
+            sign). (less than sign) / (slash) p (greater than sign). -->
+
+        </div>
+        <!-- (less than sign) / (slash) div (greater than sign) ends the left 
+        form column. -->
+
+        <div class="right-column"></div>
+        <!-- (less than sign) div (d i v) class (class) = (equals sign) 
+        "right-column" (greater than sign) is the container for the 
+        decorative branding image. (less than sign) / (slash) div 
+        (greater than sign). -->
+
     </div>
+    <!-- (less than sign) / (slash) div (greater than sign) ends the main 
+    screen layout container. -->
 
-    <!-- 
-      RIGHT SIDE: IMAGE
-      Displays the Wema Travellers bus image.
-      -->
-    <div class="right-column"></div>
-  </div>
 </body>
+<!-- (less than sign) / (slash) body (greater than sign) ends the visible page 
+content section. -->
 
 </html>
+<!-- (less than sign) / (slash) html (greater than sign) ends the overall web 
+document structure. -->

@@ -14,10 +14,16 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {      // [10
 }                                                                    // [12] Close security barrier.
 
 $sql_report = "SELECT * FROM feedback_report_view ORDER BY feedback_date DESC"; // [13] Data Retrieval: Fetch all records from the virtual feedback view.
-$res_report = $conn->query($sql_report);                             // [14] Execute the standardized report query on the database.
+// mysqli_query (MySQL Improved query) procedural function.
+$res_report = mysqli_query($conn, $sql_report); 
+/* $ (variable) res_report (result list) = (assignment). 
+   mysqli_query (MySQL query) is the command that sends the instruction 
+   to the database server. ( starts. $conn (bridge) , (comma) 
+   $sql_report (the instruction) ) ends. ; (semicolon). */
 
 if (!$res_report) {                                                  // [15] Integrity Check: Verify successful dataset generation.
-    die("System Error: Unable to generate feedback report. Detail: " . $conn->error); // [16] Halt if virtual view or connection fails.
+    // mysqli_error (MySQL Improved error) procedural function.
+    die("System Error: Unable to generate feedback report. Detail: " . mysqli_error($conn)); // [16] Halt if virtual view or connection fails.
 }                                                                    // [17] Close integrity check.
 ?>                                                                   <!-- [18] Close PHP script and prepare for document definition. -->
 
@@ -35,27 +41,46 @@ if (!$res_report) {                                                  // [15] Int
         th, td { padding: 15px; border-bottom: 1px solid #edf2f7; }  /* [30] cell layout. */
         th { background-color: #f1f5f9; color: #4a5568; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; } /* [31] branding. */
         tr:hover { background-color: #fcfdfe; }                      /* [32] interaction. */
-        .btn { display: inline-block; margin-top: 30px; padding: 12px 25px; background-color: #4CAF50; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.2s; } /* [33] cmd btn. */
+        .btn { display: inline-block; padding: 12px 25px; background-color: #4CAF50; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background 0.2s; } /* [33] cmd btn. */
         .btn:hover { background-color: #388e3c; }                    /* [34] interaction. */
         .center-button { text-align: center; }                       /* [35] button wrapper. */
         @media screen and (max-width: 900px) { table { font-size: 0.8rem; } .container { padding: 15px; } } /* [36] responsive tweaks. */
+        @media print { .no-print { display: none; } } /* Hide buttons during printing. */
     </style>                                                         <!-- [37] Terminate internal CSS block. -->
 </head>                                                              <!-- [38] Close head section. -->
 
 <body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [39] Start visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [40] Inject the unified administrative header. -->
     <div class="container">                                              <!-- [41] Open the audit card. -->
+        <div class="no-print" style="text-align: center; margin-bottom: 30px;">
+            <a href="dashboard.php" class="btn" style="background-color: #4a5568;">← Back to Dashboard Hub</a>
+            <!-- (less than sign) ! (exclamation mark) - (dash) - (dash) starts an HTML comment explaining the print tool.
+                 window (w i n d o w) is the browser's global object for the current page.
+                 . (dot) is the member access operator.
+                 print (p r i n t) is the function that triggers the system print menu.
+                 ( (bracket) ) (bracket) tells the browser to execute the tool immediately.
+                 - (dash) - (dash) (greater than sign) ends the explanation. -->
+            <button onclick="window.print()" class="btn" style="background-color: #64748b; border: none; margin-left: 10px; cursor: pointer;">Print Feedback Audit</button>
+        </div>
         <h1>Customer Satisfaction Report</h1>                            <!-- [42] Section title. -->
         <table>                                                          <!-- [43] Start data grid. -->
             <thead><tr><th>ID</th><th>Passenger</th><th>Bus ID</th><th>Vehicle Name</th><th>Score (1-5)</th><th>Passenger Comments</th><th>Date Submitted</th></tr></thead> <!-- [44] head labels. -->
             <tbody>                                                      <!-- [45] Records start. -->
-                <?php if ($res_report && $res_report->num_rows > 0): while ($fb_row = $res_report->fetch_assoc()): ?> <!-- [46] Loop through virtual feedback view records. -->
+                <?php 
+                // mysqli_num_rows (MySQL Improved number of rows) procedural function.
+                if ($res_report && mysqli_num_rows($res_report) > 0): 
+                    // mysqli_fetch_assoc (MySQL Improved fetch associative) procedural function.
+                    while ($fb_row = mysqli_fetch_assoc($res_report)): ?> <!-- while (while) starts a loop. $fb_row (row container) pulls data. 
+                                                                     mysqli_fetch_assoc (fetch associative) converts raw data into labeled pieces. 
+                                                                     ( starts. $res_report (result source). ) ends. : (colon) starts the loop block. -->
                 <tr><td style="color: #888;"><?= $fb_row['feedback_id'] ?></td> <!-- [47] identifier. -->
-                    <td style="font-weight: 600;"><?= htmlspecialchars($fb_row['user_name']) ?></td> <!-- [48] identity. -->
+                    <td style="font-weight: 600;"><?= htmlspecialchars($fb_row['user_name']) ?></td> <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                                                                                        that encodes text for safety. ( starts the tool. $fb_row (data row) 
+                                                                                                        ['user_name'] (identity label) ) ends. -->
                     <td style="font-family: monospace;"><?= $fb_row['bus_id'] !== null ? htmlspecialchars($fb_row['bus_id']) : '<em>N/A</em>' ?></td> <!-- [49] vehicle link. -->
                     <td><?= $fb_row['bus_name'] !== null ? htmlspecialchars($fb_row['bus_name']) : '<span style="color: #bbb;">No Bus Linked</span>' ?></td> <!-- [50] vehicle branding. -->
                     <td style="font-weight: bold; color: <?= $fb_row['rating'] >= 4 ? '#27ae60' : '#e67e22' ?>;"><?= $fb_row['rating'] ?> / 5</td> <!-- [51] score weighting. -->
-                    <td style="max-width: 300px; font-style: italic; color: #444;">"<?= htmlspecialchars($fb_row['comments']) ?>"</td> <!-- [52] verbatim comment. -->
+                    <td style="max-width: 300px; font-style: italic; color: #444;">"<?= htmlspecialchars($fb_row['comments']) ?>"</td> <!-- htmlspecialchars (security tool) ( $fb_row ['comments'] (user review data) ) -->
                     <td style="font-size: 0.85rem; color: #718096;"><?= $fb_row['feedback_date'] ?></td> <!-- [53] timestamp. -->
                 </tr>                                                    <!-- [54] end row. -->
                 <?php endwhile; else: ?>                                 <!-- [55] end loop. -->
@@ -63,7 +88,7 @@ if (!$res_report) {                                                  // [15] Int
                 <?php endif; ?>                                          <!-- [57] end record set check. -->
             </tbody>                                                     <!-- [58] end grid body. -->
         </table>                                                         <!-- [59] end grid. -->
-        <div class="center-button"><a href="dashboard.php" class="btn">← Back to Dashboard Hub</a></div> <!-- [60] return cmd. -->
+        <div class="center-button no-print"><a href="dashboard.php" class="btn">← Back to Dashboard Hub</a></div> <!-- [60] return cmd. Wrapped in no-print. -->
     </div>                                                               <!-- [61] end card enclosure. -->
     <script src="js/footer.js"></script>                                 <!-- [62] inject footer. -->
 </body>                                                              <!-- [63] end body. -->

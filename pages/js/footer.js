@@ -1,27 +1,42 @@
 // ==========================================================================
 // FOOTER.JS (Footer Section Loader)
 // ==========================================================================
-// Purpose: This script dynamically injects a consistent copyright footer at the absolute bottom of every webpage it is included in.
-// This design pattern avoids the need to manually type the footer code into dozens of different HTML files.
-// ==========================================================================
+// / (forward slash) / (forward slash) starts a single-line comment.
+// FOOTER.JS is the module title. ( (bracket) Footer Section Loader 
+// (bracket) describes the function of this script.
 
-// document.addEventListener: Adds an event listener to the entire HTML document.
-// 'DOMContentLoaded': Tells the browser to wait until the basic HTML structure (DOM) is fully loaded and parsed.
-// function (): The block of code that will execute as soon as the DOM is ready.
 document.addEventListener('DOMContentLoaded', function () {
+// document (the webpage object) . (dot) addEventListener (listen for event) 
+// is the tool that monitors the state of the web page. ( (opening bracket) 
+// starts the input. 'DOMContentLoaded' (D O M Content Loaded) is the 
+// specific event trigger that fires when the HTML structure is fully 
+// ready. , (comma) separates the trigger from the action. function 
+// (function) starts the logical instructions. ( ) (empty brackets) means 
+// no external inputs. { (opening curly bracket) marks the start of the 
+// footer loading logic.
 
-  // const footer: Declares a constant variable (it won't change) to hold the HTML template.
-  // The ` (backtick) allows us to create a multi-line string in JavaScript (Template Literal).
+// const (constant) is a variable type that cannot be changed once assigned. 
+// footer (f o o t e r) is the unique label for the bottom container data. 
+// = (equals sign) is the assignment operator. ` (backtick symbol) starts a 
+// multi-line template literal string block for HTML code.
   const footer = `
-      <div id="footer"> <!-- A div container with ID 'footer', which is specifically styled in main.css for theme consistency. -->
-        <!-- &copy;: This is a special HTML Entity that instructs the browser to render the circular Copyright $(\copyright)$ symbol. -->
-        <p>&copy; 2026 Wema Travellers. All rights reserved.</p> <!-- The copyright notice text. -->
-      </div> <!-- Closes the footer container. -->
-    `; // Ends the string definition.
+      <div id="footer" class="no-print">
+        <p>&copy; 2026 Wema Travellers. All rights reserved.</p>
+      </div>
+    `;
+// ` (backtick symbol) ends the multi-line string block. ; (semicolon) 
+// terminates the instruction.
 
-  // document.body: Selects the <body> element of the current page.
-  // insertAdjacentHTML: A high-performance method to add HTML content into the document.
-  // 'beforeend': A positioning flag that means "place this new HTML just before the </body> tag closes" (i.e., at the very bottom).
-  // footer: The variable containing the HTML code we just defined above.
   document.body.insertAdjacentHTML('beforeend', footer);
-}); // Closes the event listener function.
+// document (the page object) . (dot) body (the <body> tag) . 
+// insertAdjacentHTML (insert adjacent H T M L) is the built-in function 
+// that injects content into the page. ( (opening bracket) starts the 
+// command. 'beforeend' (before end) is the precise position instruction 
+// which means "place this at the very bottom of the page content". , 
+// (comma) separates inputs. footer (the label for our HTML data) ) 
+// (closing bracket). ; (semicolon) terminates the instruction.
+
+});
+// } (closing curly bracket) ends the logical instructions block. 
+// ) (closing bracket) ends the event listener input. ; (semicolon) 
+// terminates the entire script.

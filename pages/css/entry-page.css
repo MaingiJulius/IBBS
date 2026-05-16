@@ -4,112 +4,163 @@
 /* =========================================================================== */
 /* Specific layout for Login/Signup pages. */
 /* ========================================================================== */
+/* / (forward slash) * (asterisk) starts a professional documentation block.
+   ENTRY PAGE STYLES is the module title. * (asterisk) / (forward slash) closes. */
 
 /* --- CONTAINER --- */
-/* The main wrapper that holds both the visual image side and the interactive form side. */
 .row {
+/* . (dot) row (class name) targets the main screen wrapper. { starts. */
+
     display: flex;
-    /* Flexbox is used to place the form and image side-by-side. */
+    /* display (layout mode) : (colon) flex (activates flexbox) ; (semicolon) 
+       places form and image side-by-side. */
+
     flex: 1;
-    /* Instructs the row to expand and take up all available horizontal space. */
-    /* Take up all available vertical space */
+    /* flex (flexibility) : (colon) 1 (expand to fill space) ; (semicolon). */
+
     margin: 0 !important;
-    /* Overrides any external system margins to ensure the page touches the screen edges. */
+    /* margin (external space) : (colon) 0 !important (force) ; (semicolon) 
+       ensures the content touches the screen edges. */
+
     overflow: hidden;
-    /* Prevents scrollbars from appearing if content slightly overflows the viewport. */
+    /* overflow (overflow management) : (colon) hidden (hide extra) ; 
+       (semicolon) prevents accidental scrollbars. */
 }
+/* } ends row style. */
 
 .height-full {
+/* . (dot) height-full (class) targets 100% height elements. { starts. */
+
     height: 100%;
-    /* Ensures the container occupies 100% of the vertical height of its parent. */
+    /* height (vertical span) : (colon) 100% ; (semicolon) fills the container. */
 }
+/* } ends height-full style. */
 
 /* --- LEFT COLUMN (Form) --- */
 .left-column {
+/* . (dot) left-column (class) targets the interactive form half of the screen. 
+   { starts the style block. */
+
     flex: 1;
-    /* Tells the column to take up exactly half of the available space (50%). */
-    /* Take up 50% space */
+    /* flex (flexibility) : (colon) 1 (occupies 50% of the row) ; (semicolon). */
+
     padding: 40px;
-    /* Internal cushion to keep the form from touching the screen edges. */
+    /* padding (internal space) : (colon) 40px ; (semicolon) cushion 
+       from edges. */
+
     display: flex;
-    /* Activates Flexbox for internal alignment. */
+    /* display (layout) : (colon) flex ; (semicolon). */
+
     flex-direction: column;
-    /* Stacks children (title, form, prompts) vertically. */
+    /* flex-direction (path) : (colon) column (vertical stack) ; (semicolon). */
+
     align-items: center;
-    /* Horizontally centers all content within the column. */
-    /* Center form horizontally */
+    /* align-items (alignment) : (colon) center (centers content 
+       horizontally) ; (semicolon). */
+
     background-color: var(--body-bg);
-    /* Applies the branding pink background. */
-    /* Ensure pink background */
+    /* background-color (surface) : (colon) var(--body-bg) (pink) ; (semicolon). */
+
     overflow-y: auto;
-    /* Adds a scrollbar only if the form height exceeds the screen size. */
+    /* overflow-y (vertical overflow) : (colon) auto (scroll if needed) ; 
+       (semicolon). */
 }
+/* } ends left-column style. */
 
-/* Title "Welcome Back" / "Create Account" */
 .welcoming-title {
+/* . (dot) welcoming-title (class) targets the "Welcome" heading. { starts. */
+
     font-size: 2rem;
-    /* Sets a large, bold font size (2 times the base size). */
+    /* font-size (size) : (colon) 2rem (extra large) ; (semicolon). */
+
     color: var(--text-color);
-    /* Branding dark purple. */
+    /* color (text color) : (colon) var(--text-color) (dark purple) ; (semicolon). */
+
     margin-bottom: 30px;
-    /* Adds significant space below the title. */
+    /* margin-bottom (space below) : (colon) 30px ; (semicolon). */
+
     font-weight: bold;
-    /* Bold text for a strong welcoming feel. */
+    /* font-weight (thickness) : (colon) bold ; (semicolon). */
 }
+/* } ends welcoming-title style. */
 
-/* Form Wrapper */
 .form {
-    width: 100%;
-    /* Allows the form to be responsive. */
-    max-width: 400px;
-    /* Limits the form width so it doesn't look too stretched on desktops. */
-    /* Limit width */
-}
+/* . (dot) form (class) targets the input box wrapper. { starts. */
 
-/* Links to switch between Login/Signup */
+    width: 100%;
+    /* width (horizontal span) : (colon) 100% ; (semicolon) responsive. */
+
+    max-width: 400px;
+    /* max-width (maximum width) : (colon) 400px ; (semicolon) 
+       prevents stretching on wide screens. */
+}
+/* } ends form style. */
+
 .sign-up-prompt,
 .login-prompt {
+/* Targets the "Don't have an account?" text links. { starts. */
+
     margin-top: 20px;
-    /* Adds space above the "Don't have an account?" prompt. */
+    /* margin-top (space above) : (colon) 20px ; (semicolon). */
+
     font-size: 1rem;
-    /* Standard text size. */
+    /* font-size (text size) : (colon) 1rem ; (semicolon). */
 }
+/* } ends prompts style. */
 
 .sign-up-link,
 .log-in-link {
+/* Targets the specific clickable links. { starts. */
+
     color: var(--text-color);
-    /* Uses dark purple to match the rest of the text. */
+    /* color (text color) : (colon) var(--text-color) ; (semicolon). */
+
     font-weight: bold;
-    /* Bolder text makes the links stand out. */
+    /* font-weight (thickness) : (colon) bold ; (semicolon). */
+
     text-decoration: underline;
-    /* Permanent underline to clearly signal these are clickable links. */
+    /* text-decoration (line) : (colon) underline (mandatory signal) ; 
+       (semicolon). */
 }
+/* } ends link style. */
 
 /* --- RIGHT COLUMN (Image Decor) --- */
 .right-column {
+/* . (dot) right-column (class) targets the visual image half of the screen. 
+   { starts the style block. */
+
     flex: 1;
-    /* Also takes up exactly 50% of the space. */
-    /* Take up 50% space */
+    /* flex (flexibility) : (colon) 1 (occupies 50% of the row) ; (semicolon). */
+
     background-image: url("../img/wema_bus_sunset.png");
-    /* Loads the premium bus branding image. */
+    /* background-image (picture) : (colon) url (path) ( "../img/..." ) 
+       ; (semicolon) loads the branding image. */
+
     background-size: cover;
-    /* Ensures the image fills the entire column without distortion. */
+    /* background-size (scaling) : (colon) cover (fills container) ; (semicolon). */
+
     background-position: center;
-    /* Keeps the bus at the center of the view. */
+    /* background-position (alignment) : (colon) center ; (semicolon). */
+
     border-left: 5px solid white;
-    /* Adds a crisp white divider line between the form and the image. */
-    /* Visual separator */
+    /* border-left (left outline) : (colon) 5px solid white ; (semicolon) 
+       creates a divider line. */
+
     display: none;
-    /* By default, this column is HIDDEN (Mobile First methodology). */
-    /* Hidden on mobile */
+    /* display (visibility) : (colon) none (hidden) ; (semicolon) 
+       hidden on small mobile devices by default. */
 }
+/* } ends right-column style. */
 
-/* Responsive Media Query: Show image only on larger screens (Desktops/Tablets) */
 @media (min-width: 768px) {
+/* @media (media query) targets devices with width >= 768 pixels. { starts. */
 
-    /* Applies only when the screen width is at least 768 pixels. */
     .right-column {
+    /* Targets the image column only on larger screens. { starts. */
+
         display: block;
-        /* Changes state from 'none' to 'block' to reveal the decorative image. */
+        /* display (visibility) : (colon) block (visible) ; (semicolon) 
+           reveals the branding image on tablets and desktops. */
     }
 }
+/* } ends media query block. */

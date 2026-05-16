@@ -1,272 +1,720 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * ================================================================= // [3] Visual header for administrative documentation clarity.
- * ADMINISTRATION: USER MANAGEMENT HUB (view_users_sorted.php)       // [4] Title identifying this script as the master user dashboard.
- * ================================================================= // [5] Visual header for administrative documentation clarity.
- * Purpose: This script provides an interface for staff members      // [6] Description: bridge for staff to audit the user registry.
- * (Admins & Agents) to audit the entire system's user database.    // [7] Target audience: high-level personnel.
- * Capabilities: User Registration, Role Assignment, Edit, and Delete. // [8] Functional summary of management capabilities.
- * ================================================================= // [9] Visual header for administrative documentation clarity.
- */                                                                  // [10] Close multi-line documentation block.
+<?php
+// < (less than sign) ? (question mark) php (PHP: Hypertext Preprocessor) is the opening 
+// tag that starts the server-side logic engine.
 
-// [1] DATABASE BRIDGE: Import the $conn connection configuration.   // [11] Documentation for the database integration step.
-require_once 'db_connection.php';                                    // [12] Import the database bridge object ($conn) for MySQL communication.
-require_once 'logger.php';                                           // [12.5] Import the logging utility for auditing operations.
+/**
+ * ADMINISTRATION: USER MANAGEMENT HUB (view_users_sorted.php)
+ */
+// / (forward slash) * (asterisk) * (asterisk) opens a professional documentation block.
+// ADMINISTRATION: USER MANAGEMENT HUB is the module title. * (asterisk) / 
+// (forward slash) closes the block.
 
-// [2] SESSION STATE: Start the engine to track who is currently accessing the page. // [13] Documentation for session handling.
-session_start();                                                    // [14] Initialize or resume the user session to identify the requester.
+require_once 'db_connection.php';
+// require_once (require once) is a directive that imports the database bridge file and 
+// ensures it is only loaded one time to prevent errors. 'db_connection.php' (quote db 
+// underscore connection dot php quote) is the file path. ; (semicolon) terminates the line.
 
-/* --- [3] ACCESS WALL: ROLE-BASED SECURITY --- */                   // [15] Marker for the primary security access control check.
+require_once 'logger.php';
+// require_once (require once) is a directive that imports the activity tracking tool. 
+// 'logger.php' is the file path. ; (semicolon) terminates the instruction.
 
-/**                                                                  // [16] Documentation for security check logic.
- * Security Check Logic:                                             // [17] Header for authorization verification.
- * - is_set($_SESSION['role']): Ensures they are logged in.          // [18] Authentication prerequisite.
- * - in_array(...): Ensures their role is either 'ADMIN' or 'AGENT'. // [19] Role-level prerequisite.
- * - If check fails: Terminate script with a clear 'Access Denied' message. // [20] Outcome for unauthorized access.
- */                                                                  // [21] Close documentation block.
-if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) { // [22] Verify staff permission via role hierarchy.
-    die("Access Denied: Staff Authorization Required.");             // [23] Halt execution and display error if unauthorized.
-}                                                                    // [24] Close security validation boundary.
+session_start();
+// session_start (session start) is the command that activates the server's memory 
+// to track the user across different pages. ( ) (empty brackets) execute the tool. 
+// ; (semicolon) terminates the instruction.
 
-/* --- [4] TRANSACTIONAL LOGIC: DELETE OPERATION --- */               // [25] Marker for processing the 'Delete' action via URL parameter.
+if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) {
+// if (if) starts a logic check for security. ( (opening bracket) starts condition. 
+// ! (exclamation mark) is the NOT operator. isset (is set) checks if a memory 
+// container exists. ( $ (dollar sign) _ (underscore) SESSION [ 'role' ] ) (bracket). 
+// || (double pipe) is the logical OR operator. !in_array (not in array) checks if 
+// the user's role is missing from the authorized list. ['ADMIN', 'AGENT'] (authorized 
+// roles). ) (closing bracket). { (opening curly bracket) starts the rejection logic.
 
-// Condition: Check if the 'delete_user' variable exists in the URL queries. // [26] Documentation for deletion condition.
-if (isset($_GET['delete_user'])) {                                   // [27] Detect if 'delete_user' exists in the incoming query string.
-    // Capture the unique ID of the target user to be removed.        // [28] Documentation for ID capture.
-    $uid = $_GET['delete_user'];                                     // [29] Capture the specific user ID targeted for removal.
+    die("Access Denied: Staff Authorization Required.");
+    // die (die) is a terminal function that prints an error message and stops all 
+    // further code execution. ( "Access Denied..." ) is the message. 
+    // ; (semicolon) terminates the line.
+}
+// } (closing curly bracket) ends the security check block.
+
+if (isset($_GET['delete_user'])) {
+// if (if) starts a logic check to determine if a user removal request has been 
+// transmitted through the URL. ( (opening bracket) starts the condition. 
+// isset (is set) is a built-in tool that verifies if a variable exists. ( (bracket) 
+// $ (dollar sign) is the variable prefix. _ (underscore) connects to the 
+// array name. GET (G E T) is a Superglobal Array used by the server to 
+// collect data sent via the URL query string. [ (opening square bracket) 
+// starts the index pointer. 'delete_user' (quote d e l e t e underscore u s e r 
+// quote) is the specific key attached to the deletion link. ] (closing square 
+// bracket) ends the pointer. ) (bracket) ends the isset tool. ) (closing 
+// bracket) ends the if condition. { (opening curly bracket) marks the 
+// beginning of the user deletion processing logic.
+
+    $uid = $_GET['delete_user'];
+    // $ (dollar sign) variable marker. uid (u i d) is the logical label chosen 
+    // to represent the User Identification number being targeted for removal. 
+    // = (equals sign) is the assignment operator. $ (dollar sign) _ (underscore) 
+    // GET [ 'delete_user' ] retrieves the ID from the URL. ; (semicolon) 
+    // terminates the instruction.
     
-    /* --- [4.5] SELF-DELETION PROTECTION --- */                       // [30] Safety check to prevent administrative lockout.
-    // Logic: Prevent an Admin from locking themselves out of the system. // [31] Rationale for self-deletion block.
-    if ($uid == $_SESSION['user_id']) {                              // [32] Logic: Prevent the active user from deleting themselves.
-        // Redirection with a specific error flag in the URL.        // [33] documentation for error redirect.
-        header("Location: view_users_sorted.php?err=System Safety: You cannot delete your own active session account!"); // [34] Redirect with self-safety error message.
-    } else {                                                         // [35] Else block for standard deletion of other users.
-        // Standard Deletion Flow:                                    // [36] Header for normal deletion logic.
-        // PREPARE: Formulate the DELETE SQL template with security placeholders. // [37] Documentation for SQL prep.
-        $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ?"); // [38] Prepare the SQL command for secure execution.
-        // BIND: Inject the user ID safely as an integer ('i').        // [39] Documentation for binding.
-        $stmt->bind_param("i", $uid);                                // [40] Bind the target ID to the placeholder as an integer.
-        // EXECUTE: Command the database to remove the matching record. // [41] Documentation for execution.
-        // [AUDIT LOG] Record the deletion before final teardown.
-        logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed User Record (UID: $uid)");
+    if ($uid == $_SESSION['user_id']) {
+    // if (if) starts a critical safety check to prevent a staff member from 
+    // accidentally deleting their own account. ( (opening bracket) starts the 
+    // comparison. $ (dollar sign) uid (the target ID) == (double equals sign) 
+    // is the comparison operator for equality. $ (dollar sign) _ (underscore) 
+    // SESSION (the server's memory array) [ 'user_id' ] (the logged-in user's 
+    // ID) ) (closing bracket). { (opening curly bracket) starts the error 
+    // prevention logic.
 
-        $stmt->close();                                              // [44] Release the statement resource.
-        
-        // Success Redirection: Refresh the list with a confirmation note. // [45] Documentation for success redirect.
-        header("Location: view_users_sorted.php?msg=Success: The selected user record has been deleted."); // [46] Redirect with success confirmation.
-    }                                                                // [47] Close conditional safety block.
-    // EXIT: Ensure no further code runs after the header relocation. // [48] Documentation for exit.
-    exit();                                                          // [49] Halt processing following the redirect header.
-}                                                                    // [50] Close the deletion logic boundary.
+        header("Location: view_users_sorted.php?err=System Safety: You cannot delete yourself!");
+        // header (h e a d e r) is a specialized tool that sends raw HTTP 
+        // instructions to the browser. ( (opening bracket) "Location: ..." 
+        // (quote) is the redirection command that moves the user back to the 
+        // list page with a safety warning. ) (closing bracket). ; (semicolon).
 
-/* --- [5] TRANSACTIONAL LOGIC: CREATE NEW USER --- */               // [51] Marker for processing new user registrations.
+        exit();
+        // exit (e x i t) is a terminal command that kills all further server-side 
+        // processing for this request to ensure no accidental deletion occurs. 
+        // ( ) (empty brackets). ; (semicolon).
+    }
+    // } (closing curly bracket) ends the self-deletion safety block.
 
-// Condition: Detect if the 'add_user' form was submitted via POST.   // [52] Documentation for POST detection.
-if (isset($_POST['add_user'])) {                                     // [53] Detect if 'add_user' form was submitted via POST method.
-    // DATA CAPTURE: Map raw form inputs to local PHP variables.      // [54] Documentation for data mapping.
-    $first = $_POST['first_name'];      // Passenger/Staff First Name. // [55] Extract new user's first name from form data.
-    $last = $_POST['last_name'];       // Passenger/Staff Last Name.  // [56] Extract new user's last name from form data.
-    $email = $_POST['email'];           // Primary communication/login ID. // [57] Extract new user's email login identifier.
-    $phone = $_POST['phone_number'];    // Contact marker.             // [58] Extract new user's mobile contact number.
-    $role = $_POST['role'];             // Identity: PASSENGER | AGENT | ADMIN. // [59] Extract the systemic permissions level (role).
+    $sql_del = "DELETE FROM users WHERE user_id = ?";
+    // $ (dollar sign) variable marker. sql_del (s q l underscore d e l) is a 
+    // logical identifier chosen to describe the database removal instruction. 
+    // = (equals sign) assignment operator. "DELETE FROM..." (quote) starts the 
+    // SQL command. ? (question mark) is a critical security placeholder. It 
+    // acts as a safety "hole" that prevents SQL Injection by ensuring the 
+    // ID added later is treated only as a literal value, never as a part of 
+    // the command. ; (semicolon) terminates the line.
     
-    /* --- [5.5] SECURITY: CRYPTOGRAPHIC HASHING --- */               // [60] Section for secure password processing.
-    // We never store visible passwords. password_hash() creates a secure one-way hash. // [61] Rationale for hashing.
-    // PASSWORD_DEFAULT ensures the most modern algorithm (currently Bcrypt) is used. // [62] Algorithm selection rationale.
-    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);    // [63] Generate a one-way secure cryptographic password hash.
+    $stmt_del = mysqli_prepare($conn, $sql_del);
+    // $ (dollar sign) variable marker. stmt_del (s t m t underscore d e l) is 
+    // the handle for the removal tool object. = (equals sign) assignment. 
+    // mysqli (MySQL Improved) _ (underscore) prepare (prepare) is the security 
+    // function that pre-compiles the command. Pre-compiling (pre compiling) 
+    // is the process where the database locks the structure of the DELETE 
+    // instruction before any data is introduced, preventing malicious 
+    // modification. ( (opening bracket) $ (dollar sign) conn (bridge handle) 
+    // , (comma) $ (dollar sign) sql_del (the command blueprint) ) (closing 
+    // bracket). ; (semicolon).
+    
+    mysqli_stmt_bind_param($stmt_del, "i", $uid);
+    /* mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+       bind (bind) _ (underscore) param (parameter) is the function that 
+       securely attaches the data to the query blueprint. 
+       ( starts the tool. $stmt_del is the tool handle. , (comma) separates info. 
+       "i" (integer) means the data is a number. , (comma). $uid is the data. 
+       ) ends the tool. ; (semicolon) terminates the line. */
+    
+    mysqli_stmt_execute($stmt_del);
+    // mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+    // execute (execute) is the command that triggers the actual database 
+    // removal. ( (opening bracket) $ (dollar sign) stmt_del (handle) ) 
+    // (closing bracket). ; (semicolon).
+    
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed User UID: $uid");
+    // logActivity (l o g underscore a c t i v i t y) is a custom audit tool 
+    // that records the event for administrative review. ( (opening bracket) 
+    // $ (dollar sign) _ (underscore) SESSION [ 'user_id' ] (performer) , 
+    // (comma) $ (dollar sign) _ (underscore) SESSION [ 'name' ] (performer) 
+    // , (comma) 'DELETION' (type) , (comma) "Removed..." (description) ) 
+    // (closing bracket). ; (semicolon).
+    
+    mysqli_stmt_close($stmt_del);
+    // mysqli_stmt_close (close) terminates the removal tool and releases 
+    // server resources now that the operation is finished. ( (opening 
+    // bracket) $ (dollar sign) stmt_del ) (closing bracket). ; (semicolon).
+    
+    header("Location: view_users_sorted.php?msg=User deleted successfully.");
+    // header (header) redirection tool sends the browser to the success list page. 
+    // ; (semicolon).
 
-    // SQL PREPARATION: Build the insertion template.                 // [64] Documentation for INSERT preparation.
-    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?, ?)"); // [65] Prepare the INSERT SQL command.
-    
-    // PARAMETER BINDING: Map the 6 string inputs ("ssssss") to the query placeholders. // [66] Documentation for parameter binding.
-    $stmt->bind_param("ssssss", $first, $last, $email, $phone, $pass, $role); // [67] Map the 6 string variables to the query placeholders.
-    
-    // EXECUTION BLOCK: Run the query and handle potential outcome scenarios. // [68] Documentation for execution block.
-    if($stmt->execute()) {                                           // [69] Attempt to commit the new user record to the database.
-        // CASE: SUCCESS.                                             // [70] Success scenario.
-        $msg = "Success: A new profile for " . $role . " has been initialized."; // [71] Define success message.
-    } else {                                                         // [72] Error scenario.
-        // CASE: DB FAILURE (e.g. Email collision / Unique Constraint violation). // [73] Rationale for failure.
-        $msg = "System Error: The user could not be initialized. " . $conn->error; // [74] Define error message with DB feedback.
-    }                                                                // [75] Close execution check.
-    
-    // FINALIZATION: Close statement and refresh UI.                  // [76] Documentation for finalization.
-    $stmt->close();                                                  // [77] Release the statement resource.
-    header("Location: view_users_sorted.php?msg=" . urlencode($msg)); // [78] Redirect to clear form and display status message.
-    exit();                                                          // [79] Halt further execution to ensure redirect behavior.
-}                                                                    // [80] Close POST logic boundary.
-?>                                                                   <!-- [81] Close PHP processing and prepare for document rendering. -->
+    exit();
+    // exit (exit) stops the script. ; (semicolon).
+}
+// } (closing curly bracket) ends the deletion block.
 
-<!DOCTYPE html>                                                         <!-- [82] Define the document type as standard HTML5. -->
-<html lang="en">                                                     <!-- [83] Root element defining the content language as English. -->
-<head>                                                               <!-- [84] Head section containing non-visible document metadata. -->
-    <meta charset="UTF-8">                                           <!-- [85] Specify UTF-8 character encoding for the document. -->
-    <title>User Directory Management - Wema Travellers</title>         <!-- [86] Set the browser tab title for the user directory page. -->
-    
-    <link rel="stylesheet" href="css/main.css">                      <!-- [87] Load the primary shared CSS stylesheet. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [88] Load global layout and branding style variables. -->
-    
-    <style>                                                          /* [89] Start internal CSS block for page-specific UI layout. */
-        .view-container {                                            /* [90] Define the primary content card container. */
-            max-width: 1200px;                                       /* [91] Limit max width for optimal layout on large screens. */
-            margin: 30px auto;                                       /* [92] Apply vertical spacing and horizontal centering. */
-            padding: 35px;                                           /* [93] Internal cushioning within the main card. */
-            background: #ffffff;                                     /* [94] High-contrast white background signature. */
-            border-radius: 12px;                                     /* [95] Modern rounded aesthetic for the dashboard card. */
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05);                /* [96] Soft shadow for premium depth perception. */
-        }                                                            /* [97] End container definition. */
+if (isset($_POST['add_user'])) {
+// if (if) starts a logic check to determine if the user creation form has been 
+// submitted. ( (opening bracket) starts the condition. isset (is set) is a 
+// built-in tool that verifies if a variable exists. ( (bracket) $ (dollar sign) 
+// is the variable prefix. _ (underscore) connects to the array name. POST 
+// (P O S T) is a Superglobal Array used by the server to collect and pull 
+// data from an HTML form sent via the secure HTTP POST method. It does NOT 
+// send data to the database directly; it only captures what the user typed. 
+// [ (opening square bracket) starts the index pointer. 'add_user' (quote) is 
+// the name attribute of the submit button. ] (closing square bracket) ends 
+// the pointer. ) (bracket) ends the isset tool. ) (closing bracket) ends the 
+// condition. { (opening curly bracket) marks the start of the logic.
 
-        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [98] Layout for the return navigation link. */
-        .crud-table { width: 100%; border-collapse: collapse; margin-top: 30px; } /* [99] Base layout for the data grid table. */
-        .crud-table th, .crud-table td { padding: 18px; border-bottom: 1px solid #edf2f7; text-align: left; } /* [100] standard cells. */
-        .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; } /* [101] header style. */
-        .action-btn { padding: 8px 15px; border-radius: 8px; text-decoration: none; color: #ffffff; font-size: 0.85rem; display: inline-block; } /* [102] buttons. */
-        .btn-delete { background-color: #ef4444; }                    /* [103] alert color for deletion. */
-        .btn-reset { background-color: #f59e0b; }                     /* [103.5] Warning color for password reset. */
-        .add-form { background: #f8fafc; padding: 30px; border-radius: 12px; margin-bottom: 40px; border: 1px solid #e2e8f0; } /* [104] entry form. */
-        .form-row { display: flex; gap: 20px; flex-wrap: wrap; }      /* [105] horizontal form fields layout. */
-        .form-group { flex: 1; min-width: 240px; }                    /* [106] field spacing logic. */
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; color: #4a5568; } /* [107] labels. */
-    </style>                                                         <!-- [108] Terminate internal CSS block. -->
-</head>                                                              <!-- [109] End document head. -->
+    $first = $_POST['first_name'];
+    // $ (dollar sign) variable marker. first (f i r s t) is the unique label 
+    // chosen to identify the container for the user's initial name. = (equals 
+    // sign) is the assignment operator. $ (dollar sign) _ (underscore) POST 
+    // (post superglobal array that pulls/collects form data) [ 'first_name' ] 
+    // (key for the first name field) retrieves data. ; (semicolon) terminates 
+    // the instruction.
+
+    $last = $_POST['last_name'];
+    // $ (dollar sign) variable. last label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST (Superglobal Array) [ 'last_name' ] ; (semicolon).
+
+    $email = $_POST['email'];
+    // $ (dollar sign) variable. email label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST (Superglobal Array) [ 'email' ] ; (semicolon).
+
+    $phone = $_POST['phone_number'];
+    // $ (dollar sign) variable. phone label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST (Superglobal Array) [ 'phone_number' ] ; (semicolon).
+
+    $role = $_POST['role'];
+    // $ (dollar sign) variable. role label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST (Superglobal Array) [ 'role' ] ; (semicolon).
+    
+    $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    // $ (dollar sign) variable marker. pass (p a s s) identifies the container 
+    // for the secure secret. = (equals sign) assignment operator. password_hash 
+    // (password hash) is the tool that encrypts the secret. ( (opening bracket) 
+    // $ (dollar sign) _ (underscore) POST (Superglobal Array that pulls data 
+    // from the password field) [ 'password' ] , (comma) PASSWORD_DEFAULT 
+    // (algorithm) ) (closing bracket). ; (semicolon).
+
+    $sql_add = "INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?, ?)";
+    // $ (dollar sign) variable marker. sql_add (s q l underscore a d d) is a 
+    // logical identifier chosen to describe the database creation command. 
+    // = (equals sign) assignment. "INSERT INTO..." (quote) starts the SQL 
+    // instruction. ? (question marks) are six critical security placeholders 
+    // that neutralize SQL Injection by separating the command structure from 
+    // user data. ; (semicolon) terminates the command.
+
+    $stmt_add = mysqli_prepare($conn, $sql_add);
+    // $ (dollar sign) variable marker. stmt_add (s t m t underscore a d d) is 
+    // the handle for the creation tool object. = (equals sign) assignment. 
+    // mysqli_prepare (prepare) pre-compiles the command blueprint. Pre-compiling 
+    // (pre compiling) locks the structural shape of the INSERT command in the 
+    // database before any data is added. ( (opening bracket) $ (dollar sign) 
+    // conn (bridge handle) , (comma) $ (dollar sign) sql_add (the command 
+    // blueprint) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_add, "ssssss", $first, $last, $email, $phone, $pass, $role);
+    /* mysqli_stmt_bind_param (MySQL Improved statement bind parameter) 
+       securely pours the user data into the database blueprint holes (?). 
+       "ssssss" (six strings) defines the data types. 
+       $first, $last, etc. are the variables being safely poured in. 
+       ; (semicolon) terminates the instruction. */
+    
+    if(mysqli_stmt_execute($stmt_add)) {
+    // if (if) check for successful insertion. ( mysqli_stmt_execute ( $stmt_add ) ) 
+    // (bracket). { (opening curly bracket) starts the success path.
+
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'REGISTRATION', "Created new user: $email");
+        // logActivity (log activity) records the new account creation in the audit logs. 
+        // ; (semicolon).
+
+        header("Location: view_users_sorted.php?msg=New user added.");
+        // header redirection back to the list with success message. ; (semicolon).
+
+    } else {
+    // } (closing curly bracket) else (otherwise) failure branch starts. { (opening 
+    // curly bracket).
+
+        header("Location: view_users_sorted.php?err=Error: " . mysqli_error($conn));
+        // header redirection with the specific database error description. ; (semicolon).
+    }
+    // } (closing curly bracket) ends success check.
+
+    mysqli_stmt_close($stmt_add);
+    // mysqli_stmt_close releases the server memory used for the insertion tool. ; (semicolon).
+
+    exit();
+    // exit (exit) stops the script. ; (semicolon).
+}
+// } (closing curly bracket) ends creation logic block.
+
+// --- UPDATE LOGIC (INLINE) ---
+if (isset($_POST['update_user'])) {
+// if (if) starts a logic check to determine if the profile modification form 
+// has been submitted. ( (opening bracket) starts the condition. isset (is set) 
+// checks if a variable exists. ( (bracket) $ (dollar sign) _ (underscore) 
+// POST [ 'update_user' ] (submit button) ) (bracket) ) (bracket). 
+// { (opening curly bracket) marks the start of the update processing logic.
+
+    $uid = $_POST['user_id'];
+    // $ (dollar sign) variable marker. uid (u i d) is the logical label for the 
+    // User Identification number. = (equals sign) assignment operator. 
+    // $ (dollar sign) _ (underscore) POST (Superglobal Array that pulls/collects 
+    // data from the form) [ 'user_id' ] retrieves the target ID. ; (semicolon).
+
+    $first = $_POST['first_name'];
+    // $ (dollar sign) variable. first label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'first_name' ] ; (semicolon).
+
+    $last = $_POST['last_name'];
+    // $ (dollar sign) variable. last label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'last_name' ] ; (semicolon).
+
+    $email = $_POST['email'];
+    // $ (dollar sign) variable. email label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'email' ] ; (semicolon).
+
+    $phone = $_POST['phone_number'];
+    // $ (dollar sign) variable. phone label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'phone_number' ] ; (semicolon).
+
+    $role = $_POST['role'];
+    // $ (dollar sign) variable. role label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'role' ] ; (semicolon).
+
+    $sql_upd = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=? WHERE user_id=?";
+    // $ (dollar sign) variable marker. sql_upd (s q l underscore u p d) is a 
+    // logical identifier chosen to describe the database modification command. 
+    // = (equals sign) assignment operator. "UPDATE..." (quote) starts the 
+    // SQL instruction. ? (question marks) are the six security placeholders 
+    // that neutralize SQL Injection by separating the command structure from 
+    // user data. ; (semicolon) terminates the line.
+
+    $stmt_upd = mysqli_prepare($conn, $sql_upd);
+    // $ (dollar sign) variable marker. stmt_upd (s t m t underscore u p d) is 
+    // the handle for the update tool object. = (equals sign) assignment. 
+    // mysqli_prepare (prepare) pre-compiles the update blueprint. Pre-compiling 
+    // (pre compiling) locks the structural shape of the UPDATE command in the 
+    // database before data is introduced. ( (opening bracket) $ (dollar sign) 
+    // conn (bridge handle) , (comma) $ (dollar sign) sql_upd (the command 
+    // blueprint) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_upd, "sssssi", $first, $last, $email, $phone, $role, $uid);
+    /* mysqli_stmt_bind_param (MySQL Improved statement bind parameter) 
+       securely pours 5 pieces of text (s) and 1 number (i) into the query. 
+       This prevents hackers from changing the database structure. 
+       ; (semicolon). */
+    
+    if(mysqli_stmt_execute($stmt_upd)) {
+    // if (if) check for successful execution of the update. ( (bracket) 
+    // mysqli_stmt_execute ( $stmt_upd ) ) (bracket). { (opening curly bracket).
+
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Modified User UID: $uid");
+        // logActivity (log activity) records the profile change in the audit logs. 
+        // ; (semicolon).
+
+        header("Location: view_users_sorted.php?msg=User updated.");
+        // header redirection back to the list with success message. ; (semicolon).
+
+    } else {
+    // } (closing curly bracket) else (otherwise) failure branch starts. { (opening 
+    // curly bracket).
+
+        header("Location: view_users_sorted.php?err=Update Failed.");
+        // header redirection with error message. ; (semicolon).
+    }
+    // } (closing curly bracket) ends success check.
+
+    mysqli_stmt_close($stmt_upd);
+    // mysqli_stmt_close releases the server memory for the update handle. ; (semicolon).
+
+    exit();
+    // exit (exit) stops the script. ; (semicolon).
+}
+// } (closing curly bracket) ends update logic block.
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management - Wema Travellers</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+    /* [82] <script> starts JavaScript logic. */
+
+        // toggleEdit function (toggle edit) switches between label view and input view.
+        function toggleEdit(uid) {
+        /* [83] function toggleEdit( uid ). { starts block. */
+        /* [83.1] toggleEdit is a tool to swap labels for text boxes. uid is the specific user ID. { starts block. */
+
+            // Find the display span and the edit form by their ID.
+            var views = document.querySelectorAll('.view-' + uid);
+            /* [84] var views = search for '.view-ID'. ; (semicolon). */
+            /* [84.1] var (variable) views is a list of all display labels for this user. querySelectorAll finds them. ; (semicolon). */
+
+            var edits = document.querySelectorAll('.edit-' + uid);
+            /* [85] var edits = search for '.edit-ID'. ; (semicolon). */
+            /* [85.1] var (variable) edits is a list of all hidden input boxes for this user. ; (semicolon). */
+            
+            // Toggle visibility.
+            views.forEach(v => v.style.display = (v.style.display === 'none' ? 'inline' : 'none'));
+            /* [86] views loop. v.style.display toggle. ; (semicolon). */
+            /* [86.1] forEach iterates over every label. (v.style.display) toggles between "none" (hidden) and "inline" (visible). ; (semicolon). */
+
+            edits.forEach(e => e.style.display = (e.style.display === 'none' ? 'inline' : 'none'));
+            /* [87] edits loop. e.style.display toggle. ; (semicolon). */
+            
+            // Toggle the row buttons.
+            document.getElementById('btn-main-' + uid).style.display = 
+                (document.getElementById('btn-main-' + uid).style.display === 'none' ? 'inline-block' : 'none');
+            /* [88] document.getElementById('btn-main-ID') toggle. ; (semicolon). */
+            /* [88.1] Toggles visibility of the primary "Update/Delete" buttons. ; (semicolon). */
+
+            document.getElementById('btn-save-' + uid).style.display = 
+                (document.getElementById('btn-save-' + uid).style.display === 'none' ? 'inline-block' : 'none');
+            /* [89] document.getElementById('btn-save-ID') toggle. ; (semicolon). */
+            /* [89.1] Toggles visibility of the "Save/Cancel" buttons. ; (semicolon). */
+        }
+        /* [90] } ends function. */
+
+        // Simple validation (No Regex)
+        function validateInline(uid) {
+        /* [91] function validateInline( uid ). { starts block. */
+        /* [91.1] validateInline checks if text boxes are empty before saving. { starts block. */
+
+            var f = document.getElementById("f-"+uid).value.trim();
+            /* [92] var f = find input "f-ID".value.trim(). ; (semicolon). */
+            /* [92.1] Gets the text from the first name box and removes spaces. ; (semicolon). */
+
+            if (f == "") { alert("First Name is required"); return false; }
+            /* [93] if empty. alert "First Name...". return false. ; (semicolon). */
+            /* [93.1] if (f) is empty (""), show a popup and stop the save. ; (semicolon). */
+
+            return true;
+            /* [94] return true (allow save). ; (semicolon). */
+        }
+        /* [95] } ends function. */
+
+        function validateAdd() {
+        /* [96] function validateAdd(). { starts block. */
+
+            var f = document.getElementById("add_f").value.trim();
+            /* [97] var f = find input "add_f".value.trim(). ; (semicolon). */
+
+            if (f == "") { alert("First Name is required"); return false; }
+            /* [98] if empty. alert. return false. ; (semicolon). */
+
+            return true;
+            /* [99] return true. ; (semicolon). */
+        }
+        /* [100] } ends function. */
+    </script>
+</head>
+<!-- [102] </head> ends metadata. -->
 
 <body class="<?= strtolower($_SESSION['role']) ?>-role">
-    <script src="js/header2.js"></script>                                <!-- [111] Inject the global administrative navigation bar. -->
-    <div style="height: 100px;"></div>                                   <!-- [112] Fixed header offset buffer. -->
-    
-    <div class="back-btn-container">                                      <!-- [113] Container for the return shortcut. -->
-        <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px;">← Return to Main Hub</a> <!-- [114] nav link. -->
-    </div>                                                               <!-- [115] End return container. -->
+<!-- [103] <body> starts visible page. class adds user role. -->
 
-    <div class="view-container">                                         <!-- [116] Main UI content card start. -->
-        <h2 style="color: var(--purple); margin-bottom: 5px;">👥 User System Directory</h2> <!-- [117] Page header. -->
-        <p style="color: #718096; margin-bottom: 30px; font-size: 0.95rem;">Auditing all registered profiles (Passengers, Agents, and Administrators).</p> <!-- [118] Subheader. -->
+    <script src="js/header2.js"></script>
+    <!-- [104] <script> pulls in navigation header. -->
 
-        <?php if(isset($_GET['msg'])): ?>                                <!-- [119] Conditional logic for success feedback. -->
-            <div style="background: #f0fff4; color: #22543d; padding: 15px; border-radius: 8px; border-left: 6px solid #38a169; margin-bottom: 20px; font-weight: 600;"> ✅ <?= htmlspecialchars($_GET['msg']) ?> </div> <!-- [120] msg box. -->
-        <?php endif; ?>                                                   <!-- [121] Close success check. -->
+    <div style="height: 100px;"></div>
+    <!-- [105] <div> spacer box. -->
+
+    <div class="view-container">
+    <!-- [106] <div class="view-container"> starts main card. -->
+
+        <h2 style="color:var(--purple);">👥 User Management</h2>
+        <!-- [107] <h2> title with user emoji 👥. -->
         
-        <?php if(isset($_GET['err'])): ?>                                <!-- [122] Conditional logic for error feedback. -->
-            <div style="background: #fff5f5; color: #9b2c2c; padding: 15px; border-radius: 8px; border-left: 6px solid #e53e3e; margin-bottom: 20px; font-weight: 600;"> ❌ <?= htmlspecialchars($_GET['err']) ?> </div> <!-- [123] err box. -->
-        <?php endif; ?>                                                   <!-- [124] Close error check. -->
+        <!-- Success/Error Feedback -->
+        <?php if(isset($_GET['msg'])): ?>
+        <!-- [108] [php] if URL has 'msg'. [?] -->
+            <div style="color:green; font-weight:bold;"><?= htmlspecialchars($_GET['msg']) ?></div>
+            <!-- [109] <div> prints success message in green. -->
+        <?php endif; ?>
+        <!-- [110] [php] endif; [?] -->
 
-        <div class="add-form">                                           <!-- [125] Wrapper for account provisioning interface. -->
-            <h3>🆕 Initialize New Account</h3>                           <!-- [126] Form title area. -->
-            <form method="POST" id="userForm" onsubmit="return validateForm()">
-                <div class="form-row">                                   <!-- [128] Responsive row for data entry fields. -->
-                    <div class="form-group"><label>First Name</label><input type="text" name="first_name" id="first_name" class="input" placeholder="Samuel" onmouseout="validateFirstName()"></div> <!-- [129] field. -->
-                    <div class="form-group"><label>Last Name</label><input type="text" name="last_name" id="last_name" class="input" placeholder="Mwangi" onmouseout="validateLastName()"></div> <!-- [130] field. -->
-                    <div class="form-group"><label>Email ID</label><input type="text" name="email" id="email" class="input" placeholder="name@domain.com" onmouseout="validateEmail()"></div> <!-- [131] field. -->
-                    <div class="form-group"><label>Contact Phone</label><input type="text" name="phone_number" id="phone_number" class="input" placeholder="0712 XXX XXX" onmouseout="validatePhone()"></div> <!-- [132] field. -->
-                    <div class="form-group"><label>Security Password</label><input type="password" name="password" id="password" class="input" placeholder="Set temporary pass..." onmouseout="validatePassword()"></div> <!-- [133] field. -->
-                    <div class="form-group"><label>Official Role</label><select name="role" id="role" class="input" onmouseout="validateRole()"><option value="PASSENGER">PASSENGER</option><option value="AGENT">AGENT</option><option value="ADMIN">ADMIN</option></select></div> <!-- [134] field. -->
-                </div>                                                   <!-- [135] end layout row. -->
-                <button type="submit" name="add_user" class="button regular-button pink-background" style="margin-top: 25px; padding: 12px 40px;">Finalize Registration</button> <!-- [136] submit btn. -->
-            </form>                                                      <!-- [137] end form. -->
-        </div>                                                           <!-- [138] end provision box. -->
+        <?php if(isset($_GET['err'])): ?>
+        <!-- [111] [php] if URL has 'err'. [?] -->
+            <div style="color:red; font-weight:bold;"><?= htmlspecialchars($_GET['err']) ?></div>
+            <!-- [112] <div> prints error message in red. -->
+        <?php endif; ?>
+        <!-- [113] [php] endif; [?] -->
 
-        <script>
-            // Custom JS Validation for User Management
-            function validateFirstName() {
-                var val = document.getElementById("first_name").value.trim();
-                if (val == "") {
-                    alert("First Name is required.");
-                    document.getElementById("first_name").focus();
-                    return false;
-                }
-                return true;
-            }
+        <!-- Add User Form -->
+        <div class="add-form">
+        <!-- [114] <div class="add-form"> starts user creation box. -->
 
-            function validateLastName() {
-                var val = document.getElementById("last_name").value.trim();
-                if (val == "") {
-                    alert("Last Name is required.");
-                    document.getElementById("last_name").focus();
-                    return false;
-                }
-                return true;
-            }
+            <h3>Add New User</h3>
+            <!-- [115] <h3> title. -->
 
-            function validateEmail() {
-                var val = document.getElementById("email").value.trim();
-                if (val == "" || val.indexOf("@") == -1 || val.indexOf(".") == -1) {
-                    alert("A valid Email address is required.");
-                    document.getElementById("email").focus();
-                    return false;
-                }
-                return true;
-            }
+            <form method="POST" onsubmit="return validateAdd()">
+            <!-- [116] <form> starts data submission. onsubmit triggers validation check. -->
 
-            function validatePhone() {
-                var val = document.getElementById("phone_number").value.trim();
-                if (val == "" || isNaN(val.replace(/\s/g, '')) || val.length < 10) {
-                    alert("A valid contact phone number is required (min 10 digits).");
-                    document.getElementById("phone_number").focus();
-                    return false;
-                }
-                return true;
-            }
+                <input type="text" name="first_name" id="add_f" placeholder="First Name" required class="input">
+                <!-- [117] <input> text box for first name. -->
 
-            function validatePassword() {
-                var val = document.getElementById("password").value;
-                var regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                if (!regex.test(val)) {
-                    alert("Password must be at least 8 characters long, including uppercase, lowercase, number, and special character.");
-                    document.getElementById("password").focus();
-                    return false;
-                }
-                return true;
-            }
+                <input type="text" name="last_name" placeholder="Last Name" class="input">
+                <!-- [118] <input> text box for last name. -->
 
-            function validateRole() {
-                var val = document.getElementById("role").value;
-                if (val == "") {
-                    alert("Please select a role.");
-                    document.getElementById("role").focus();
-                    return false;
-                }
-                return true;
-            }
+                <input type="email" name="email" id="add_e" placeholder="Email" required class="input">
+                <!-- [119] <input> text box for email address. -->
 
-            function validateForm() {
-                if (!validateFirstName()) return false;
-                if (!validateLastName()) return false;
-                if (!validateEmail()) return false;
-                if (!validatePhone()) return false;
-                if (!validatePassword()) return false;
-                if (!validateRole()) return false;
-                return true;
-            }
-        </script>
+                <input type="text" name="phone_number" placeholder="Phone" class="input">
+                <!-- [120] <input> text box for phone number. -->
 
+                <input type="password" name="password" id="add_p" placeholder="Password" required class="input">
+                <!-- [121] <input> text box for secret password. -->
 
-        <table class="crud-table">                                       <!-- [139] Main registry data table definition. -->
-            <thead><tr><th>ID</th><th>Full Name</th><th>Verified Email</th><th>Mobile Contact</th><th>Identity Role</th><th>Admin Commands</th></tr></thead> <!-- [140] headers. -->
-            <tbody>                                                      <!-- [141] Open body for record rendering loop. -->
-                <?php                                                     // [142] Re-open PHP for data retrieval.
-                $sql = "SELECT * FROM users ORDER BY user_id ASC";       // [143] Define query to fetch all system personnel in sequence.
-                $result = $conn->query($sql);                            // [144] Direct communication with MySQL to fetch user collection.
-                while($row = $result->fetch_assoc()):                    // [145] Iterator: Process the result set row by row.
-                ?>                                                        <!-- [146] Interrupt PHP to output the specific HTML row. -->
-                <tr>                                                     <!-- [147] Data row definition for a single user record. -->
-                    <td><strong style="color: #718096;"><?= $row['user_id'] ?></strong></td> <!-- [148] unique id cell. -->
-                    <td style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td> <!-- [149] name. -->
-                    <td style="color: #4a5568;"><?= htmlspecialchars($row['email']) ?></td> <!-- [150] email cell. -->
-                    <td style="font-family: monospace; letter-spacing: 0.5px;"><?= htmlspecialchars($row['phone_number']) ?></td> <!-- [151] phone cell. -->
-                    <td><span style="background: <?= ($row['role'] == 'ADMIN' ? '#faf5ff' : ($row['role'] == 'AGENT' ? '#f0fff4' : '#ebf8ff')) ?>; color: <?= ($row['role'] == 'ADMIN' ? '#6b46c1' : ($row['role'] == 'AGENT' ? '#2f855a' : '#2b6cb0')) ?>; padding: 5px 12px; border-radius: 50px; font-weight: 900; font-size: 0.7rem; border: 1px solid currentColor;"><?= $row['role'] ?></span></td> <!-- [152] badge. -->
-                    <td>                                                  <!-- [153] Administrative command container. -->
-                        <a href="edit_user.php?user_id=<?= $row['user_id'] ?>" class="action-btn" style="background-color: #3182ce; margin-right: 5px;">Update</a> 
-                        <a href="op_reset_password.php?user_id=<?= $row['user_id'] ?>" class="action-btn btn-reset" style="margin-right: 5px;" onclick="return confirm('RESET PASSWORD: This will set the user\'s password to 123456. Proceed?')">Reset</a>
-                        <a href="?delete_user=<?= $row['user_id'] ?>" class="action-btn btn-delete" onclick="return confirm('CRITICAL WARNING: Permanent deletion? Proceed?')">Delete</a> 
-                    </td>                                                <!-- [156] end commands. -->
-                </tr>                                                    <!-- [157] end record row. -->
-                <?php endwhile; ?>                                       <!-- [158] End database rendering iteration. -->
-            </tbody>                                                     <!-- [159] Close data body. -->
-        </table>                                                         <!-- [160] End data grid. -->
-    </div>                                                               <!-- [161] End central card. -->
+                <select name="role" class="input">
+                <!-- [122] <select> dropdown for permissions level. -->
 
-    <div style="height: 120px;"></div>                                   <!-- [162] Buffer for scrolling clearance. -->
-    <script src="js/footer.js"></script>                                 <!-- [163] Inject global site footer script. -->
-    <script src="js/table_manager.js"></script>
-</body>                                                              <!-- [164] End visible body section. -->
-</html>                                                              <!-- [165] Formal document termination. -->
+                    <option value="PASSENGER">PASSENGER</option>
+                    <!-- [123] <option> for passenger role. -->
+
+                    <option value="AGENT">AGENT</option>
+                    <!-- [124] <option> for agent role. -->
+
+                    <option value="ADMIN">ADMIN</option>
+                    <!-- [125] <option> for admin role. -->
+
+                </select>
+                <!-- [126] </select> ends role choice. -->
+
+                <button type="submit" name="add_user" class="action-btn btn-update">Save New User</button>
+                <!-- [127] <button> that submits the "Create" form. -->
+
+            </form>
+            <!-- [128] </form> ends user creation. -->
+
+        </div>
+        <!-- [129] </div> ends creation box. -->
+
+        <table class="crud-table">
+        <!-- [130] <table> starts the user list grid. -->
+
+            <thead>
+            <!-- [131] <thead> starts header. -->
+
+                <tr>
+                <!-- [132] <tr> starts row. -->
+
+                    <th>ID</th>
+                    <!-- [133] <th> cell for ID label. -->
+
+                    <th>First Name</th>
+                    <!-- [134] <th> cell for First Name label. -->
+
+                    <th>Last Name</th>
+                    <!-- [135] <th> cell for Last Name label. -->
+
+                    <th>Email</th>
+                    <!-- [136] <th> cell for Email label. -->
+
+                    <th>Phone</th>
+                    <!-- [137] <th> cell for Phone label. -->
+
+                    <th>Role</th>
+                    <!-- [138] <th> cell for Role label. -->
+
+                    <th>Actions</th>
+                    <!-- [139] <th> cell for Actions label. -->
+
+                </tr>
+                <!-- [140] </tr> ends row. -->
+
+            </thead>
+            <!-- [141] </thead> ends header. -->
+
+            <tbody>
+            <!-- [142] <tbody> starts data rows. -->
+
+                <?php
+                $sql_list = "SELECT * FROM users ORDER BY user_id ASC";
+                // [143] $sql_list = "SELECT...". ; (semicolon).
+                // [143.1] Command to pull all users from the database. ; (semicolon).
+
+                $res_list = mysqli_query($conn, $sql_list);
+                /* $ (variable) res_list (result list) = (assignment). 
+                   mysqli_query (MySQL query) is the command that sends the instruction 
+                   to the database server. ( starts. $conn (bridge) , (comma) 
+                   $sql_list (the instruction) ) ends. ; (semicolon). */
+
+                while($row = mysqli_fetch_assoc($res_list)):
+                    /* while (while) starts a loop. $row (row container) pulls data. 
+                       mysqli_fetch_assoc (fetch associative) converts raw data into labeled pieces. 
+                       ( starts. $res_list (result source). ) ends. : (colon) starts the loop block. */
+
+                    $uid = $row['user_id'];
+                    // [146] $uid = data. ; (semicolon).
+                    // [146.1] $uid stores the current user's unique number. ; (semicolon).
+                ?>
+                <!-- [147] [?] starts HTML inside loop. -->
+
+                <tr>
+                <!-- [148] <tr> starts a data row for this user. -->
+
+                    <form method="POST" onsubmit="return validateInline(<?= $uid ?>)">
+                    <!-- [149] <form> for modifying this user. [echo] $uid adds the ID to the check. -->
+
+                        <input type="hidden" name="user_id" value="<?= $uid ?>">
+                        <!-- [150] <input type="hidden"> stores the ID invisibly so the server knows who to update. -->
+
+                        <td><?= $uid ?></td>
+                        <!-- [151] <td> cell prints the user's ID number. -->
+                        
+                        <!-- First Name Cell -->
+                        <td>
+                        <!-- [152] <td> cell for First Name. -->
+
+                            <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['first_name']) ?></span>
+                            <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                 that encodes text for safety. ( starts the tool. $row (data row) 
+                                 ['first_name'] (label) ) ends. -->
+                            <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                 that converts dangerous symbols like < into safe text so hackers cannot 
+                                 run scripts. ( starts the tool. $row (row variable) ['first_name'] (column name) 
+                                 is the data being protected. ) ends the tool. -->
+
+                            <input type="text" name="first_name" id="f-<?= $uid ?>" value="<?= htmlspecialchars($row['first_name']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
+                            <!-- value (initial text) = [echo] htmlspecialchars (security tool) 
+                                 ( $row ['first_name'] ) ensures the text in the box is safe. -->
+
+                        </td>
+                        <!-- [155] </td> ends cell. -->
+                        
+                        <!-- Last Name Cell -->
+                        <td>
+                        <!-- [156] <td> cell for Last Name. -->
+
+                            <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['last_name']) ?></span>
+                            <!-- htmlspecialchars (security tool) ( $row ['last_name'] ) -->
+                            <!-- htmlspecialchars (security tool) ( $row ['last_name'] (the family name data) ) 
+                                 converts symbols into safe text. -->
+
+                            <input type="text" name="last_name" id="l-<?= $uid ?>" value="<?= htmlspecialchars($row['last_name']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
+                            <!-- value = [echo] htmlspecialchars (security tool) ( $row ['last_name'] ) -->
+
+                        </td>
+                        <!-- [159] </td> -->
+
+                        <!-- Email Cell -->
+                        <td>
+                        <!-- [160] <td> cell for Email. -->
+
+                            <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['email']) ?></span>
+                            <!-- htmlspecialchars (security tool) ( $row ['email'] ) -->
+                            <!-- htmlspecialchars (security tool) ( $row ['email'] (electronic mail address data) ) -->
+
+                            <input type="email" name="email" id="e-<?= $uid ?>" value="<?= htmlspecialchars($row['email']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
+                            <!-- value = [echo] htmlspecialchars (security tool) ( $row ['email'] ) -->
+
+                        </td>
+                        <!-- [163] </td> -->
+
+                        <!-- Phone Cell -->
+                        <td>
+                        <!-- [164] <td> cell for Phone. -->
+
+                            <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['phone_number']) ?></span>
+                            <!-- htmlspecialchars (security tool) ( $row ['phone_number'] (contact info) ) -->
+
+                            <input type="text" name="phone_number" value="<?= htmlspecialchars($row['phone_number']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
+                            <!-- value = [echo] htmlspecialchars (security tool) ( $row ['phone_number'] ) -->
+
+                        </td>
+                        <!-- [167] </td> -->
+
+                        <!-- Role Cell -->
+                        <td>
+                        <!-- [168] <td> cell for Role. -->
+
+                            <span class="view-<?= $uid ?>"><?= $row['role'] ?></span>
+                            <!-- [169] <span> label. -->
+
+                            <select name="role" class="edit-<?= $uid ?> input-inline" style="display:none;">
+                            <!-- [170] <select> hidden dropdown. -->
+
+                                <option value="PASSENGER" <?= $row['role']=='PASSENGER'?'selected':'' ?>>PASSENGER</option>
+                                <!-- [171] <option>. ? (ternary) choice checks if this is the current role and marks as 'selected'. -->
+
+                                <option value="AGENT" <?= $row['role']=='AGENT'?'selected':'' ?>>AGENT</option>
+                                <!-- [172] <option>. -->
+
+                                <option value="ADMIN" <?= $row['role']=='ADMIN'?'selected':'' ?>>ADMIN</option>
+                                <!-- [173] <option>. -->
+
+                            </select>
+                            <!-- [174] </select> ends hidden dropdown. -->
+
+                        </td>
+                        <!-- [175] </td> -->
+
+                        <!-- Actions Cell -->
+                        <td>
+                        <!-- [176] <td> cell for Buttons. -->
+                            <!-- Default Action Buttons -->
+                            <div id="btn-main-<?= $uid ?>">
+                            <!-- < (less than sign) div (box) id (identity) = "btn-main- [echo] $uid" (unique number) > starts the visible action box. -->
+
+                                <button type="button" class="action-btn btn-update" onclick="toggleEdit(<?= $uid ?>)">Update</button>
+                                <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                     class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                     onclick (on click event) = "toggleEdit (run the toggle tool) ( [echo] $uid (for this user) )" 
+                                     > (greater than sign) Update (label) < / (slash) button > (ends item). -->
+
+                                <a href="?delete_user=<?= $uid ?>" class="action-btn btn-delete" onclick="return confirm('Delete user?')">Delete</a>
+                                <!-- < (less than sign) a (anchor link) href (destination) = "?delete_user = [echo] $uid" (sends ID to URL) 
+                                     class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                     onclick (on click event) = "return confirm (ask a question) ( 'Delete user?' )" 
+                                     > (greater than sign) Delete (label) < / (slash) a > (ends link). -->
+
+                            </div>
+                            <!-- < / (slash) div > ends main button box. -->
+                            
+                            <!-- Editing Action Buttons -->
+                            <div id="btn-save-<?= $uid ?>" style="display:none;">
+                            <!-- < (less than sign) div (box) id (identity) = "btn-save- [echo] $uid" (unique number) 
+                                 style (visual) = "display:none;" (starts hidden) > starts the edit action box. -->
+
+                                <button type="submit" name="update_user" class="action-btn btn-update">Save</button>
+                                <!-- < (less than sign) button (clickable item) type (nature) = "submit" (sends the form data) 
+                                     name (server label) = "update_user" (tells PHP which logic to run) 
+                                     class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                     > (greater than sign) Save (label) < / (slash) button > (ends item). -->
+
+                                <button type="button" class="action-btn btn-delete" onclick="toggleEdit(<?= $uid ?>)">Cancel</button>
+                                <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                     class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                     onclick (on click event) = "toggleEdit (run the toggle tool) ( [echo] $uid (for this user) )" 
+                                     > (greater than sign) Cancel (label) < / (slash) button > (ends item). -->
+
+                            </div>
+                            <!-- < / (slash) div > ends edit button box. -->
+
+                        </td>
+                        <!-- [185] </td> -->
+
+                    </form>
+                    <!-- [186] </form> ends modification form. -->
+
+                </tr>
+                <!-- [187] </tr> ends row for this user. -->
+
+                <?php endwhile; ?>
+                <!-- [188] [php] endwhile; [?] ends the loop. -->
+
+            </tbody>
+            <!-- [189] </tbody> ends data rows. -->
+
+        </table>
+        <!-- [190] </table> ends grid. -->
+
+    </div>
+    <!-- [191] </div> ends main card. -->
+
+    <div style="height: 100px;"></div>
+    <!-- [192] <div> spacer box. -->
+
+    <script src="js/footer.js"></script>
+    <!-- [193] <script> pulls in footer. -->
+
+    <div style="text-align:center;"><a href="dashboard.php" style="color:var(--purple); font-weight:bold;">← Back to Dashboard</a></div>
+    <!-- [194] <div> contains a link to return to the dashboard. -->
+
+</body>
+<!-- [195] </body> ends visible page. -->
+
+</html>
+<!-- [196] </html> ends document. -->
+
+<?php mysqli_close($conn); ?>
+<!-- [197] [php] starts PHP. mysqli_close (m y s q l i underscore c l o s e) shuts down the database bridge $conn to save resources. ; terminates. [?] ends PHP. -->

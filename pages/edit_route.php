@@ -37,11 +37,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_route'])) { // [
 
     // SQL ARCHITECTURE: Define the data synchronization command.    // [31] Narrative comment for the database write section.
     $sql = "UPDATE routes SET from_location=?, to_location=?, departure_date=?, departure_time=?, cost=?, bus_id=? WHERE route_id=?"; // [32] Define the SQL UPDATE query with '?' placeholders.
-    $stmt = $conn->prepare($sql);                                   // [33] Prepare the SQL command to protect against injection attacks.
+    $stmt = $conn->prepare($sql);
+    /* $stmt (handle) = (assignment). 
+       $conn (bridge) -> prepare (prepare) is the security tool that pre-compiles 
+       the command blueprint. "prepare" is used because it supports secure 
+       "Prepared Statements" using placeholders like ? to prevent SQL Injection. 
+       ( starts. $sql (blueprint) ) ends. ; (semicolon). */
     
     // TYPE BINDING: Mapping variables to the query placeholders.    // [34] Narrative comment for parameter mapping.
     // "ssssdii" = 4 Strings, 1 Double/Decimal, 2 Integers.          // [35] Explaining the type definition string for bind_param.
-    $stmt->bind_param("ssssdii", $from, $to, $date, $time, $cost, $bus_id, $route_id); // [36] Sanitize and bind the inputs to the statement object.
+    $stmt->bind_param("ssssdii", $from, $to, $date, $time, $cost, $bus_id, $route_id);
+    /* $stmt (handle) -> bind (bind) _ (underscore) param (parameter) is the 
+       function that securely pours the data into the ? placeholders. 
+       The ? (Question Mark) is a safety hole that ensures user data 
+       is never treated as a command, blocking SQL Injection. 
+       ( starts. "ssssdii" (string, string, string, string, decimal, integer, integer) 
+       is the list of data types. , (comma) separates the variables being safely 
+       attached. ) ends. ; (semicolon). */
     $stmt->execute();                                                // [37] Transmit the finalized update command to the MySQL engine.
     $stmt->close();                                                  // [38] Release the server-side statement resource immediately.
 
@@ -156,7 +168,10 @@ if (!$route) {                                                       // [49] Che
     <form method="POST" id="editRouteForm" onsubmit="return validateForm()">                                             <!-- [131] Open the data submission form using the POST method. -->
         <div class="form-group">                                     <!-- [132] Group container for the 'Starting Location' input. -->
             <label>From Location</label>                             <!-- [133] Textual label identifying the starting city field. -->
-            <input type="text" name="from_location" id="from_location" value="<?= htmlspecialchars($route['from_location']) ?>" onmouseout="validateFrom()"> <!-- [134] Text input pre-filled with existing data (XSS protected). -->
+            <input type="text" name="from_location" id="from_location" value="<?= htmlspecialchars($route['from_location']) ?>" onmouseout="validateFrom()">
+            <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                 that encodes text so symbols like < are safe. ( starts the tool. 
+                 $route (data row) ['from_location'] (origin label) ) ends. -->
         </div>                                                       <!-- [135] Close starting location group. -->
         <div class="form-group">                                     <!-- [136] Group container for the 'Destination' input. -->
             <label>To Location</label>                               <!-- [137] Textual label identifying the arrival city field. -->

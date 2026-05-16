@@ -1,208 +1,454 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * ================================================================= // [3] Visual header for administrative documentation clarity.
- * ADMINISTRATION: ROUTE & SCHEDULE MANAGEMENT (view_routes.php)     // [4] Title identifying this script as the logistics command hub.
- * ================================================================= // [5] Visual header for administrative documentation clarity.
- * Purpose: This script serves as the command center for bus logistics. // [6] Main objective: manage the platform's geographical reach.
- * Features: Route creation, inventory listing, Country-based grouping. // [7] Key components: inventory control and data visualization.
- * ================================================================= // [8] Visual header for administrative documentation clarity.
- */                                                                  // [9] Close multi-line documentation block.
+<?php
+// <?php (opening tag) tells the server to start interpreting the code as PHP.
 
-require_once 'db_connection.php';                                    // [10] Import database bridge object ($conn) for MySQL communication.
-session_start();                                                    // [11] Initialize or resume user session to identify the administrative officer.
+/**
+ * ADMINISTRATION: ROUTE & SCHEDULE MANAGEMENT (view_routes.php)
+ */
 
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) { // [12] Restrict access to authenticated STAFF (Admin/Agent) only.
-    header("Location: login.html");                                  // [13] Redirect unauthorized guests to the security portal.
-    exit();                                                          // [14] Halt execution to protect logistics data records.
-}                                                                    // [15] Close security barrier.
+// require_once (require once) includes the database connection.
+require_once 'db_connection.php';
+// session_start (session start) starts the user session.
+session_start();
 
-if (isset($_GET['delete_route'])) {                                  // [16] Action Handle: Detect a deletion request via URL parameter.
-    $route_id = $_GET['delete_route'];                               // [17] Map the targeted route ID to a local variable.
-    $stmt = $conn->prepare("DELETE FROM routes WHERE route_id = ?"); // [18] Prepare a secure SQL template for record removal.
-    $stmt->bind_param("i", $route_id);                               // [19] Safely inject the ID integer into the query template.
-    $stmt->execute();                                                // [20] Commit the destructive command to the database engine.
-    $stmt->close();                                                  // [21] Release database resources.
-    header("Location: view_routes.php?msg=Success: The travel route has been permanently removed."); // [22] Redirect with confirmation message.
-    exit();                                                          // [23] Halt logic flow.
-}                                                                    // [24] Close deletion block.
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT'])) {
+// if (if) starts a logic check to verify the visitor's identity and permissions. 
+// ( (opening bracket) starts the condition. ! (exclamation mark) is the 
+// NOT operator. isset (is set) checks if a variable exists. ( (bracket) 
+// $ (dollar sign) _ (underscore) SESSION (Superglobal Array used for 
+// server-side memory) [ 'user_id' ] (key for identification) ) (bracket). 
+// || (double pipe) is the logical OR operator. ! (exclamation mark) is NOT. 
+// in_array (in array) is a tool that checks if a value exists within a list. 
+// ( (bracket) $ (dollar sign) _ (underscore) SESSION [ 'role' ] (current 
+// user type) , (comma) [ 'ADMIN' , 'AGENT' ] (list of allowed roles) ) 
+// (closing bracket). ) (closing bracket) ends the condition. { (opening 
+// curly bracket) marks the start of the denial logic.
 
-if (isset($_POST['add_route'])) {                                    // [25] Action Handle: Detect a new route submission via form POST.
-    $from = $_POST['from_location'];                                 // [26] Map origin data.
-    $to = $_POST['to_location'];                                     // [27] Map destination data.
-    $date = $_POST['departure_date'];                                // [28] Map travel date.
-    $time = $_POST['departure_time'];                                // [29] Map clock time.
-    $cost = $_POST['cost'];                                          // [30] Map ticket price.
-    $bus_id = $_POST['bus_id'];                                      // [31] Map physical bus assignment.
-    $stmt = $conn->prepare("INSERT INTO routes (from_location, to_location, departure_date, departure_time, cost, bus_id) VALUES (?, ?, ?, ?, ?, ?)"); // [32] Prepare secure insertion template.
-    $stmt->bind_param("ssssdi", $from, $to, $date, $time, $cost, $bus_id); // [33] Bind all 6 parameters (Strings and Decimals).
-    $stmt->execute();                                                // [34] Finalize the new record creation in MySQL.
-    $stmt->close();                                                  // [35] Release statement resources.
-    header("Location: view_routes.php?msg=Success: New travel segment has been initialized."); // [36] Redirect with success toast.
-    exit();                                                          // [37] Halt logic flow.
-}                                                                    // [38] Close creation block.
-?>                                                                   <!-- [39] Close PHP script and prepare for document definition. -->
+    header("Location: login.html");
+    // header (header) redirection tool sends unauthorized users to the login 
+    // page. ; (semicolon).
 
-<!DOCTYPE html>                                                         <!-- [40] Define standard HTML5 document type. -->
-<html lang="en">                                                     <!-- [41] Root element identifying English as the layout language. -->
-<head>                                                               <!-- [42] Metadata and resource header section. -->
-    <meta charset="UTF-8">                                           <!-- [43] Declare UTF-8 for international character support. -->
-    <title>Schedules & Inventory - Wema Travellers</title>                 <!-- [44] Website title for browser identification. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- [45] Responsive scaling for mobile devices. -->
-    <link rel="stylesheet" href="css/main.css">                      <!-- [46] Load shared component style assets. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [47] Load global project branding variables. -->
-    <style>                                                          /* [48] Page-specific internal CSS architecture. */
-        .view-container { max-width: 1200px; margin: 30px auto; padding: 40px; background: #ffffff; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); } /* [49] Main card. */
-        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [50] layout buffer. */
-        .crud-table { width: 100%; border-collapse: collapse; margin-top: 30px; } /* [51] analytics grid. */
-        .crud-table th, .crud-table td { padding: 16px; border-bottom: 1px solid #edf2f7; text-align: left; } /* [52] cell padding. */
-        .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; } /* [53] branding. */
-        .action-btn { padding: 8px 15px; border-radius: 8px; text-decoration: none; color: #ffffff; font-size: 0.85rem; font-weight: 600; display: inline-block; } /* [54] cmd. */
-        .btn-delete { background-color: #ef4444; } /* [55] destructive alert. */
-        .add-form { background: #f8fafc; padding: 35px; border-radius: 12px; margin-bottom: 40px; border: 1px solid #e2e8f0; } /* [56] form card. */
-        .add-form h3 { margin-top: 0; color: var(--purple); margin-bottom: 25px; } /* [57] header. */
-        .form-row { display: flex; gap: 20px; flex-wrap: wrap; } /* [58] row layout. */
-        .form-group { flex: 1; min-width: 220px; } /* [59] group layout. */
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.8rem; color: #4a5568; text-transform: uppercase; } /* [60] labels. */
-    </style>                                                         <!-- [61] Terminate internal CSS block. -->
-</head>                                                              <!-- [62] Close head section. -->
+    exit();
+    // exit (exit) stops all further script execution immediately. ; (semicolon).
+}
 
-<body class="<?= strtolower($_SESSION['role'] ?? 'staff') ?>-role"> <!-- [63] Start visible document body. -->
-    <script src="js/header2.js"></script>                                <!-- [64] Inject the unified administrative header. -->
-    <div style="height: 100px;"></div>                                   <!-- [65] Fixed header offset buffer. -->
-    <div class="back-btn-container">                                      <!-- [66] Navigation wrapper. -->
-        <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px; font-weight: 700;">← Back to Command Center</a> <!-- [67] link. -->
-    </div>                                                               <!-- [68] Close wrap. -->
+// --- ACTION 1: DELETE ROUTE ---
+if (isset($_GET['delete_route'])) {
+// if (if) starts a logic check to determine if a route removal request has 
+// been transmitted through the URL query string. ( (opening bracket) 
+// starts the condition. isset (is set) checks if a variable exists. 
+// ( (bracket) $ (dollar sign) is the variable prefix. _ (underscore) 
+// connects the prefix to the array name. GET (G E T) is a Superglobal Array 
+// used by the server to collect and pull data from the URL query string. 
+// It does NOT send data to the database directly; it only captures what 
+// is in the address bar. [ (opening square bracket) starts the index pointer. 
+// 'delete_route' (quote) is the key. ] (closing square bracket) ends the 
+// pointer. ) (bracket) ends the isset tool. ) (closing bracket) ends the 
+// condition. { (opening curly bracket) marks the start of the deletion logic.
 
-    <div class="view-container">                                         <!-- [69] Open dashboard card. -->
-        <div class="welcome-banner" style="background: linear-gradient(135deg, var(--purple), var(--pink)); color: #ffffff; padding: 25px; border-radius: 12px; margin-bottom: 30px; text-align: center;"> <!-- [70] banner. -->
-            <h2 style="margin:0; font-weight: 900;">🗺️ Travel Route Management Hub</h2> <!-- [71] title. -->
-            <p style="margin:10px 0 0; font-size: 0.95rem; opacity: 0.9;">Staff Identity: <strong><?= htmlspecialchars($_SESSION['name']) ?></strong></p> <!-- [72] ID. -->
-        </div>                                                           <!-- [73] end banner. -->
+    $route_id = $_GET['delete_route'];
+    // $ (dollar sign) variable marker. route_id (r o u t e underscore i d) is 
+    // the logical label chosen to identify the identification number of the 
+    // route. = (equals sign) assignment operator. $ (dollar sign) _ (underscore) 
+    // GET [ 'delete_route' ] retrieves the ID from the URL. ; (semicolon).
+    
+    $sql_del = "DELETE FROM routes WHERE route_id = ?";
+    // $ (dollar sign) variable marker. sql_del (s q l underscore d e l) is a 
+    // logical identifier chosen to describe the database removal command. 
+    // = (equals sign) assignment operator. "DELETE FROM..." (quote) starts the 
+    // SQL instruction. ? (question mark) is a critical security placeholder 
+    // that neutralizes SQL Injection by ensuring the ID added later is treated 
+    // only as a literal value. ; (semicolon) terminates the line.
+    
+    $stmt_del = mysqli_prepare($conn, $sql_del);
+    /* $stmt_del (handle) = (assignment). 
+       mysqli (MySQL Improved) _ (underscore) prepare (prepare) is the security 
+       function that pre-compiles the command blueprint. 
+       "Improved" (mysqli) is used because it supports secure "Prepared Statements" 
+       using placeholders like ? to prevent SQL Injection. 
+       ( starts. $conn (bridge) , (comma) $sql_del (blueprint) ) ends. ; (semicolon). */
+    
+    mysqli_stmt_bind_param($stmt_del, "i", $route_id);
+    /* mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+       bind (bind) _ (underscore) param (parameter) is the function that 
+       securely pours the data into the ? placeholders. 
+       The ? (Question Mark) is a safety hole that ensures user data 
+       is never treated as a command, blocking SQL Injection. 
+       ( starts. $stmt_del (tool handle) , (comma) "i" (integer number type) 
+       , (comma) $route_id (route identity data) ) ends. ; (semicolon). */
+    
+    mysqli_stmt_execute($stmt_del);
+    // mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+    // execute (execute) is the command that triggers the database removal. 
+    // ( (opening bracket) $ (dollar sign) stmt_del (handle) ) (closing bracket). 
+    // ; (semicolon).
 
-        <?php if(isset($_GET['msg'])): ?>                                <!-- [74] Open notification logic. -->
-            <div style="background: #f0fff4; color: #22543d; padding: 15px; border-radius: 8px; border-left: 6px solid #38a169; margin-bottom: 25px; font-weight: 600;">✅ <?= htmlspecialchars($_GET['msg']) ?></div> <!-- [75] toast. -->
-        <?php endif; ?>                                                   <!-- [76] close check. -->
+    mysqli_stmt_close($stmt_del);
+    // mysqli_stmt_close (close) terminates the tool and releases resources. 
+    // ( (bracket) $ (dollar sign) stmt_del ) (bracket). ; (semicolon).
+    
+    header("Location: view_routes.php?msg=Success: Route removed.");
+    // header (header) redirection tool sends the user back to the list. 
+    // ; (semicolon).
 
-        <div class="add-form">                                           <!-- [77] Start route creation form. -->
-            <h3>🆕 Initialize New travel path</h3>                        <!-- [78] heading. -->
-            <form method="POST" id="routeForm" onsubmit="return validateForm()">
-                <div class="form-row">                                   <!-- [80] start grid row. -->
-                    <div class="form-group"><label>Departure City/Country</label><input type="text" name="from_location" id="from_location" class="input" placeholder="Kisumu, Kenya" onmouseout="validateFrom()"></div> <!-- [81] from. -->
-                    <div class="form-group"><label>Arrival Endpoint</label><input type="text" name="to_location" id="to_location" class="input" placeholder="Kampala, Uganda" onmouseout="validateTo()"></div> <!-- [82] to. -->
-                    <div class="form-group"><label>Calendar date</label><input type="text" name="departure_date" id="departure_date" class="input" placeholder="YYYY-MM-DD" onmouseout="validateDate()"></div> <!-- [83] date. -->
-                    <div class="form-group"><label>Departure time</label><input type="text" name="departure_time" id="departure_time" class="input" placeholder="HH:MM" onmouseout="validateTime()"></div> <!-- [84] time. -->
-                    <div class="form-group"><label>Ticket Price (KES)</label><input type="text" name="cost" id="cost" class="input" placeholder="0.00" onmouseout="validateCost()"></div> <!-- [85] cost. -->
-                    <div class="form-group"><label>Fleet Assignment</label><select name="bus_id" id="bus_id" class="input" style="cursor: pointer;" onmouseout="validateBusId()"> <!-- [86] fleet dropdown. -->
-                        <option value="">Select Bus...</option>
-                        <?php $buses = $conn->query("SELECT bus_id, bus_name FROM buses ORDER BY bus_name ASC"); while($b = $buses->fetch_assoc()) { echo "<option value='{$b['bus_id']}'>{$b['bus_name']} (Fleet {$b['bus_id']})</option>"; } ?> <!-- [87] populate buses. -->
-                    </select></div>                                      <!-- [88] close select. -->
-                </div>                                                   <!-- [89] end grid row. -->
-                <button type="submit" name="add_route" class="button regular-button pink-background" style="margin-top:25px; padding:12px 40px; font-weight:800;">COMMIT travel Path</button> <!-- [90] submit. -->
-            </form>                                                      <!-- [91] end form. -->
-        </div>                                                           <!-- [92] end form area. -->
+    exit();
+    // exit (exit) kills the script processing immediately. ( ) (empty brackets). 
+    // ; (semicolon).
+}
+// } (closing curly bracket) ends the deletion block.
 
-        <script>
-            // Custom JS Validation for Route Management
-            function validateFrom() {
-                var val = document.getElementById("from_location").value.trim();
-                if (val == "") {
-                    alert("Departure City is required.");
-                    document.getElementById("from_location").focus();
-                    return false;
+// --- ACTION 2: ADD NEW ROUTE ---
+if (isset($_POST['add_route'])) {
+// if (if) starts a logic check to determine if the route creation form has 
+// been submitted. ( (opening bracket) starts the condition. isset (is set) 
+// checks if a variable exists. ( (bracket) $ (dollar sign) _ (underscore) 
+// POST [ 'add_route' ] (submit button) ) (bracket) ) (bracket). 
+// { (opening curly bracket) marks the start of the insertion logic.
+
+    $from   = $_POST['from_location'];
+    // $ (dollar sign) variable marker. from (f r o m) is the label chosen to 
+    // identify the departure origin. = (equals sign) assignment operator. 
+    // $ (dollar sign) _ (underscore) POST (Superglobal Array used by the 
+    // server to collect and pull data from an HTML form sent via the secure 
+    // HTTP POST method. It does NOT send data to the database directly; it 
+    // only captures what the user typed) [ 'from_location' ] retrieves data. 
+    // ; (semicolon).
+
+    $to     = $_POST['to_location'];
+    // $ (dollar sign) variable. to label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'to_location' ] ; (semicolon).
+
+    $date   = $_POST['departure_date'];
+    // $ (dollar sign) variable. date label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'departure_date' ] ; (semicolon).
+
+    $time   = $_POST['departure_time'];
+    // $ (dollar sign) variable. time label. = (equals sign) assignment. $ (dollar sign) 
+    // _ (underscore) POST [ 'departure_time' ] ; (semicolon).
+
+    $cost   = $_POST['cost'];
+    // $ (dollar sign) variable. cost (c o s t) label. = (equals sign) 
+    // assignment. $ (dollar sign) _ (underscore) POST [ 'cost' ] ; (semicolon).
+
+    $bus_id = $_POST['bus_id'];
+    // $ (dollar sign) variable. bus_id (b u s underscore i d) label. = (equals 
+    // sign) assignment. $ (dollar sign) _ (underscore) POST [ 'bus_id' ] 
+    // ; (semicolon).
+    
+    $sql_add = "INSERT INTO routes (from_location, to_location, departure_date, departure_time, cost, bus_id) VALUES (?, ?, ?, ?, ?, ?)";
+    // $ (dollar sign) variable marker. sql_add (s q l underscore a d d) is a 
+    // logical identifier chosen to describe the database creation command. 
+    // = (equals sign) assignment. "INSERT INTO..." (quote) starts the SQL 
+    // instruction. ? (question marks) are six critical security placeholders 
+    // that neutralize SQL Injection by separating the command structure from 
+    // user data. ; (semicolon) terminates the command.
+
+    $stmt_add = mysqli_prepare($conn, $sql_add);
+    // $ (dollar sign) variable marker. stmt_add (s t m t underscore a d d) is 
+    // the handle for the creation tool object. = (equals sign) assignment. 
+    // mysqli_prepare (prepare) pre-compiles the command blueprint. Pre-compiling 
+    // (pre compiling) locks the structural shape of the INSERT command in the 
+    // database before any data is added. ( (opening bracket) $ (dollar sign) 
+    // conn (bridge handle) , (comma) $ (dollar sign) sql_add (the command 
+    // blueprint) ) (closing bracket). ; (semicolon).
+    // machine already knows the exact shape of the instruction. ( (opening 
+    // bracket) $ (dollar sign) conn (bridge) , (comma) $ (dollar sign) 
+    // sql_add (command) ) (closing bracket). ; (semicolon).
+    
+    mysqli_stmt_bind_param($stmt_add, "ssssdi", $from, $to, $date, $time, $cost, $bus_id);
+    // mysqli_stmt_bind_param attaches the 4 strings, 1 decimal, and 1 integer to 
+    // the query. Binding (binding) is the process of safely pouring the 
+    // user's data into the pre-compiled blueprint holes (?). This ensures 
+    // the data is treated only as text or numbers, never as a command. 
+    // ( (opening bracket) $ (dollar sign) stmt_add (handle) , (comma) 
+    // "ssssdi" (types) , (comma) $ (dollar sign) from , (comma) $ (dollar sign) 
+    // to , (comma) $ (dollar sign) date , (comma) $ (dollar sign) time 
+    // , (comma) $ (dollar sign) cost , (comma) $ (dollar sign) bus_id 
+    // ) (closing bracket). ; (semicolon).
+    
+    mysqli_stmt_execute($stmt_add);
+    // mysqli_stmt_execute runs the insertion command. ( (opening bracket) 
+    // $ (dollar sign) stmt_add (handle) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_close($stmt_add);
+    // mysqli_stmt_close releases resources. ( (opening bracket) $ (dollar sign) 
+    // stmt_add (handle) ) (closing bracket). ; (semicolon).
+
+    header("Location: view_routes.php?msg=Success: Route created.");
+    // header redirection with success message. ; (semicolon).
+
+    exit();
+    // exit stops script. ; (semicolon).
+}
+// } (closing curly bracket).
+
+// --- ACTION 3: UPDATE ROUTE (INLINE) ---
+if (isset($_POST['update_route'])) {
+// if (if) check for the route update form submission. ( (opening bracket) 
+// isset (is set) ( $ (dollar sign) _ (underscore) POST [ 'update_route' ] ) 
+// (bracket). ) (closing bracket). { (opening curly bracket).
+
+    $route_id = $_POST['route_id'];
+    // $ (dollar sign) variable. route_id label. = (equals sign) assignment. ; (semicolon).
+
+    $from     = $_POST['from_location'];
+    // $ (dollar sign) variable. from label. = (equals sign). ; (semicolon).
+
+    $to       = $_POST['to_location'];
+    // $ (dollar sign) variable. to label. = (equals sign). ; (semicolon).
+
+    $date     = $_POST['departure_date'];
+    // $ (dollar sign) variable. date label. = (equals sign). ; (semicolon).
+
+    $time     = $_POST['departure_time'];
+    // $ (dollar sign) variable. time label. = (equals sign). ; (semicolon).
+
+    $cost     = $_POST['cost'];
+    // $ (dollar sign) variable. cost label. = (equals sign). ; (semicolon).
+
+    $bus_id   = $_POST['bus_id'];
+    // $ (dollar sign) variable. bus_id label. = (equals sign). ; (semicolon).
+
+    $sql_upd = "UPDATE routes SET from_location=?, to_location=?, departure_date=?, departure_time=?, cost=?, bus_id=? WHERE route_id=?";
+    // $ (dollar sign) variable. sql_upd label. = (equals sign). "UPDATE..." (quote). ; (semicolon).
+
+    $stmt_upd = mysqli_prepare($conn, $sql_upd);
+    // $ (dollar sign) variable. stmt_upd handle. = (equals sign). mysqli_prepare 
+    // pre-compiles the update. Pre-compiling (pre compiling) means the machine 
+    // creates a structural blueprint of the command before any data is added. 
+    // This stops hackers from injecting malicious code because the machine 
+    // already knows the exact shape of the instruction. ( (opening bracket) 
+    // $ (dollar sign) conn (bridge) , (comma) $ (dollar sign) sql_upd (command) 
+    // ) (closing bracket). ; (semicolon).
+    
+    mysqli_stmt_bind_param($stmt_upd, "ssssdii", $from, $to, $date, $time, $cost, $bus_id, $route_id);
+    // mysqli_stmt_bind_param attaches the data to the placeholders. Binding 
+    // (binding) is the process of safely pouring the user's data into the 
+    // pre-compiled blueprint holes (?). This ensures the data is treated only 
+    // as text or numbers, never as a command. ( (opening bracket) $ (dollar sign) 
+    // stmt_upd (handle) , (comma) "ssssdii" (types) , (comma) $ (dollar sign) 
+    // from , (comma) $ (dollar sign) to , (comma) $ (dollar sign) date 
+    // , (comma) $ (dollar sign) time , (comma) $ (dollar sign) cost 
+    // , (comma) $ (dollar sign) bus_id , (comma) $ (dollar sign) route_id 
+    // ) (closing bracket). ; (semicolon).
+    
+    mysqli_stmt_execute($stmt_upd);
+    // mysqli_stmt_execute runs the update command. ( (opening bracket) $ (dollar sign) 
+    // stmt_upd (handle) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_close($stmt_upd);
+    // mysqli_stmt_close releases resources. ( (opening bracket) $ (dollar sign) 
+    // stmt_upd (handle) ) (closing bracket). ; (semicolon).
+    
+    header("Location: view_routes.php?msg=Success: Route updated.");
+    // header redirection with success message. ; (semicolon).
+
+    exit();
+    // exit stops script. ; (semicolon).
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schedules & Routes - Wema Travellers</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="<?= strtolower($_SESSION['role'] ?? 'staff') ?>-role">
+    <script src="js/header2.js"></script>
+    <div style="height: 100px;"></div>
+
+    <div class="container" style="margin: 0 auto; padding: 0 20px;">
+        <div style="padding: 20px 0;"><a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← Control Panel Home</a></div>
+
+        <div class="view-container">
+            <h2 style="color: var(--purple);">🗺️ Travel Route Management Hub</h2>
+            <?php if(isset($_GET['msg'])): ?><div style="background-color: #f0fff4; color: #22543d; padding: 15px; border-radius: 6px; margin-bottom: 25px; border-left: 5px solid #38a169;"><strong>Notice:</strong> <?= htmlspecialchars($_GET['msg']) ?></div><?php endif; ?>
+
+            <div class="add-form">
+                <h3 style="margin-top:0;">🆕 Initialize New travel path</h3>
+                <form method="POST" id="routeForm" onsubmit="return validateForm()">
+                    <div class="form-row">
+                        <div class="form-group"><label>Departure City/Country</label><input type="text" name="from_location" id="from_location" class="input" placeholder="Kisumu, Kenya"></div>
+                        <div class="form-group"><label>Arrival Endpoint</label><input type="text" name="to_location" id="to_location" class="input" placeholder="Kampala, Uganda"></div>
+                        <div class="form-group"><label>Calendar date (YYYY-MM-DD)</label><input type="text" name="departure_date" id="departure_date" class="input" placeholder="2024-12-31"></div>
+                        <div class="form-group"><label>Departure time (HH:MM)</label><input type="text" name="departure_time" id="departure_time" class="input" placeholder="14:30"></div>
+                        <div class="form-group"><label>Price (KES)</label><input type="text" name="cost" id="cost" class="input" placeholder="1500"></div>
+                        <div class="form-group"><label>Fleet vehicle</label>
+                            <select name="bus_id" id="bus_id" class="input">
+                                <option value="">Select Bus...</option>
+                                <?php 
+                                $buses_sql = "SELECT bus_id, bus_name FROM buses ORDER BY bus_name ASC";
+                                $buses_res = mysqli_query($conn, $buses_sql);
+                                while($b = mysqli_fetch_assoc($buses_res)) { echo "<option value='{$b['bus_id']}'>{$b['bus_name']} (Fleet {$b['bus_id']})</option>"; } 
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" name="add_route" class="button regular-button pink-background" style="margin-top: 15px;">Save Route</button>
+                </form>
+            </div>
+
+            <script>
+                // toggleRouteEdit function (toggle route edit) switches between label view and input view for route details.
+                function toggleRouteEdit(rid) {
+                    // Find elements with classes 'view-route-ID' and 'edit-route-ID'.
+                    var views = document.querySelectorAll('.view-route-' + rid);
+                    var edits = document.querySelectorAll('.edit-route-' + rid);
+                    
+                    // Toggle visibility of spans and inputs.
+                    views.forEach(v => v.style.display = (v.style.display === 'none' ? 'inline' : 'none'));
+                    edits.forEach(e => e.style.display = (e.style.display === 'none' ? 'inline' : 'none'));
+                    
+                    // Toggle the row action buttons.
+                    document.getElementById('route-ops-main-' + rid).style.display = 
+                        (document.getElementById('route-ops-main-' + rid).style.display === 'none' ? 'inline-block' : 'none');
+                    document.getElementById('route-ops-save-' + rid).style.display = 
+                        (document.getElementById('route-ops-save-' + rid).style.display === 'none' ? 'inline-block' : 'none');
                 }
-                return true;
-            }
 
-            function validateTo() {
-                var val = document.getElementById("to_location").value.trim();
-                if (val == "") {
-                    alert("Arrival Endpoint is required.");
-                    document.getElementById("to_location").focus();
-                    return false;
+                // Front-end validation using simple string checks (No Regex)
+                function validateForm() {
+                    var from = document.getElementById("from_location").value.trim();
+                    var to = document.getElementById("to_location").value.trim();
+                    if (from == "" || to == "") { alert("Please enter valid path."); return false; }
+                    return true;
                 }
-                return true;
-            }
+            </script>
 
-            function validateDate() {
-                var val = document.getElementById("departure_date").value.trim();
-                var regex = /^\d{4}-\d{2}-\d{2}$/;
-                if (!regex.test(val)) {
-                    alert("Departure Date must be in YYYY-MM-DD format.");
-                    document.getElementById("departure_date").focus();
-                    return false;
-                }
-                return true;
-            }
+            <table class="crud-table">
+                <thead><tr><th>Ref ID</th><th>From</th><th>To</th><th>Date</th><th>Time</th><th>Fleet</th><th>Cost</th><th>Operations</th></tr></thead>
+                <tbody>
+                    <?php 
+                    // Re-fetch buses for the inline dropdowns.
+                    $buses_list = [];
+                    mysqli_data_seek($buses_res, 0);
+                    while($b = mysqli_fetch_assoc($buses_res)) { $buses_list[] = $b; }
 
-            function validateTime() {
-                var val = document.getElementById("departure_time").value.trim();
-                var regex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-                if (!regex.test(val)) {
-                    alert("Departure Time must be in HH:MM (24h) format.");
-                    document.getElementById("departure_time").focus();
-                    return false;
-                }
-                return true;
-            }
+                    $sql_routes = "SELECT r.*, b.bus_name, SUBSTRING_INDEX(r.from_location, ', ', -1) as country FROM routes r JOIN buses b ON r.bus_id = b.bus_id ORDER BY country ASC, r.departure_date ASC";
+                    $res_routes = mysqli_query($conn, $sql_routes);
+                    /* $res_routes (result list) = (assignment). 
+                       mysqli_query (MySQL Improved query) is the command that sends 
+                       the instruction to the database server. "Improved" (mysqli) is used 
+                       everywhere in the system to ensure modern security and 
+                       faster performance. ( starts. $conn (bridge) , (comma) 
+                       $sql_routes (the instruction) ) ends. ; (semicolon). */
+                    $current_country = "";
+                    while($row = mysqli_fetch_assoc($res_routes)): 
+                        /* while (while) starts a loop. $row (row container) pulls data. 
+                           mysqli_fetch_assoc (fetch associative) converts raw data into labeled pieces. 
+                           ( starts. $res_routes (result source). ) ends. : (colon) starts the loop block. */
+                        $rid = $row['route_id'];
+                        if ($row['country'] != $current_country) {
+                            $current_country = $row['country'];
+                            echo "<tr><td colspan='8' style='background:#f9fafb; font-weight:800; color:#4a5568;'>🌍 Region: " . htmlspecialchars($current_country) . "</td></tr>";
+                        }
+                    ?>
+                    <tr>
+                        <form method="POST">
+                            <input type="hidden" name="route_id" value="<?= $rid ?>">
+                            <td style="font-weight: bold;"><?= $rid ?></td>
+                            
+                            <!-- From -->
+                            <td>
+                                <span class="view-route-<?= $rid ?>"><?= htmlspecialchars($row['from_location']) ?></span>
+                                <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                     that converts dangerous symbols like < into safe text so hackers cannot 
+                                     run scripts. ( starts the tool. $row (row variable) ['from_location'] (origin) 
+                                     is the data being protected. ) ends the tool. -->
 
-            function validateCost() {
-                var val = document.getElementById("cost").value.trim();
-                if (val == "" || isNaN(val) || parseFloat(val) <= 0) {
-                    alert("A valid numeric cost is required.");
-                    document.getElementById("cost").focus();
-                    return false;
-                }
-                return true;
-            }
+                                <input type="text" name="from_location" value="<?= htmlspecialchars($row['from_location']) ?>" class="edit-route-<?= $rid ?> table-input" style="display:none;">
+                                <!-- value = [echo] htmlspecialchars (security tool) ( $row ['from_location'] ) -->
+                            </td>
 
-            function validateBusId() {
-                var val = document.getElementById("bus_id").value;
-                if (val == "") {
-                    alert("Please assign a fleet vehicle.");
-                    document.getElementById("bus_id").focus();
-                    return false;
-                }
-                return true;
-            }
+                            <!-- To -->
+                            <td>
+                                <span class="view-route-<?= $rid ?>"><?= htmlspecialchars($row['to_location']) ?></span>
+                                <!-- htmlspecialchars (security tool) ( $row ['to_location'] (destination data) ) -->
 
-            function validateForm() {
-                if (!validateFrom()) return false;
-                if (!validateTo()) return false;
-                if (!validateDate()) return false;
-                if (!validateTime()) return false;
-                if (!validateCost()) return false;
-                if (!validateBusId()) return false;
-                return true;
-            }
-        </script>
+                                <input type="text" name="to_location" value="<?= htmlspecialchars($row['to_location']) ?>" class="edit-route-<?= $rid ?> table-input" style="display:none;">
+                                <!-- value = [echo] htmlspecialchars (security tool) ( $row ['to_location'] ) -->
+                            </td>
 
+                            <!-- Date -->
+                            <td>
+                                <span class="view-route-<?= $rid ?>"><?= $row['departure_date'] ?></span>
+                                <input type="text" name="departure_date" value="<?= $row['departure_date'] ?>" class="edit-route-<?= $rid ?> table-input" style="display:none; width: 100px;">
+                            </td>
 
-        <table class="crud-table">                                       <!-- [93] Open schedule inventory grid. -->
-            <thead><tr><th>Ref ID</th><th>Source</th><th>Destination</th><th>Travel Date</th><th>Time</th><th>Fleet</th><th>Pricing</th><th>Moderation</th></tr></thead> <!-- [94] head labels. -->
-            <tbody>                                                      <!-- [95] Records start. -->
-                <?php $sql = "SELECT r.*, b.bus_name, SUBSTRING_INDEX(r.from_location, ', ', -1) as country FROM routes r JOIN buses b ON r.bus_id = b.bus_id ORDER BY country ASC, r.from_location ASC, r.departure_date ASC"; // [96] analytic grouping query.
-                $result = $conn->query($sql); $current_country = "";     // [97] Fetch and initialize country tracker.
-                while($row = $result->fetch_assoc()):                    // [98] Iterate through transport records.
-                    if ($row['country'] != $current_country) {           // [99] check for geographic region shift.
-                        $current_country = $row['country'];              // [100] update current region.
-                        echo "<tr><td colspan='8' style='background:#f1f5f9; font-weight:800; color:#475569; font-size:0.75rem; text-transform:uppercase; letter-spacing:1.5px; border-left:6px solid var(--purple); padding:12px 18px;'>🌍 Geographic Region: " . htmlspecialchars($current_country) . "</td></tr>"; // [101] separator.
-                    } ?>                                                 <!-- [102] resume HTML rendering. -->
-                <tr><td><strong style="color: #94a3b8;"><?= $row['route_id'] ?></strong></td> <!-- [103] ID cell. -->
-                    <td style="font-weight: 600; color: #1e293b;"><?= htmlspecialchars($row['from_location']) ?></td> <!-- [104] origin. -->
-                    <td style="font-weight: 600; color: #1e293b;"><?= htmlspecialchars($row['to_location']) ?></td> <!-- [105] endpoint. -->
-                    <td style="color: #4a5568;"><?= $row['departure_date'] ?></td> <!-- [106] date. -->
-                    <td style="font-family: monospace; font-weight: 700;"><?= $row['departure_time'] ?></td> <!-- [107] time. -->
-                    <td><span style="background:#faf5ff; color:#6b46c1; padding:4px 10px; border-radius:4px; font-weight:800; border:1px solid #e9d8fd;"><?= htmlspecialchars($row['bus_name']) ?></span></td> <!-- [108] fleet. -->
-                    <td style="font-weight:900; color:#2d3748;"><?= number_format($row['cost'], 2) ?> KES</td> <!-- [109] price. -->
-                    <td style="white-space: nowrap;"><a href="edit_route.php?id=<?= $row['route_id'] ?>" class="action-btn" style="background-color:#3182ce; margin-right:8px;">Modify</a> <!-- [110] edit. -->
-                        <a href="?delete_route=<?= $row['route_id'] ?>" class="action-btn btn-delete" onclick="return confirm('FINAL SECURITY WARNING: Delete ID <?= $row['route_id'] ?>? IRREVERSIBLE.')">Delete</a></td> <!-- [111] delete. -->
-                </tr>                                                    <!-- [112] end row. -->
-                <?php endwhile; ?>                                       <!-- [113] end record iteration. -->
-            </tbody>                                                     <!-- [114] end table body. -->
-        </table>                                                         <!-- [115] end grid. -->
-    </div>                                                               <!-- [116] end card. -->
-    <div style="height: 120px;"></div>                                   <!-- [117] bottom spacer. -->
-    <script src="js/footer.js"></script>                                 <!-- [118] inject footer. -->
-    <script src="js/table_manager.js"></script>
-</body>                                                              <!-- [119] end body. -->
-</html>                                                              <!-- [120] end document. -->
+                            <!-- Time -->
+                            <td>
+                                <span class="view-route-<?= $rid ?>"><?= $row['departure_time'] ?></span>
+                                <input type="text" name="departure_time" value="<?= $row['departure_time'] ?>" class="edit-route-<?= $rid ?> table-input" style="display:none; width: 70px;">
+                            </td>
+
+                            <!-- Fleet -->
+                            <td>
+                                <span class="view-route-<?= $rid ?>"><?= htmlspecialchars($row['bus_name']) ?></span>
+                                <!-- htmlspecialchars (security tool) ( $row ['bus_name'] (vehicle identity) ) -->
+
+                                <select name="bus_id" class="edit-route-<?= $rid ?> table-input" style="display:none;">
+                                    <?php foreach($buses_list as $b): ?>
+                                    <option value="<?= $b['bus_id'] ?>" <?= ($b['bus_id'] == $row['bus_id'] ? 'selected' : '') ?>><?= htmlspecialchars($b['bus_name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+
+                            <!-- Cost -->
+                            <td>
+                                <span class="view-route-<?= $rid ?>"><?= $row['cost'] ?></span>
+                                <span class="edit-route-<?= $rid ?>" style="display:none;"><input type="text" name="cost" value="<?= $row['cost'] ?>" class="table-input" style="width: 80px;"> KES</span>
+                            </td>
+
+                            <td style="white-space: nowrap;">
+                                 <!-- Main Operations -->
+                                 <div id="route-ops-main-<?= $rid ?>">
+                                 <!-- < (less than sign) div (box) id (identity) = "route-ops-main- [echo] $rid" (unique number) > starts the visible action box. -->
+
+                                     <button type="button" class="action-btn btn-update" onclick="toggleRouteEdit(<?= $rid ?>)">Update</button>
+                                     <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                          class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                          onclick (on click event) = "toggleRouteEdit (run the toggle tool) ( [echo] $rid (for this route) )" 
+                                          > (greater than sign) Update (label) < / (slash) button > (ends item). -->
+
+                                     <a href="?delete_route=<?= $rid ?>" class="action-btn btn-delete" onclick="return confirm('Delete this route?')">Delete</a>
+                                     <!-- < (less than sign) a (anchor link) href (destination) = "?delete_route = [echo] $rid" (sends ID to URL) 
+                                          class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                          onclick (on click event) = "return confirm (ask a question) ( 'Delete this route?' )" 
+                                          > (greater than sign) Delete (label) < / (slash) a > (ends link). -->
+
+                                 </div>
+                                 
+                                 <!-- Save/Cancel Operations -->
+                                 <div id="route-ops-save-<?= $rid ?>" style="display:none;">
+                                 <!-- < (less than sign) div (box) id (identity) = "route-ops-save- [echo] $rid" (unique number) 
+                                      style (visual) = "display:none;" (starts hidden) > starts the edit action box. -->
+
+                                     <button type="submit" name="update_route" class="action-btn btn-update">Update</button>
+                                     <!-- < (less than sign) button (clickable item) type (nature) = "submit" (sends the form data) 
+                                          name (server label) = "update_route" (tells PHP which logic to run) 
+                                          class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                          > (greater than sign) Update (label) < / (slash) button > (ends item). -->
+
+                                     <button type="button" class="action-btn btn-delete" onclick="toggleRouteEdit(<?= $rid ?>)">Cancel</button>
+                                     <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                          class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                          onclick (on click event) = "toggleRouteEdit (run the toggle tool) ( [echo] $rid (for this route) )" 
+                                          > (greater than sign) Cancel (label) < / (slash) button > (ends item). -->
+
+                                 </div>
+                             </td>
+                        </form>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div style="height: 100px;"></div>
+    <script src="js/footer.js"></script>
+</body>
+</html>
+<?php mysqli_close($conn); ?>

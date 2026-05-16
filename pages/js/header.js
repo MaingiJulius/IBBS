@@ -1,42 +1,53 @@
 // ==========================================================================
 // HEADER.JS (Primary Navigation Loader)
 // ==========================================================================
-// Purpose: This script automatically injects the main navigation bar and branding banner into the very top of the webpage.
-// Design Logic: Centralizing the header ensures that if the company name or menu changes, we only edit one file instead of many.
-// ==========================================================================
+// / (forward slash) / (forward slash) starts a single-line documentation comment.
+// HEADER.JS is the module title. ( (bracket) Primary Navigation Loader 
+// (bracket) describes the function of this script.
 
-// document.addEventListener: Listens for browser events.
-// 'DOMContentLoaded': Specifically waits for the HTML to be downloaded and turned into a tree (DOM) before running.
-// function (): The logic wrapper for the injection process.
 document.addEventListener('DOMContentLoaded', function () {
+// document (the webpage object) . (dot) addEventListener (listen for event) 
+// is the tool that monitors the state of the web page. ( (opening bracket) 
+// starts the input. 'DOMContentLoaded' (D O M Content Loaded) is the 
+// specific event trigger that fires when the HTML structure is fully 
+// ready. , (comma) separates the trigger from the action. function 
+// (function) starts the logical instructions. ( ) (empty brackets) means 
+// no external inputs. { (opening curly bracket) marks the start of the 
+// header loading logic.
 
-  // const header: Defines a container for the HTML markup of the global header.
+// const (constant) is a variable type that cannot be changed once assigned. 
+// header (h e a d e r) is the unique label for the top navigation HTML data. 
+// = (equals sign) is the assignment operator. ` (backtick symbol) starts a 
+// multi-line template literal string block for HTML code.
   const header = `
-      <!-- TOP BANNER Section: Holds the primary branding and company title. -->
-      <div id="banner"> <!-- Div with ID 'banner', styled in the CSS with a 1.5rem italicized font. -->
-        <h1>Wema Travelers</h1> <!-- The main Level-1 heading for the site. -->
-      </div> <!-- Closes the banner division. -->
+      <div id="banner" class="no-print">
+        <h1>Wema Travelers</h1>
+      </div>
   
-      <!-- NAVIGATION LINKS Section: Holds the interactive menu for user navigation. -->
-      <div id="nav-links"> <!-- Styled in main.css as a lavender flexbox container centered on the screen. -->
-        
-        <!-- Centered Links Group - Wraps the main internal navigation destinations. -->
-        <div style="display: flex; gap: 20px;"> <!-- Inline Flexbox specifically to manage the 20-pixel gap between links. -->
-            <a href="index(home).html">Home</a> <!-- Link to the public-facing landing page. -->
-            <a href="book.php">Book</a> <!-- Link to the bus booking engine. -->
-            <a href="user_summary.php">Profile</a> <!-- Link to the user's dashboard/summary. -->
-            <a href="user_history.php" target="_blank">View History</a> <!-- Target='_blank' opens the travel history in a new browser tab. -->
-            <a href="feedback.html">Feedback</a> <!-- Link to the star rating and commment form. -->
-        </div> <!-- Closes the flex group. -->
+      <div id="nav-links" class="no-print">
+        <div style="display: flex; gap: 20px;">
+            <a href="index(home).html">Home</a>
+            <a href="book.php">Book</a>
+            <a href="user_summary.php">Profile</a>
+            <a href="user_history.php" target="_blank">View History</a>
+            <a href="feedback.html">Feedback</a>
+        </div>
+        <a href="login.html" style="position: absolute; right: 20px;">SignOut</a>
+      </div>
+    `;
+// ` (backtick symbol) ends the multi-line string block. ; (semicolon) 
+// terminates the instruction.
 
-        <!-- Right Aligned SignOut - A standalone link moved to the far right for UI balance. -->
-        <a href="login.html" style="position: absolute; right: 20px;">SignOut</a> <!-- 'absolute' pulls it out of the center and 'right: 20px' pins it. -->
-      </div> <!-- Closes the navigation container. -->
-    `; // Ends the string.
-
-  // document.body: Selects the main content body of the HTML document.
-  // insertAdjacentHTML: Injects our string as raw HTML.
-  // 'afterbegin': A positioning flag that means "place this at the very start of the <body> tag" (At the top).
-  // header: The variable containing the banner and link code.
   document.body.insertAdjacentHTML('afterbegin', header);
-}); // Ends the DOM listener.
+// document (the page object) . (dot) body (the <body> tag) . 
+// insertAdjacentHTML (insert adjacent H T M L) is the built-in function 
+// that injects content into the page. ( (opening bracket) starts the 
+// command. 'afterbegin' (after begin) is the precise position instruction 
+// which means "place this at the very top of the page content". , 
+// (comma) separates inputs. header (the label for our HTML data) ) 
+// (closing bracket). ; (semicolon) terminates the instruction.
+
+});
+// } (closing curly bracket) ends the logical instructions block. 
+// ) (closing bracket) ends the event listener input. ; (semicolon) 
+// terminates the entire script.

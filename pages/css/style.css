@@ -4,116 +4,196 @@
 /* ========================================================================== */
 /* Theme customization. */
 /* ========================================================================== */
-
-/*
- * =========================================================================
- * CSS !IMPORTANT PROPERTY EXPLANATION
- * =========================================================================
- * The '!important' syntax is a CSS rule used to "force" a specific style to apply,
- * even if there are other rules that would normally override it.
- *
- * HOW IT WORKS:
- * 1. CSS normally follows "Specificity" (IDs beat classes, classes beat tags).
- * 2. It also follows "Source Order" (the rule further down in the file wins).
- * 3. When you add '!important' to a property, it breaks these rules and
- *    gives that specific property the HIGHEST priority possible.
- *
- * WHEN TO USE IT:
- * - When you need to override complex styles from external libraries.
- * - When you want to ensure a utility class (like a hidden class) ALWAYS works.
- *
- * CAUTION:
- * Overusing !important can make a stylesheet very hard to maintain because it
- * creates "unbreakable" rules that are difficult to change later.
- * =========================================================================
- */
+/* / (forward slash) * (asterisk) starts a professional documentation block.
+   SECONDARY STYLESHEET is the module title. * (asterisk) / (forward slash) closes. */
 
 /* --- GENERAL BODY OVERRIDES --- */
 :root {
-  /* Targeted styles to modify the page body's layout further. */
+/* : (colon) root (r o o t) pseudo-class targets the document root (<html>). 
+   { (curly bracket) starts the global rules block. */
+
   background-color: var(--body-bg);
-  /* Enforces the light pink/body background. */
-  /* Pink */
+  /* background-color (surface) : (colon) var(--body-bg) (pink) ; (semicolon) 
+     enforces the themed pink background. */
+
   color: var(--text-color);
-  /* Enforces the dark purple text color. */
+  /* color (text color) : (colon) var(--text-color) (dark purple) ; (semicolon) 
+     enforces high-contrast readability. */
+
   display: flex;
-  /* Enables Flexbox on the body itself to manage page-level structure. */
+  /* display (layout) : (colon) flex ; (semicolon) enables flexible 
+     container logic on the body. */
+
   flex-direction: column;
-  /* Organizes children (Header, Content, Footer) in a vertical stack. */
+  /* flex-direction (path) : (colon) column (vertical) ; (semicolon) 
+     organizes Header, Content, and Footer in a stack. */
+
   min-height: 100vh;
-  /* Ensures the body always spans at least the full height of the user's screen. */
+  /* min-height (minimum height) : (colon) 100vh (100% of the screen) ; 
+     (semicolon) ensures the body fills the entire display. */
 }
+/* } ends root override style. */
 
 /* --- HEADER OVERRIDES --- */
 #banner {
-  /* Overrides for the unique Banner ID. */
+/* # (hash) banner (unique ID) targets the top branding bar. { starts. */
+
   background-color: var(--header-bg);
-  /* Directly links to the medium purple branding color. */
-  /* Medium Purple */
+  /* background-color (surface) : (colon) var(--header-bg) (purple) ; 
+     (semicolon). */
 }
+/* } ends banner override. */
 
 #nav-links {
-  /* Overrides for the navigation link container. */
+/* # (hash) nav-links (unique ID) targets the navigation container. { starts. */
+
   background-color: var(--nav-bg);
-  /* Directly links to the lighter lavender/purple branding color. */
-  /* Light Purple */
+  /* background-color (surface) : (colon) var(--nav-bg) (light purple) ; 
+     (semicolon). */
 }
+/* } ends nav-links override. */
 
 #nav-links a {
-  /* Specific overrides for navigational anchor (link) tags. */
+/* Targets links inside the navigation container. { starts. */
+
   color: white !important;
-  /* Uses !important to force the white color, overriding any generic link color rules. */
-  /* Force white text */
+  /* color (text) : (colon) white !important (force) ; (semicolon) 
+     overrides any generic link color rules. */
 }
+/* } ends link override. */
 
 /* --- CONTENT BOXES --- */
-/* These classes define standardized containers for dashboard panels and profile modules. */
 .view-container,
 .profile-container,
 .ticket-container {
-  /* background: applies a semi-transparent white wash. */
-  /* rgba(255, 255, 255, 0.5): Red=255, Green=255, Blue=255 (White) at 0.5 (50%) transparency. */
+/* . (dot) class-names (labels) targets dashboard and profile panels. { starts. */
+
   background: rgba(255, 255, 255, 0.5) !important;
-  /* Semi-transparent white */
+  /* background (surface) : (colon) white at 50% transparency (rgba 0.5) 
+     !important (force) ; (semicolon). */
+
   border: 2px solid var(--header-bg);
-  /* Adds a 2px solid purple outline to separate the box from the pink background. */
+  /* border (outline) : (colon) 2px (size) solid (style) var(--header-bg) 
+     (purple) ; (semicolon). */
+
   border-radius: 15px;
-  /* Adds significant curvature to the corners for a soft UI feel. */
+  /* border-radius (corner curvature) : (colon) 15px (pixels) ; (semicolon) 
+     softens the UI look. */
+
   margin-bottom: 40px;
-  /* Adds 40px space below each container to prevent crowding. */
-  /* Preserve space at the bottom for other pages */
+  /* margin-bottom (external space) : (colon) 40px ; (semicolon) 
+     prevents crowding between sections. */
 }
+/* } ends container boxes style. */
 
 /* --- TABLES --- */
-/* Applies a high-visibility theme to all table data representations. */
 th {
-  /* Styles specifically for Table Header cells. */
+/* th (table heading) targets the header cells in data grids. { starts. */
+
   background-color: var(--header-bg) !important;
-  /* Forces the purple header background. */
+  /* background-color (surface) : (colon) var(--header-bg) !important (force) 
+     ; (semicolon) ensures headings are always purple. */
+
   color: white !important;
-  /* Forces the text in headers to be bold white for maximum contrast. */
+  /* color (text) : (colon) white !important (force) ; (semicolon) 
+     ensures headings are always readable. */
 }
+/* } ends th style. */
 
 /* --- FOOTER --- */
 footer,
 #footer {
-  /* Targeted styles for the bottom-of-page area. */
+/* footer (tag) , (and) #footer (ID) target the bottom section. { starts. */
+
   background-color: #4a1a4a !important;
-  /* Sets a extremely dark purple, almost black, for a grounded footer. */
-  /* Dark Purple for better readability and theme consistency */
+  /* background-color (surface) : (colon) #4a1a4a (extremely dark purple) 
+     !important (force) ; (semicolon). */
+
   color: white !important;
-  /* Forces copyright and link text to be white. */
+  /* color (text) : (colon) white !important (force) ; (semicolon). */
+
   text-align: center;
-  /* Centers the footer content. */
+  /* text-align (alignment) : (colon) center ; (semicolon). */
+
   padding: 15px;
-  /* Adds 15px of internal padding. */
-  /* Removed fixed position to allow scrolling to the bottom */
+  /* padding (internal space) : (colon) 15px ; (semicolon). */
+
   margin-top: 0;
-  /* Ensures the footer sits flush against its preceding content unless a gap is specified elsewhere. */
+  /* margin-top (external space) : (colon) 0 ; (semicolon) sits flush 
+     against content. */
+
   font-size: 0.9rem;
-  /* Sets a slightly smaller text size for secondary footer info. */
+  /* font-size (size) : (colon) 0.9rem (small) ; (semicolon). */
+
   width: 100%;
-  /* Ensures the footer spans the entire width of the page. */
+  /* width (horizontal span) : (colon) 100% ; (semicolon). */
+
   box-sizing: border-box;
-  /* Includes the 15px padding inside the 100% width calculation. */
+  /* box-sizing (calculation) : (colon) border-box ; (semicolon) 
+     includes padding in the width calculation. */
 }
+/* } (closing curly bracket) ends the footer style. */
+
+/* --- PRINT MODE ARCHITECTURE --- */
+@media print {
+/* @ (at-sign) is the CSS rule prefix. media (m e d i a) is the keyword for 
+   responsive design. print (p r i n t) is the specific target for paper 
+   output. { (opening curly bracket) starts the logic block for the printer. */
+
+    .no-print, 
+    #search-hub, 
+    header, 
+    footer, 
+    #banner, 
+    #nav-links, 
+    .back-btn-container,
+    .button.regular-button,
+    button { 
+        display: none !important; 
+    }
+    /* . (dot) is the class selector. no-print (label) , (comma) is the list 
+       separator. # (hash) is the ID selector. search-hub (identity label) 
+       is the search box. display (visual rule) : (colon) none (hidden) 
+       ! (exclamation) important (force rule) ; (semicolon). 
+       This tells the browser to KILL the visibility of these items when printing. */
+
+    body { 
+        background-color: white !important; 
+        color: black !important;
+        margin: 0;
+        padding: 0;
+    }
+    /* body (page body) { background-color (surface) : white (saves ink). 
+       color (text) : black (high contrast). !important (force). } */
+
+    .view-container { 
+        border: none !important; 
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+    }
+    /* .view-container (report card) { removes decorative borders and 
+       shadows for a flat document appearance. width: 100% (full paper span). } */
+
+    table { 
+        width: 100% !important; 
+        border-collapse: collapse !important;
+    }
+    /* table (data grid) { border-collapse (clean lines) : collapse ; } */
+
+    th { 
+        background-color: #f8fafc !important; 
+        color: black !important; 
+        border: 1px solid #ddd !important;
+    }
+    /* th (header) { background-color : light grey (visible contrast) ; } */
+
+    td { 
+        border: 1px solid #ddd !important; 
+    }
+    /* td (cell) { border (boundary) : 1px solid (visible line) ; } */
+}
+/* } (closing curly bracket) ends the print mode logic. */

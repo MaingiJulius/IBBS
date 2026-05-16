@@ -1,164 +1,513 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * BUS FLEET MANAGEMENT (admin_buses_report.php)                     // [3] Title identifying this script as the fleet control center.
- * Purpose: This page serves as the control center for Wema Travellers' physical assets. // [4] Main objective: asset life-cycle management.
- * Admins use this to:                                               // [5] Functionality: operational administrative tasks.
- * 1. Register new buses (Registration numbers, Names, Seat Limits).  // [6] Task: vehicle registration and capacity definition.
- * 2. View the current fleet list.                                   // [7] Task: fleet inventory oversight.
- * 3. Assign/Change drivers for specific buses.                      // [8] Task: staff/asset mapping and operational assignments.
- * 4. Remove buses from the system (provided they have no active routes). // [9] Task: fleet decommissioning with integrity checks.
- */                                                                  // [10] Close multi-line documentation block.
+<?php
+// < (less than sign) ? (question mark) php (PHP: Hypertext Preprocessor) is the opening 
+// tag that starts the server-side logic engine.
 
-require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
-require_once 'logger.php';                                           // [11.5] Import logging utility for audit trail.
-session_start();                                                    // [12] Initialize or resume user session to identify the administrative officer.
+/**
+ * BUS FLEET MANAGEMENT (admin_buses_report.php)
+ */
+// / (forward slash) * (asterisk) * (asterisk) opens a professional documentation block.
+// BUS FLEET MANAGEMENT is the module title. * (asterisk) / (forward slash) closes 
+// the block.
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {      // [13] Security Barrier: Verify requester identity and 'ADMIN' credential.
-    die("Security Error: Access denied. Fleet management requires Administrative privileges."); // [14] Halt execution with descriptive error.
-}                                                                    // [15] Close security barrier.
+require_once 'db_connection.php';
+// require_once (require once) is a directive that imports the database bridge file and 
+// ensures it is only loaded one time to prevent errors. 'db_connection.php' (quote db 
+// underscore connection dot php quote) is the file path. ; (semicolon) terminates the line.
 
-if (isset($_POST['add_bus'])) {                                      // [16] Action Handler: Intercept form submission for new vehicle registration.
-    $reg_no         = $_POST['reg_no'];                              // [17] Capture: Official government identifier (Plate Number).
-    $bus_name       = $_POST['bus_name'];                            // [18] Capture: Marketing/Operational name of the vehicle.
-    $max_passengers = $_POST['max_passengers'];                      // [19] Capture: Legal seating capacity of the unit.
-    $stmt_add = $conn->prepare("INSERT INTO buses (reg_no, bus_name, max_passengers) VALUES (?, ?, ?)"); // [20] Prepare secure SQL insertion statement.
-    $stmt_add->bind_param("ssi", $reg_no, $bus_name, $max_passengers);  // [21] Bind data variables to statement placeholders.
-    $stmt_add->execute();                                            // [22] Commit new vehicle record to the MySQL engine.
-    $stmt_add->close();                                              // [23] Release statement resource memory.
-    header('Location: admin_ buses_report.php?msg=System: New bus record created successfully.'); // [24] Refresh page with success notification.
-    exit();                                                          // [25] Terminate script post-redirect.
-}                                                                    // [26] End registration block.
+require_once 'logger.php';
+// require_once (require once) is a directive that imports the activity tracking tool. 
+// 'logger.php' is the file path. ; (semicolon) terminates the instruction.
 
-if (isset($_GET['remove_bus'])) {                                    // [27] Action Handler: Intercept GET request for vehicle decommissioning.
-    $bus_id = $_GET['remove_bus'];                                   // [28] Capture: Target vehicle ID from URL parameter.
-    $stmt_del = $conn->prepare("DELETE FROM buses WHERE bus_id = ?"); // [29] Prepare secure SQL deletion statement.
-    $stmt_del->bind_param("i", $bus_id);                             // [30] Bind target ID to statement.
+session_start();
+// session_start (session start) is the command that activates the server's memory 
+// to track the user across different pages. ( ) (empty brackets) execute the tool. 
+// ; (semicolon) terminates the instruction.
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
+// if (if) starts a logic check for security. ( (opening bracket) starts condition. 
+// ! (exclamation mark) is the NOT operator. isset (is set) checks if a memory 
+// container exists. ( $ (dollar sign) _ (underscore) SESSION [ 'user_id' ] ) (bracket). 
+// || (double pipe) is the logical OR operator. $_SESSION['role'] !== 'ADMIN' 
+// (not identical to admin text). ) (closing bracket). { (opening curly bracket) 
+// starts the security error logic.
+
+    die("Security Error: Access denied.");
+    // die (die) is a terminal function that prints an error message and stops all 
+    // further code execution. ( "Security Error..." ) is the message. 
+    // ; (semicolon) terminates the line.
+}
+// } (closing curly bracket) ends the security check block.
+
+if (isset($_POST['add_bus'])) {
+// if (if) starts a logic check to determine if the bus registration form has 
+// been submitted. ( (opening bracket) starts the condition. isset (is set) 
+// checks if a variable exists. ( (bracket) $ (dollar sign) _ (underscore) 
+// POST [ 'add_bus' ] (submit button) ) (bracket) ) (bracket). 
+// { (opening curly bracket) marks the start of the logic.
+
+    $reg_no = $_POST['reg_no'];
+    // $ (dollar sign) variable marker. reg_no (r e g underscore n o) is the 
+    // logical label chosen to identify the registration number. = (equals 
+    // sign) assignment operator. $ (dollar sign) _ (underscore) POST 
+    // (Superglobal Array used by the server to collect and pull data from an 
+    // HTML form sent via the secure HTTP POST method. It does NOT send data 
+    // to the database directly; it only captures what the user typed) 
+    // [ 'reg_no' ] retrieves data. ; (semicolon).
+
+    $bus_name = $_POST['bus_name'];
+    // $ (dollar sign) variable marker. bus_name label. = (equals sign) 
+    // assignment. $ (dollar sign) _ (underscore) POST [ 'bus_name' ] 
+    // ; (semicolon).
+
+    $max_passengers = $_POST['max_passengers'];
+    // $ (dollar sign) variable marker. max_passengers label. = (equals sign) 
+    // assignment. $ (dollar sign) _ (underscore) POST [ 'max_passengers' ] 
+    // ; (semicolon).
     
-    // [AUDIT LOG] Record the deletion.
-    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Bus from Fleet (ID: $bus_id)");
+    $sql_add = "INSERT INTO buses (reg_no, bus_name, max_passengers) VALUES (?, ?, ?)";
+    // $ (dollar sign) variable marker. sql_add (s q l underscore a d d) is a 
+    // logical identifier chosen to describe the database creation command. 
+    // = (equals sign) assignment. "INSERT INTO..." (quote) starts the SQL 
+    // instruction. ? (question marks) are three critical security placeholders 
+    // that neutralize SQL Injection by separating the command structure from 
+    // user data. ; (semicolon) terminates the command.
 
-    if($stmt_del->execute()) { $msg = "Success: Bus record permanently removed from fleet."; } // [31] Attempt execution and log success.
-    else { $msg = "Error: Database Integrity Violation. This bus is still assigned to active routes. Please delete or re-assign those routes before removing the vehicle."; } // [32] Log failure (likely active route dependencies).
-    $stmt_del->close();                                              // [33] Release resource memory.
-    header("Location: admin_buses_report.php?msg=" . urlencode($msg)); // [34] Refresh page with result message.
-    exit();                                                          // [35] Terminate script post-redirect.
-}                                                                    // [36] End decommissioning block.
+    $stmt_add = mysqli_prepare($conn, $sql_add);
+    /* $stmt_add (handle) = (assignment). 
+       mysqli (MySQL Improved) _ (underscore) prepare (prepare) is the security 
+       function that pre-compiles the command blueprint. 
+       "Improved" (mysqli) is used because it supports secure "Prepared Statements" 
+       that prevent hackers from injecting malicious code into our database. 
+       ( starts. $conn (bridge) , (comma) $sql_add (blueprint) ) ends. ; (semicolon). */
 
-if (isset($_POST['assign_driver'])) {                                // [37] Action Handler: Intercept crew assignment update.
-    $bus_id = $_POST['bus_id'];                                      // [38] Capture: Target vehicle identifier.
-    $driver_id = !empty($_POST['driver_id']) ? $_POST['driver_id'] : null; // [39] Logik: Map selection to ID or NULL for de-assignment.
-    $stmt_upd = $conn->prepare("UPDATE buses SET driver_id = ? WHERE bus_id = ?"); // [40] Prepare secure SQL update command.
-    $stmt_upd->bind_param("ii", $driver_id, $bus_id);                // [41] Bind integers to statement placeholders.
-    
-    // [AUDIT LOG] Record the assignment update.
-    logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Updated Driver Assignment for Bus ID: $bus_id");
+    mysqli_stmt_bind_param($stmt_add, "ssi", $reg_no, $bus_name, $max_passengers);
+    /* mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+       bind (bind) _ (underscore) param (parameter) is the function that 
+       securely attaches the data to the query blueprint. 
+       ( starts. $stmt_add is the tool handle. , (comma) separates info. 
+       "ssi" (string, string, integer) defines the types. 
+       $reg_no, $bus_name, $max_passengers are the variables being safely poured in. 
+       ; (semicolon) terminates the line. */
 
-    $stmt_upd->execute();                                            // [42] Commit staff change to the fleet ledger.
-    $stmt_upd->close();                                              // [43] Release statement resource.
-    header('Location: admin_buses_report.php?msg=Staff Update: Driver assignment refreshed.'); // [44] Refresh page with update status.
-    exit();                                                          // [45] Terminate script post-redirect.
-}                                                                    // [46] End assignment block.
-?>                                                                   <!-- [47] Close PHP script and prepare for document definition. -->
+    mysqli_stmt_execute($stmt_add);
+    // mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+    // execute (execute) is the command that triggers the database creation. 
+    // ( (opening bracket) $ (dollar sign) stmt_add (handle) ) (closing 
+    // bracket). ; (semicolon).
 
-<!DOCTYPE html>                                                         <!-- [48] Define standard HTML5 document type. -->
-<html lang="en">                                                     <!-- [49] Root element identifying English. -->
-<head>                                                               <!-- [50] Metadata and resource header section. -->
-    <meta charset="UTF-8">                                           <!-- [51] UTF-8 character encoding. -->
-    <title>Fleet & Driver Management - Wema Travellers</title>         <!-- [52] Browser tab title. -->
-    <link rel="stylesheet" href="css/main.css">                      <!-- [53] Global layout assets. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [54] Global branding assets. -->
-    <style>                                                          /* [55] Internal CSS for fleet management layout. */
-        .view-container { max-width: 1200px; margin: 20px auto; padding: 20px; background: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); } /* [56] Main container. */
-        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [57] Navigation layout. */
-        .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; } /* [58] Data grid. */
-        .crud-table th, .crud-table td { padding: 12px; border: 1px solid #eeeeee; text-align: left; } /* [59] Cell styles. */
-        .crud-table th { background-color: var(--purple); color: white; font-weight: 600; } /* [60] Branding. */
-        .action-btn { padding: 6px 12px; border-radius: 4px; text-decoration: none; color: white; font-size: 0.85em; font-weight: bold; } /* [61] Action buttons. */
-        .btn-delete { background-color: #e74c3c; }                   /* [62] Destructive button. */
-        .btn-delete:hover { background-color: #c0392b; }             /* [63] Interaction. */
-        .add-form { background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #dee2e6; } /* [64] Inventory form card. */
-        .add-form h3 { margin-top: 0; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px; } /* [65] Form title. */
-        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }     /* [66] Responive grid. */
-        .form-group { flex: 1; min-width: 200px; }                   /* [67] Form field box. */
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; } /* [68] Field labels. */
-    </style>                                                         <!-- [69] End internal CSS. -->
-</head>                                                              <!-- [70] End head. -->
+    mysqli_stmt_close($stmt_add);
+    // mysqli_stmt_close (close) terminates the tool and releases resources. 
+    // ( (bracket) $ (dollar sign) stmt_add ) (bracket). ; (semicolon).
 
-<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [71] Start visible body. -->
-    <script src="js/header2.js"></script>                                <!-- [72] Inject global navigation. -->
-    <div style="height: 100px;"></div>                                   <!-- [73] Fixed header offset. -->
+    header('Location: admin_buses_report.php?msg=Bus Added');
+    // header (header) redirection tool sends the user to the list page with a 
+    // success message. ; (semicolon).
 
-    <div class="back-btn-container"><a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← Control Panel Home</a></div> <!-- [74] Exit path. -->
+    exit();
+    // exit (exit) stops the script processing. ; (semicolon).
+}
+// } (closing curly bracket) ends the creation block.
 
-    <div class="view-container">                                     <!-- [75] Open fleet card. -->
-        <h2>Bus Fleet & Crew Management</h2>                        <!-- [76] Title. -->
-        <?php if(isset($_GET['msg'])): ?><div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb;"><strong>System Notice:</strong> <?= htmlspecialchars($_GET['msg']) ?></div><?php endif; ?> <!-- [77] Status notification. -->
+if (isset($_POST['update_bus'])) {
+// if (if) check for the bus update form submission. ( (opening bracket) isset 
+// (is set) ( $ (dollar sign) _ (underscore) POST [ 'update_bus' ] ) (bracket). 
+// ) (closing bracket). { (opening curly bracket) starts the modification logic.
 
-        <div class="add-form">                                       <!-- [78] Open registration form. -->
-            <h3>Fleet Registration Form</h3>                         <!-- [79] Form title. -->
-            <form method="POST" id="busForm" onsubmit="return validateForm()">
-                <div class="form-row">               <!-- [80] Open form layout. -->
-                    <div class="form-group"><label>Vehicle Plate No.</label><input type="text" name="reg_no" id="reg_no" class="input" placeholder="e.g. KCA 001Z" onmouseout="validatePlate()"></div> <!-- [81] Plate entry. -->
-                    <div class="form-group"><label>Bus Display Name</label><input type="text" name="bus_name" id="bus_name" class="input" placeholder="e.g. Scania Luxury" onmouseout="validateBusName()"></div> <!-- [82] Name entry. -->
-                    <div class="form-group"><label>Total Seat Count</label><input type="text" name="max_passengers" id="max_passengers" class="input" value="40" onmouseout="validateCapacity()"></div> <!-- [83] Cap entry. -->
-                </div><button type="submit" name="add_bus" class="button regular-button pink-background" style="margin-top: 15px;">Add Vehicle to Fleet</button>
-            </form> <!-- [84] Save btn. -->
-        </div>                                                       <!-- [85] End form. -->
+    $bus_id = $_POST['bus_id'];
+    // $ (dollar sign) variable. bus_id (bus id) label. = (equals sign) assignment 
+    // of the database ID. ; (semicolon).
 
-        <script>
-            // Custom JS Validation for Bus Fleet Registration
-            function validatePlate() {
-                var val = document.getElementById("reg_no").value.trim();
-                if (val.length < 5) {
-                    alert("Please enter a valid vehicle plate number (min 5 characters).");
-                    document.getElementById("reg_no").focus();
-                    return false;
+    $reg_no = $_POST['reg_no'];
+    // $ (dollar sign) variable. reg_no label. = (equals sign) assignment. ; (semicolon).
+
+    $bus_name = $_POST['bus_name'];
+    // $ (dollar sign) variable. bus_name label. = (equals sign) assignment. ; (semicolon).
+
+    $max_passengers = $_POST['max_passengers'];
+    // $ (dollar sign) variable. max_passengers label. = (equals sign) assignment. ; (semicolon).
+
+    $driver_id = !empty($_POST['driver_id']) ? $_POST['driver_id'] : null;
+    // $ (dollar sign) variable. driver_id label. = (equals sign) assignment. 
+    // ! (not) empty (empty) checks if data exists. ? (question mark) is ternary 
+    // IF true. : (colon) is ternary ELSE (null). ; (semicolon).
+
+    $sql_upd = "UPDATE buses SET reg_no=?, bus_name=?, max_passengers=?, driver_id=? WHERE bus_id=?";
+    // $ (dollar sign) variable. sql_upd (sql update) label. = (equals sign). 
+    // "UPDATE..." (quote) SQL command. ; (semicolon).
+
+    $stmt_upd = mysqli_prepare($conn, $sql_upd);
+    // $ (dollar sign) variable. stmt_upd (statement update) handle. = (equals sign). 
+    // mysqli_prepare (MySQL Improved prepare) pre-compiles the update blueprint. 
+    // Pre-compiling (pre compiling) means the machine creates a structural 
+    // blueprint of the command before any data is added. This stops hackers 
+    // from injecting malicious code because the machine already knows the 
+    // exact shape of the instruction. ( (opening bracket) $ (dollar sign) 
+    // conn (bridge) , (comma) $ (dollar sign) sql_upd (command) ) (closing bracket). 
+    // ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_upd, "ssiii", $reg_no, $bus_name, $max_passengers, $driver_id, $bus_id);
+    /* mysqli_stmt_bind_param (MySQL Improved statement bind parameter) 
+       securely pours 2 pieces of text (s) and 3 numbers (i) into the query. 
+       This prevents hackers from changing the database structure. 
+       ; (semicolon). */
+    // mysqli_stmt_bind_param attaches the 2 strings and 3 integers to the query. 
+    // Binding (binding) is the process of safely pouring the user's data into the 
+    // pre-compiled blueprint holes (?). This ensures the data is treated only as 
+    // text or numbers, never as a command. ( (opening bracket) $ (dollar sign) 
+    // stmt_upd (handle) , (comma) "ssiii" (types) , (comma) $ (dollar sign) 
+    // reg_no , (comma) $ (dollar sign) bus_name , (comma) $ (dollar sign) 
+    // max_passengers , (comma) $ (dollar sign) driver_id , (comma) $ (dollar sign) 
+    // bus_id ) (closing bracket). ; (semicolon).
+
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Updated Bus: $bus_id");
+    // logActivity (log activity) records the modification in the audit logs. 
+    // ( performer_id , name , action , message ) (bracket). ; (semicolon).
+
+    mysqli_stmt_execute($stmt_upd);
+    // mysqli_stmt_execute runs the update command against the database. ( (opening 
+    // bracket) $ (dollar sign) stmt_upd (handle) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_close($stmt_upd);
+    // mysqli_stmt_close releases the server resources. ( (opening bracket) 
+    // $ (dollar sign) stmt_upd (handle) ) (closing bracket). ; (semicolon).
+
+    header('Location: admin_buses_report.php?msg=Updated');
+    // header redirection to the list with success message. ; (semicolon).
+
+    exit();
+    // exit (exit) stops the script processing. ; (semicolon).
+}
+// } (closing curly bracket) ends the update block.
+
+if (isset($_GET['remove_bus'])) {
+// if (if) check for the bus removal request in the URL. ( (opening bracket) isset 
+// (is set) ( $ (dollar sign) _ (underscore) GET [ 'remove_bus' ] ) (bracket). 
+// ) (closing bracket). { (opening curly bracket) starts the removal logic.
+
+    $bus_id = $_GET['remove_bus'];
+    // $ (dollar sign) variable. bus_id (bus id) label. = (equals sign) assignment 
+    // of the URL data. ; (semicolon).
+
+    $stmt_del = mysqli_prepare($conn, "DELETE FROM buses WHERE bus_id = ?");
+    // $ (dollar sign) variable. stmt_del (statement delete) handle. = (equals sign) 
+    // assignment. mysqli_prepare pre-compiles the deletion blueprint. Pre-compiling 
+    // (pre compiling) means the machine creates a structural blueprint of the command 
+    // before any data is added. This stops hackers from injecting malicious 
+    // code because the machine already knows the exact shape of the instruction. 
+    // ( (opening bracket) $ (dollar sign) conn (bridge) , (comma) "DELETE..." 
+    // (SQL command) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_del, "i", $bus_id);
+    // mysqli_stmt_bind_param attaches the integer ID to the placeholder. 
+    // Binding (binding) is the process of safely pouring the user's data into 
+    // the pre-compiled blueprint holes (?). This ensures the data is treated 
+    // only as numbers, never as a command. ( (opening bracket) $ (dollar sign) 
+    // stmt_del (handle) , (comma) "i" (integer type) , (comma) $ (dollar sign) 
+    // bus_id (target data) ) (closing bracket). ; (semicolon).
+
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Bus: $bus_id");
+    // logActivity records the deletion event in the security logs. ; (semicolon).
+
+    mysqli_stmt_execute($stmt_del);
+    // mysqli_stmt_execute runs the deletion command against the database. 
+    // ( (opening bracket) $ (dollar sign) stmt_del (handle) ) (closing bracket). 
+    // ; (semicolon).
+
+    mysqli_stmt_close($stmt_del);
+    // mysqli_stmt_close releases the server resources. ( (opening bracket) 
+    // $ (dollar sign) stmt_del (handle) ) (closing bracket). ; (semicolon).
+
+    header("Location: admin_buses_report.php?msg=Deleted");
+    // header redirection to the list with success message. ; (semicolon).
+
+    exit();
+    // exit (exit) stops the script. ; (semicolon).
+}
+// [48] } ends removal block.
+?>
+<!-- [49] [?] (closing tag) stops the PHP engine. -->
+
+<!DOCTYPE html>
+<!-- [50] <!DOCTYPE html> defines a standard modern web document. -->
+
+<html lang="en">
+<!-- [51] <html> (html tag) starts the web page structure. lang="en" (English). -->
+
+<head>
+<!-- [52] <head> contains hidden configuration for the page. -->
+
+    <meta charset="UTF-8">
+    <!-- [53] <meta> sets text encoding to UTF-8. -->
+
+    <title>Fleet Management - Wema Travellers</title>
+    <!-- [54] <title> sets the text on the browser tab. -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- [55] <link> imports design rules from 'main.css'. -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- [56] <link> imports design rules from 'style.css'. -->
+
+</head>
+<!-- [64] </head> ends configuration. -->
+
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
+<!-- [65] <body> starts the visible content. (echo) prints the user role. -->
+
+    <script src="js/header2.js"></script>
+    <!-- [66] <script> imports the navigation bar logic. -->
+
+    <div style="height: 100px;"></div>
+    <!-- [67] <div> is a spacer box with height. -->
+
+    <div class="container" style="margin: 0 auto;">
+    <!-- [68] Main wrapper box. -->
+
+        <div class="view-container">
+        <!-- [69] Content box. -->
+
+            <h2 style="color: var(--purple);">Fleet Management</h2>
+            <!-- [70] <h2> is a large heading. style sets purple color. -->
+
+            <div style="background: #fdfdfd; padding: 20px; border: 1px solid #eee; margin-bottom: 30px;">
+            <!-- [71] Form box for adding buses. -->
+
+                <h3>Add New Bus</h3>
+                <!-- [72] <h3> is a smaller heading. -->
+
+                <form method="POST" onsubmit="return validateForm()">
+                <!-- [73] <form> (form). method="POST" (secure). onsubmit checks before saving. -->
+
+                    <div style="display: flex; gap: 10px;">
+                    <!-- [74] <div> row with gaps. -->
+
+                        <div style="flex:1;"><label>Plate No.</label><input type="text" name="reg_no" id="reg_no" class="input"></div>
+                        <!-- [75] Plate No input box. -->
+
+                        <div style="flex:1;"><label>Name</label><input type="text" name="bus_name" id="bus_name" class="input"></div>
+                        <!-- [76] Name input box. -->
+
+                        <div style="flex:1;"><label>Capacity</label><input type="text" name="max_passengers" id="max_passengers" class="input" value="40"></div>
+                        <!-- [77] Capacity input box. -->
+
+                    </div>
+                    <!-- [78] </div> ends row. -->
+
+                    <button type="submit" name="add_bus" class="button pink-background" style="margin-top: 15px;">Save Bus</button>
+                    <!-- [79] <button> saves the form data. -->
+
+                </form>
+                <!-- [80] </form> ends. -->
+
+            </div>
+            <!-- [81] </div> ends form box. -->
+
+            <script>
+            // [82] <script> starts JavaScript logic.
+
+                function toggleBusEdit(bid) {
+                // [83] function is a tool for logic. toggleBusEdit name. ( bid ) is ID. { (curly) starts.
+
+                    var views = document.querySelectorAll('.view-bus-' + bid);
+                    // [84] var (variable). views label. = (assign). document.querySelectorAll finds elements with class. ; (semicolon).
+
+                    var edits = document.querySelectorAll('.edit-bus-' + bid);
+                    // [85] var (variable). edits label. finds textbox elements. ; (semicolon).
+
+                    views.forEach(v => v.style.display = (v.style.display === 'none' ? 'inline' : 'none'));
+                    // [86] views.forEach repeats for each label. Toggle visibility logic. ; (semicolon).
+
+                    edits.forEach(e => e.style.display = (e.style.display === 'none' ? 'inline' : 'none'));
+                    // [87] edits.forEach repeats for each textbox. Toggle visibility logic. ; (semicolon).
+
+                    document.getElementById('ops-m-' + bid).style.display = (document.getElementById('ops-m-' + bid).style.display === 'none' ? 'inline-block' : 'none');
+                    // [88] document.getElementById finds main buttons. Toggle visibility logic. ; (semicolon).
+
+                    document.getElementById('ops-s-' + bid).style.display = (document.getElementById('ops-s-' + bid).style.display === 'none' ? 'inline-block' : 'none');
+                    // [89] document.getElementById finds save buttons. Toggle visibility logic. ; (semicolon).
                 }
-                return true;
-            }
+                // [90] } ends function.
 
-            function validateBusName() {
-                var val = document.getElementById("bus_name").value.trim();
-                if (val.length < 3) {
-                    alert("Please enter a valid bus display name (min 3 characters).");
-                    document.getElementById("bus_name").focus();
-                    return false;
+                function validateForm() {
+                // [91] function for checking form data. { (curly) starts.
+
+                    var r = document.getElementById("reg_no").value.trim();
+                    // [92] var (variable). r label. = (assign). get values and trim gaps. ; (semicolon).
+
+                    if (r == "") { alert("Plate Required"); return false; }
+                    // [93] if empty, show alert and stop. ; (semicolon).
+
+                    return true;
+                    // [94] return true allows saving. ; (semicolon).
                 }
-                return true;
-            }
+                // [95] } ends function.
 
-            function validateCapacity() {
-                var val = document.getElementById("max_passengers").value.trim();
-                if (val == "" || isNaN(val) || parseInt(val) < 10 || parseInt(val) > 100) {
-                    alert("Please enter a valid numeric seat capacity between 10 and 100.");
-                    document.getElementById("max_passengers").focus();
-                    return false;
-                }
-                return true;
-            }
+            </script>
+            <!-- [96] </script> ends JavaScript. -->
 
-            function validateForm() {
-                if (!validatePlate()) return false;
-                if (!validateBusName()) return false;
-                if (!validateCapacity()) return false;
-                return true;
-            }
-        </script>
+            <table class="crud-table">
+            <!-- [97] <table> starts the data grid. -->
 
+                <thead><tr><th>ID</th><th>Name</th><th>Plate</th><th>Capacity</th><th>Driver</th><th>Actions</th></tr></thead>
+                <!-- [98] <thead> (header). <tr> (row). <th> (cell headings). -->
 
-        <table class="crud-table">                                   <!-- [86] Start fleet grid. -->
-            <thead><tr><th>Ref ID</th><th>Bus Identity</th><th>Plate Number</th><th>Capacity</th><th>Crew Assignment (Driver)</th><th>Operations</th></tr></thead> <!-- [87] Head. -->
-            <tbody>                                                  <!-- [88] Inventory list start. -->
-                <?php $drivers_res = $conn->query("SELECT driver_id, full_name FROM drivers ORDER BY full_name ASC"); $drivers_list = []; while($d = $drivers_res->fetch_assoc()) { $drivers_list[] = $d; } // [89] Cache personnel for dropdown population. ?>
-                <?php $sql_fleet = "SELECT b.*, d.full_name as driver_name FROM buses b LEFT JOIN drivers d ON b.driver_id = d.driver_id ORDER BY b.bus_id DESC"; $result_fleet = $conn->query($sql_fleet); while($bus_row = $result_fleet->fetch_assoc()): ?> <!-- [90] Loop through fleet records with driver JOIN. -->
-                <tr><td><?= $bus_row['bus_id'] ?></td><td><?= htmlspecialchars($bus_row['bus_name']) ?></td><td style="font-family: monospace; font-weight: bold;"><?= htmlspecialchars($bus_row['reg_no']) ?></td><td><?= $bus_row['max_passengers'] ?> Seats</td> <!-- [91] Vehicle stats. -->
-                    <td><form method="POST" style="display:flex; gap:8px; align-items:center;"><input type="hidden" name="bus_id" value="<?= $bus_row['bus_id'] ?>"><select name="driver_id" class="input" style="margin-top:0; height:36px; padding:0 8px; flex:1;"><option value="">-- [ UNASSIGNED ] --</option><?php foreach($drivers_list as $crew): ?><option value="<?= $crew['driver_id'] ?>" <?= ($crew['driver_id'] == $bus_row['driver_id'] ? 'selected' : '') ?>><?= htmlspecialchars($crew['full_name']) ?></option><?php endforeach; ?></select><button type="submit" name="assign_driver" class="button regular-button pink-background" style="height:36px; margin-top:0; padding:0 15px; font-size:0.85em; border-radius:4px; box-shadow:none;">Update</button></form></td> <!-- [92] Staff mapping. -->
-                    <td><a href="?remove_bus=<?= $bus_row['bus_id'] ?>" class="action-btn btn-delete" onclick="return confirm('CRITICAL WARNING: This will permanently delete the vehicle record. \n\nContinue?')">Delete Bus</a></td> <!-- [93] Decommission path. -->
-                </tr>                                                <!-- [94] End row. -->
-                <?php endwhile; ?>                                   <!-- [95] End loop. -->
-            </tbody>                                                 <!-- [96] End body. -->
-        </table>                                                     <!-- [97] End grid. -->
-    </div>                                                           <!-- [98] End fleet card. -->
-    <div style="height: 100px;"></div><script src="js/footer.js"></script> <!-- [99] Layout/Footer. -->
-</body>                                                              <!-- [100] End body. -->
-</html>                                                              <!-- [101] End document. -->
+                <tbody>
+                <!-- [99] <tbody> starts the data rows. -->
+
+                    <?php 
+                    $drvs = mysqli_query($conn, "SELECT driver_id, full_name FROM drivers ORDER BY full_name ASC");
+                    /* $drvs (result list) = (assignment). 
+                       mysqli_query (MySQL Improved query) is the command that sends 
+                       the instruction to the database. "Improved" (mysqli) is used 
+                       everywhere in the system to ensure modern security and 
+                       faster performance. ( starts. $conn (bridge) , (comma) 
+                       "SELECT..." (instruction) ) ends. ; (semicolon). */
+
+                    $dlist = []; while($d = mysqli_fetch_assoc($drvs)) { $dlist[] = $d; }
+                    // [101] $ (dollar) variable. dlist array. while loop builds the list of drivers. ; (semicolon).
+
+                    $res = mysqli_query($conn, "SELECT b.*, d.full_name as driver_name FROM buses b LEFT JOIN drivers d ON b.driver_id = d.driver_id ORDER BY b.bus_id DESC");
+                    // [102] $ (dollar) variable. res label. gets buses and driver names from database. ; (semicolon).
+
+                    while($row = mysqli_fetch_assoc($res)): $bid = $row['bus_id'];
+                        /* while (while) starts a loop. $row (row container) pulls data. 
+                           mysqli_fetch_assoc (fetch associative) converts raw data 
+                           into labeled pieces for easy use. ( starts. $res (result source). ) ends. */
+                    ?>
+
+                    <tr>
+                    <!-- [104] <tr> starts a data row. -->
+
+                        <form method="POST">
+                        <!-- [105] <form> for updating this row. -->
+
+                            <input type="hidden" name="bus_id" value="<?= $bid ?>">
+                            <!-- [106] <input> (hidden) stores the bus ID. -->
+
+                            <td><?= $bid ?></td>
+                            <!-- [107] <td> (cell) prints the ID. -->
+
+                            <td>
+                                <span class="view-bus-<?= $bid ?>"><?= htmlspecialchars($row['bus_name']) ?></span>
+                                <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                     that encodes text for safety. ( starts the tool. $row (data row) 
+                                     ['bus_name'] (vehicle label) ) ends. -->
+                                <!-- [108] <span> (label) shows bus name. -->
+
+                                <input type="text" name="bus_name" value="<?= htmlspecialchars($row['bus_name']) ?>" class="edit-bus-<?= $bid ?>" style="display:none;">
+                                <!-- [109] <input> (textbox) for editing name (hidden by default). -->
+                            </td>
+
+                            <td>
+                                <span class="view-bus-<?= $bid ?>"><?= htmlspecialchars($row['reg_no']) ?></span>
+                                <!-- [110] <span> shows plate number. -->
+
+                                <input type="text" name="reg_no" value="<?= htmlspecialchars($row['reg_no']) ?>" class="edit-bus-<?= $bid ?>" style="display:none;">
+                                <!-- [111] <input> for editing plate. -->
+                            </td>
+
+                            <td>
+                                <span class="view-bus-<?= $bid ?>"><?= $row['max_passengers'] ?></span>
+                                <!-- [112] <span> shows capacity. -->
+
+                                <input type="text" name="max_passengers" value="<?= $row['max_passengers'] ?>" class="edit-bus-<?= $bid ?>" style="display:none; width:50px;">
+                                <!-- [113] <input> for editing capacity. -->
+                            </td>
+
+                            <td>
+                                <select name="driver_id" class="input" style="padding:5px; width:auto;">
+                                <!-- [114] <select> (dropdown) for driver. -->
+
+                                    <option value="">-- No Driver --</option>
+                                    <!-- [115] <option> (choice) for no driver. -->
+
+                                    <?php foreach($dlist as $d): ?>
+                                    <!-- [116] foreach loops through the driver list. -->
+
+                                    <option value="<?= $d['driver_id'] ?>" <?= ($d['driver_id'] == $row['driver_id'] ? 'selected' : '') ?>><?= htmlspecialchars($d['full_name']) ?></option>
+                                    <!-- [117] <option> choice with logic to mark as 'selected'. -->
+
+                                    <?php endforeach; ?>
+                                    <!-- [118] End driver loop. -->
+
+                                </select>
+                                <!-- [119] </select> ends dropdown. -->
+
+                                <button type="submit" name="update_bus" class="action-btn" style="background:#48bb78; margin:0;">Save</button>
+                                <!-- [120] <button> saves driver assignment. -->
+                            </td>
+
+                            <td>
+                                <div id="ops-m-<?= $bid ?>">
+                                <!-- < (less than sign) div (box) id (identity) = "ops-m- [echo] $bid" (unique number) > starts the visible action box. -->
+
+                                    <button type="button" class="action-btn btn-update" onclick="toggleBusEdit(<?= $bid ?>)">Edit</button>
+                                    <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                         class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                         onclick (on click event) = "toggleBusEdit (run the toggle tool) ( [echo] $bid (for this bus) )" 
+                                         > (greater than sign) Edit (label) < / (slash) button > (ends item). -->
+
+                                    <a href="?remove_bus=<?= $bid ?>" class="action-btn btn-delete" onclick="return confirm('Delete?')">Del</a>
+                                    <!-- < (less than sign) a (anchor link) href (destination) = "?remove_bus = [echo] $bid" (sends ID to URL) 
+                                         class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                         onclick (on click event) = "return confirm (ask a question) ( 'Delete?' )" 
+                                         > (greater than sign) Del (label) < / (slash) a > (ends link). -->
+
+                                </div>
+                                <!-- < / (slash) div > ends main button box. -->
+
+                                <div id="ops-s-<?= $bid ?>" style="display:none;">
+                                <!-- < (less than sign) div (box) id (identity) = "ops-s- [echo] $bid" (unique number) 
+                                     style (visual) = "display:none;" (starts hidden) > starts the edit action box. -->
+
+                                    <button type="submit" name="update_bus" class="action-btn btn-update">Update</button>
+                                    <!-- < (less than sign) button (clickable item) type (nature) = "submit" (sends the form data) 
+                                         name (server label) = "update_bus" (tells PHP which logic to run) 
+                                         class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                         > (greater than sign) Update (label) < / (slash) button > (ends item). -->
+
+                                    <button type="button" class="action-btn btn-delete" onclick="toggleBusEdit(<?= $bid ?>)">Cancel</button>
+                                    <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                         class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                         onclick (on click event) = "toggleBusEdit (run the toggle tool) ( [echo] $bid (for this bus) )" 
+                                         > (greater than sign) Cancel (label) < / (slash) button > (ends item). -->
+
+                                </div>
+                                <!-- < / (slash) div > ends edit button box. -->
+                            </td>
+
+                        </form>
+                        <!-- [129] </form> ends inline form. -->
+
+                    </tr>
+                    <!-- [130] </tr> ends data row. -->
+
+                    <?php endwhile; ?>
+                    <!-- [131] End of fleet while loop. -->
+
+                </tbody>
+                <!-- [132] </tbody> ends data body. -->
+
+            </table>
+            <!-- [133] </table> ends data grid. -->
+
+        </div>
+        <!-- [134] </div> ends content box. -->
+
+    </div>
+    <!-- [135] </div> ends main wrapper. -->
+
+    <div style="height: 100px;"></div>
+    <!-- [136] <div> bottom spacer box. -->
+
+    <script src="js/footer.js"></script>
+    <!-- [137] <script> imports footer logic. -->
+
+</body>
+<!-- [138] </body> ends visible content. -->
+
+</html>
+<!-- [139] </html> ends document structure. -->
+
+<?php mysqli_close($conn); ?>
+<!-- [140] mysqli_close shuts the database bridge. ; (semicolon). -->

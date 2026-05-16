@@ -1,165 +1,554 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * STAFF MANAGEMENT (admin_drivers.php)                              // [3] Title identifying this script as the personnel management hub.
- * Purpose: This interface allows Administrators to manage the human resources // [4] Main objective: manage professional drivers.
- * (the professional drivers) of Wema Travellers.                    // [5] Functionality: staff registry oversight.
- * Admins can register new drivers, see currently active drivers, and // [6] Task: CRUD operations for professional staff.
- * remove drivers who are no longer with the company.                // [7] Task: personnel retirement/deletion.
- */                                                                  // [8] Close multi-line documentation block.
+<?php
+// < (less than sign) ? (question mark) php (PHP: Hypertext Preprocessor) is the opening 
+// tag that starts the server-side logic engine.
 
-require_once 'db_connection.php';                                    // [9] Import database bridge object ($conn) for MySQL communication.
-require_once 'logger.php';                                           // [9.5] Import logging utility for audit trail.
-session_start();                                                    // [10] Initialize or resume user session to identify the administrative officer.
+/**
+ * STAFF MANAGEMENT (admin_drivers.php)
+ */
+// / (forward slash) * (asterisk) * (asterisk) opens a professional documentation block.
+// STAFF MANAGEMENT is the module title. * (asterisk) / (forward slash) 
+// closes the block.
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {      // [11] Security Barrier: Verify requester identity and 'ADMIN' credential.
-    die("Security Error: Access denied. Driver management is restricted to Administrators."); // [12] Halt execution with descriptive error.
-}                                                                    // [13] Close security barrier.
+require_once 'db_connection.php';
+// require_once (require once) is a directive that imports the database bridge file and 
+// ensures it is only loaded one time to prevent errors. 'db_connection.php' (quote db 
+// underscore connection dot php quote) is the file path. ; (semicolon) terminates the line.
 
-if (isset($_POST['add_driver'])) {                                   // [14] Action Handler: Intercept form submission for new driver registration.
-    $national_id = $_POST['national_id'];                            // [15] Capture: Official government identifier for tracking.
-    $full_name   = $_POST['full_name'];                              // [16] Capture: Legal name of the driver professional.
-    $phone       = $_POST['phone'];                                  // [17] Capture: Primary mobile contact channel.
-    $email       = $_POST['email'];                                  // [18] Capture: Digital work contact record.
-    $stmt_reg = $conn->prepare("INSERT INTO drivers (national_id, full_name, phone, email) VALUES (?, ?, ?, ?)"); // [19] Prepare secure SQL insertion statement.
-    $stmt_reg->bind_param("ssss", $national_id, $full_name, $phone, $email); // [20] Bind data variables to statement placeholders.
-    $stmt_reg->execute();                                            // [21] Commit new driver record to the MySQL engine.
-    $stmt_reg->close();                                              // [22] Release statement resource memory.
-    header('Location: admin_drivers.php?msg=System: Driver record created successfully.'); // [23] Refresh page with success notification.
-    exit();                                                          // [24] Terminate script post-redirect.
-}                                                                    // [25] End registration block.
+require_once 'logger.php';
+// require_once (require once) imports the activity logging utility. 'logger.php' 
+// (quote logger dot php quote) is the file path. ; (semicolon) terminates the instruction.
 
-if (isset($_GET['remove_driver'])) {                                 // [26] Action Handler: Intercept GET request for driver deletion.
-    $driver_id = $_GET['remove_driver'];                             // [27] Capture: Target driver ID from URL parameter.
-    $stmt_rem = $conn->prepare("DELETE FROM drivers WHERE driver_id = ?"); // [28] Prepare secure SQL deletion statement.
-    $stmt_rem->bind_param("i", $driver_id);                          // [29] Bind target ID to statement.
+session_start();
+// session_start (session start) is the command that activates the server's memory 
+// to track the user across different pages. ( ) (empty brackets) execute the tool. 
+// ; (semicolon) terminates the instruction.
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
+// if (if) starts a logic check for security. ( (opening bracket) starts condition. 
+// ! (exclamation mark) is the NOT operator. isset (is set) checks if a memory 
+// container exists. ( $ (dollar sign) _ (underscore) SESSION [ 'user_id' ] ) (bracket). 
+// || (double pipe) is the logical OR operator. $_SESSION['role'] !== 'ADMIN' 
+// (not identical to admin text). ) (closing bracket). { (opening curly bracket) 
+// starts the security error logic.
+
+    die("Security Error: Access denied.");
+    // die (die) is a terminal function that prints an error message and stops all 
+    // further code execution. ( "Security Error: Access denied." ) is the message. 
+    // ; (semicolon) terminates the line.
+}
+// } (closing curly bracket) ends the security check block.
+
+if (isset($_POST['add_driver'])) {
+// if (if) starts a logic check to determine if the driver creation form has 
+// been submitted. ( (opening bracket) starts the condition. isset (is set) 
+// checks if a variable exists. ( (bracket) $ (dollar sign) _ (underscore) 
+// POST [ 'add_driver' ] (submit button) ) (bracket) ) (bracket). 
+// { (opening curly bracket) marks the start of the logic.
+
+    $national_id = $_POST['national_id'];
+    // $ (dollar sign) variable marker. national_id (n a t i o n a l underscore 
+    // i d) is the logical label chosen to identify the identification number. 
+    // = (equals sign) assignment operator. $ (dollar sign) _ (underscore) 
+    // POST (Superglobal Array that pulls/collects form data) [ 'national_id' ] 
+    // retrieves data. ; (semicolon).
+
+    $full_name = $_POST['full_name'];
+    // $ (dollar sign) variable marker. full_name label. = (equals sign) 
+    // assignment. $ (dollar sign) _ (underscore) POST [ 'full_name' ] 
+    // ; (semicolon).
+
+    $phone = $_POST['phone'];
+    // $ (dollar sign) variable marker. phone label. = (equals sign) 
+    // assignment. $ (dollar sign) _ (underscore) POST [ 'phone' ] ; (semicolon).
+
+    $email = $_POST['email'];
+    // $ (dollar sign) variable marker. email label. = (equals sign) 
+    // assignment. $ (dollar sign) _ (underscore) POST [ 'email' ] ; (semicolon).
     
-    // [AUDIT LOG] Record the deletion.
-    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Driver Record (DID: $driver_id)");
+    $sql_reg = "INSERT INTO drivers (national_id, full_name, phone, email) VALUES (?, ?, ?, ?)";
+    // $ (dollar sign) variable marker. sql_reg (s q l underscore r e g) is a 
+    // logical identifier chosen to describe the database creation command. 
+    // = (equals sign) assignment. "INSERT INTO..." (quote) starts the SQL 
+    // instruction. ? (question marks) are four critical security placeholders 
+    // that neutralize SQL Injection by separating the command structure from 
+    // user data. ; (semicolon) terminates the command.
 
-    if($stmt_rem->execute()) { $msg = "Success: Driver has been removed from the registry."; } // [30] Attempt execution and log success.
-    else { $msg = "Error: This driver is currently assigned to a bus. Please update the bus fleet before deletion."; } // [31] Log failure (likely FK constraint).
-    $stmt_rem->close();                                              // [32] Release memory.
-    header("Location: admin_drivers.php?msg=" . urlencode($msg));     // [33] Refresh page with result message.
-    exit();                                                          // [34] Terminate script.
-}                                                                    // [35] End deletion block.
-?>                                                                   <!-- [36] Close PHP script and prepare for document definition. -->
+    $stmt_reg = mysqli_prepare($conn, $sql_reg);
+    /* $stmt_reg (handle) = (assignment). 
+       mysqli (MySQL Improved) _ (underscore) prepare (prepare) is the security 
+       function that pre-compiles the command blueprint. 
+       "Improved" (mysqli) is used because it supports secure "Prepared Statements" 
+       that prevent hackers from injecting malicious code into our database. 
+       ( starts. $conn (bridge) , (comma) $sql_reg (blueprint) ) ends. ; (semicolon). */
 
-<!DOCTYPE html>                                                         <!-- [37] Define standard HTML5 document type. -->
-<html lang="en">                                                     <!-- [38] Root element identifying English. -->
-<head>                                                               <!-- [39] Metadata and resource header section. -->
-    <meta charset="UTF-8">                                           <!-- [40] UTF-8 character encoding. -->
-    <title>Manage Professional Staff - Wema Travellers</title>          <!-- [41] Browser tab title. -->
-    <link rel="stylesheet" href="css/main.css">                      <!-- [42] Global layout assets. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [43] Global branding assets. -->
-    <style>                                                          /* [44] Internal CSS for driver management layout. */
-        .view-container { max-width: 1200px; margin: 20px auto; padding: 30px; background: #ffffff; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); } /* [45] Main container. */
-        .back-btn-container { padding: 20px 0; max-width: 1200px; margin: 0 auto; } /* [46] Navigation layout. */
-        .crud-table { width: 100%; border-collapse: collapse; margin-top: 20px; } /* [47] Data grid. */
-        .crud-table th, .crud-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; text-align: left; } /* [48] Cell styles. */
-        .crud-table th { background-color: var(--purple); color: white; font-weight: 600; } /* [49] Branding. */
-        .action-btn { padding: 8px 15px; border-radius: 5px; text-decoration: none; color: white; font-size: 0.85em; font-weight: bold; transition: opacity 0.2s; } /* [50] Action buttons. */
-        .btn-delete { background-color: #f44336; }                   /* [51] Destructive button. */
-        .btn-delete:hover { opacity: 0.8; }                          /* [52] Interaction. */
-        .add-form { background: #fdfdfd; padding: 25px; border-radius: 10px; margin-bottom: 40px; border: 1px solid #eee; } /* [53] Reg form card. */
-        .add-form h3 { margin-top: 0; color: #444; margin-bottom: 20px; } /* [54] Form title. */
-        .form-row { display: flex; gap: 15px; flex-wrap: wrap; }     /* [55] Responive grid. */
-        .form-group { flex: 1; min-width: 200px; }                   /* [56] Form field box. */
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #666; font-size: 0.9em; } /* [57] Field labels. */
-    </style>                                                         <!-- [58] End internal CSS. -->
-</head>                                                              <!-- [59] End head. -->
+    mysqli_stmt_bind_param($stmt_reg, "ssss", $national_id, $full_name, $phone, $email);
+    // mysqli_stmt_bind_param (bind parameter) is the function that securely 
+    // attaches the 4 data points to the placeholders. Binding (binding) is the 
+    // safe act of pouring the variables into the pre-compiled blueprint holes 
+    // (?). ( (opening bracket) $ (dollar sign) stmt_reg (handle) , (comma) 
+    // "ssss" (four strings) , (comma) $ (dollar sign) national_id , (comma) 
+    // $ (dollar sign) full_name , (comma) $ (dollar sign) phone , (comma) 
+    // $ (dollar sign) email ) (closing bracket). ; (semicolon).
 
-<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [60] Start visible body. -->
-    <script src="js/header2.js"></script>                                <!-- [61] Inject global header. -->
-    <div style="height: 100px;"></div>                                   <!-- [62] Layout offset. -->
+    mysqli_stmt_execute($stmt_reg);
+    // mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+    // execute (execute) is the command that triggers the database creation. 
+    // ( (opening bracket) $ (dollar sign) stmt_reg (handle) ) (closing bracket). 
+    // ; (semicolon).
 
-    <div class="container" style="max-width:1200px; margin: 0 auto;">    <!-- [63] Content constraint. -->
-        <div class="back-btn-container"><a href="dashboard.php" class="button regular-button green-background" style="text-decoration:none;">← Control Panel Home</a></div> <!-- [64] Return path. -->
+    mysqli_stmt_close($stmt_reg);
+    // mysqli_stmt_close (close) terminates the tool and releases resources. 
+    // ( (bracket) $ (dollar sign) stmt_reg ) (bracket). ; (semicolon).
 
-        <div class="view-container">                                     <!-- [65] Open management card. -->
-            <h2>Drivers & Staff Registry</h2>                            <!-- [66] Title. -->
-            <?php if(isset($_GET['msg'])): ?>                            <!-- [67] Check for system notifications. -->
-            <div style="padding: 15px; margin-bottom: 25px; border-radius: 6px; background-color: <?= strpos($_GET['msg'], 'Error') !== false ? '#ffeeee' : '#eeffee' ?>; color: <?= strpos($_GET['msg'], 'Error') !== false ? '#cc0000' : '#007700' ?>; border: 1px solid <?= strpos($_GET['msg'], 'Error') !== false ? '#ffcccc' : '#ccffcc' ?>;"><strong>Notice:</strong> <?= htmlspecialchars($_GET['msg']) ?></div> <!-- [68] Display notification. -->
-            <?php endif; ?>                                              <!-- [69] End notification check. -->
+    header('Location: admin_drivers.php?msg=Driver Added');
+    // header (header) redirection tool sends the user back to the list. 
+    // ; (semicolon).
 
-            <div class="add-form">                                       <!-- [70] Open registration form. -->
-                <h3>New Staff Registration</h3>                          <!-- [71] Form Title. -->
-                <form method="POST" id="driverForm" onsubmit="return validateForm()">
-                    <div class="form-row">               <!-- [72] Open form layout. -->
-                        <div class="form-group"><label>Full Legal Name</label><input type="text" name="full_name" id="full_name" class="input" placeholder="e.g. John Kamau" onmouseout="validateFullName()"></div> <!-- [73] Name entry. -->
-                        <div class="form-group"><label>ID / PASSPORT / BIRTH CERT. NO</label><input type="text" name="national_id" id="national_id" class="input" placeholder="ID/PASSPORT/BIRTH CERT. NO" onmouseout="validateID()"></div> <!-- [74] ID entry. -->
-                        <div class="form-group"><label>Phone Number</label><input type="text" name="phone" id="phone" class="input" placeholder="0712345678" onmouseout="validatePhone()"></div> <!-- [75] Phone entry. -->
-                        <div class="form-group"><label>Work Email Address</label><input type="text" name="email" id="email" class="input" placeholder="john.k@wematravellers.com" onmouseout="validateEmail()"></div> <!-- [76] Email entry. -->
+    exit();
+    // exit (exit) kills the script processing immediately. ; (semicolon).
+}
+// } (closing curly bracket) ends the creation logic block.
+
+if (isset($_POST['update_driver'])) {
+// if (if) starts a logic check to determine if the driver modification form 
+// has been submitted. ( (opening bracket) starts the condition. isset (is set) 
+// checks if a variable exists. ( (bracket) $ (dollar sign) _ (underscore) 
+// POST [ 'update_driver' ] (submit button) ) (bracket) ) (bracket). 
+// { (opening curly bracket) marks the start of the logic.
+
+    $driver_id = $_POST['driver_id'];
+    // $ (dollar sign) variable. driver_id (d r i v e r underscore i d) label. 
+    // = (equals sign) assignment. $ (dollar sign) _ (underscore) POST 
+    // (Superglobal Array that pulls form data) [ 'driver_id' ] retrieves 
+    // the target ID. ; (semicolon).
+
+    $national_id = $_POST['national_id'];
+    // $ (dollar sign) variable marker. national_id label. = (equals sign). 
+    // ; (semicolon).
+
+    $full_name = $_POST['full_name'];
+    // $ (dollar sign) variable marker. full_name label. = (equals sign). 
+    // ; (semicolon).
+
+    $phone = $_POST['phone'];
+    // $ (dollar sign) variable marker. phone label. = (equals sign). 
+    // ; (semicolon).
+
+    $email = $_POST['email'];
+    // $ (dollar sign) variable marker. email label. = (equals sign). 
+    // ; (semicolon).
+
+    $sql_upd = "UPDATE drivers SET national_id=?, full_name=?, phone=?, email=? WHERE driver_id=?";
+    // $ (dollar sign) variable marker. sql_upd (s q l underscore u p d) is a 
+    // logical identifier chosen to describe the database modification command. 
+    // = (equals sign) assignment operator. "UPDATE..." (quote) starts the 
+    // SQL instruction. ? (question marks) are the five security placeholders 
+    // that neutralize SQL Injection by separating the command structure from 
+    // user data. ; (semicolon) terminates the line.
+
+    $stmt_upd = mysqli_prepare($conn, $sql_upd);
+    // $ (dollar sign) variable marker. stmt_upd (s t m t underscore u p d) is 
+    // the handle for the update tool object. = (equals sign) assignment. 
+    // mysqli_prepare (prepare) pre-compiles the update blueprint. Pre-compiling 
+    // (pre compiling) locks the structural shape of the UPDATE command in the 
+    // database before data is introduced. ( (opening bracket) $ (dollar sign) 
+    // conn (bridge handle) , (comma) $ (dollar sign) sql_upd (the command 
+    // blueprint) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_upd, "ssssi", $national_id, $full_name, $phone, $email, $driver_id);
+    // mysqli_stmt_bind_param (bind parameter) attaches the 4 strings and 1 integer 
+    // to the placeholders. Binding (binding) is the process of safely pouring 
+    // the variables into the pre-compiled blueprint holes (?). ( (opening 
+    // bracket) $ (dollar sign) stmt_upd (handle) , (comma) "ssssi" (types) 
+    // , (comma) $ (dollar sign) national_id , (comma) $ (dollar sign) full_name 
+    // , (comma) $ (dollar sign) phone , (comma) $ (dollar sign) email , (comma) 
+    // $ (dollar sign) driver_id ) (closing bracket). ; (semicolon).
+    // safely pouring the user's data into the pre-compiled blueprint holes (?). 
+    // This ensures the data is treated only as text or numbers, never as a 
+    // command. ( (opening bracket) $ (dollar sign) stmt_upd (handle) , (comma) 
+    // "ssssi" (types) , (comma) $ (dollar sign) national_id , (comma) $ (dollar sign) 
+    // full_name , (comma) $ (dollar sign) phone , (comma) $ (dollar sign) email 
+    // , (comma) $ (dollar sign) driver_id ) (closing bracket). ; (semicolon).
+
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Updated Driver: $driver_id");
+    // logActivity (log activity) is the tool that records the change in the audit 
+    // logs. ( ID , Name , Action , Message ) (bracket). ; (semicolon).
+
+    mysqli_stmt_execute($stmt_upd);
+    // mysqli_stmt_execute runs the update command against the database. ( (opening 
+    // bracket) $ (dollar sign) stmt_upd (handle) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_close($stmt_upd);
+    // mysqli_stmt_close releases resources. ( (opening bracket) $ (dollar sign) 
+    // stmt_upd (handle) ) (closing bracket). ; (semicolon).
+
+    header('Location: admin_drivers.php?msg=Updated');
+    // header (header) tool sends refresh command. ; (semicolon).
+
+    exit();
+    // exit (exit) stops the script. ( ) (empty brackets). ; (semicolon).
+}
+// } (closing curly bracket) ends the update logic block.
+
+if (isset($_GET['remove_driver'])) {
+// if (if) starts a check for the deletion link. ( (opening bracket) isset (is set) 
+// ( $ (dollar sign) _ (underscore) GET [ 'remove_driver' ] ) (bracket). ) (closing 
+// bracket). { (opening curly bracket) starts the removal logic.
+
+    $driver_id = $_GET['remove_driver'];
+    // $ (dollar sign) variable. driver_id (driver id) label. = (equals sign) 
+    // assignment. $_GET['remove_driver'] is the ID from the URL. ; (semicolon).
+
+    $stmt_rem = mysqli_prepare($conn, "DELETE FROM drivers WHERE driver_id = ?");
+    // $ (dollar sign) variable. stmt_rem (statement removal) handle. = (equals sign) 
+    // assignment. mysqli_prepare pre-compiles the deletion blueprint. Pre-compiling 
+    // (pre compiling) means the machine creates a structural blueprint of the command 
+    // before any data is added. This stops hackers from injecting malicious 
+    // code because the machine already knows the exact shape of the instruction. 
+    // ( (opening bracket) $ (dollar sign) conn (bridge) , (comma) "DELETE..." 
+    // (SQL command) ) (closing bracket). ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_rem, "i", $driver_id);
+    // mysqli_stmt_bind_param (MySQL Improved statement bind parameter) attaches 
+    // the ID to the placeholder. "i" means integer. Binding (binding) is the 
+    // process of safely pouring the user's data into the pre-compiled blueprint 
+    // holes (?). This ensures the data is treated only as text or numbers, 
+    // never as a command. ( (opening bracket) $ (dollar sign) stmt_rem (handle) 
+    // , (comma) "i" (integer type) , (comma) $ (dollar sign) driver_id (data) 
+    // ) (closing bracket). ; (semicolon).
+
+    logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Driver: $driver_id");
+    // logActivity (log activity) records the deletion event in the security logs. 
+    // ( ID , Name , Action , Message ) (bracket). ; (semicolon).
+
+    mysqli_stmt_execute($stmt_rem);
+    // mysqli_stmt_execute runs the deletion command against the database. 
+    // ( (opening bracket) $ (dollar sign) stmt_rem (handle) ) (closing bracket). 
+    // ; (semicolon).
+
+    mysqli_stmt_close($stmt_rem);
+    // mysqli_stmt_close releases the server resources used for the deletion tool. 
+    // ( (opening bracket) $ (dollar sign) stmt_rem (handle) ) (closing bracket). 
+    // ; (semicolon).
+
+    header("Location: admin_drivers.php?msg=Deleted");
+    // header (header) tool sends the refresh command with a success message. 
+    // ; (semicolon).
+
+    exit();
+    // exit (exit) stops the script processing. ; (semicolon).
+}
+// } (closing curly bracket) ends the removal logic block.
+?>
+<!-- [47] ? (question mark) > (greater than) closing delimiter for PHP. -->
+
+<!DOCTYPE html>
+<!-- < (less than sign) ! (exclamation mark) DOCTYPE (document type) html (h t m l) 
+> (greater than sign) is the standard declaration for a modern web page. -->
+
+<html lang="en">
+<!-- < (less than sign) html (h t m l) starts the web document. lang (language) 
+= (equals sign) "en" (English text). > (greater than sign). -->
+
+<head>
+<!-- < (less than sign) head (h e a d) > (greater than sign) starts the hidden 
+configuration section of the page. -->
+
+    <meta charset="UTF-8">
+    <!-- < (less than sign) meta (m e t a) charset (character set) = (equals sign) 
+    "UTF-8" (standard text encoding) > (greater than sign). -->
+
+    <title>Manage Drivers - Wema Travellers</title>
+    <!-- < (less than sign) title (t i t l e) > (greater than sign) sets the label 
+    on the browser's tab. < / (slash) title > (greater than sign). -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- < (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- < (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
+
+</head>
+<!-- < / (slash) head (h e a d) > (greater than sign) ends configuration. -->
+
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
+<!-- < (less than sign) body (b o d y) class (class) = (equals sign) starts 
+the visible part of the page. [echo] [echo] prints the lower-case role name 
+to apply the correct design theme. -->
+
+    <script src="js/header2.js"></script>
+    <!-- < (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/header2.js" > (greater than sign) imports the navigation header logic. -->
+
+    <div style="height: 100px;"></div>
+    <!-- < (less than sign) div (d i v) style (style) = (equals sign) "height: 100px;" 
+    > (greater than sign) creates a vertical spacer. < / (slash) div >. -->
+
+    <div class="container" style="margin: 0 auto;">
+    <!-- < (less than sign) div (d i v) class (class) = (equals sign) "container" 
+    > (greater than sign) is the main page wrapper. -->
+
+        <div class="view-container">
+        <!-- < (less than sign) div (d i v) class (class) = (equals sign) 
+        "view-container" > (greater than sign) is the white content box. -->
+
+            <h2 style="color: var(--purple);">Staff Registry</h2>
+            <!-- < (less than sign) h2 (heading level two) > (greater than sign) 
+            is the main title of the module. -->
+
+            <div style="background: #fdfdfd; padding: 20px; border: 1px solid #eee; margin-bottom: 30px;">
+            <!-- < (less than sign) div (d i v) style (style) = (equals sign) starts 
+             the registration form box with a light background. -->
+
+                <h3>New Staff Registration</h3>
+                <!-- < (less than sign) h3 (heading level three) > (greater than sign) 
+                is the sub-title for the addition section. -->
+
+                <form method="POST" onsubmit="return validateForm()">
+                <!-- < (less than sign) form (f o r m) method (method) = (equals sign) 
+                "POST" (secure transmission) onsubmit (on submit) = (equals sign) 
+                "return validateForm()" (run browser check). -->
+
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <!-- < (less than sign) div (d i v) style (style) = (equals sign) 
+                    "display: flex;" (flexible layout) starts the input row. -->
+
+                        <div style="flex:1;"><label>Full Name</label><input type="text" name="full_name" id="full_name" class="input"></div>
+                        <!-- input field for the staff member's name. label (label) 
+                        provides the text description. -->
+
+                        <div style="flex:1;"><label>ID Number</label><input type="text" name="national_id" id="national_id" class="input"></div>
+                        <!-- input field for the national identification number. -->
+
+                        <div style="flex:1;"><label>Phone</label><input type="text" name="phone" id="phone" class="input"></div>
+                        <!-- input field for the contact telephone number. -->
+
+                        <div style="flex:1;"><label>Email</label><input type="text" name="email" id="email" class="input"></div>
+                        <!-- input field for the electronic mail address. -->
+
                     </div>
-                    <button type="submit" name="add_driver" class="button regular-button pink-background" style="margin-top: 15px;">Finalize Registration</button>
-                </form> <!-- [77] Submit btn. -->
-            </div>                                                       <!-- [78] End form. -->
+                    <!-- < / (slash) div > (greater than sign) ends the input row. -->
+
+                    <button type="submit" name="add_driver" class="button pink-background" style="margin-top: 15px;">Register Staff</button>
+                    <!-- button tag that triggers the 'add_driver' logic in the PHP 
+                    engine. pink-background applies the theme. -->
+
+                </form>
+                <!-- < / (slash) form > (greater than sign) ends the registration form. -->
+
+            </div>
+            <!-- < / (slash) div > (greater than sign) ends the form box. -->
 
             <script>
-                // Custom JS Validation for New Staff Registration
-                function validateFullName() {
-                    var val = document.getElementById("full_name").value.trim();
-                    if (val.length < 3) {
-                        alert("Please enter a valid full name (min 3 characters).");
-                        document.getElementById("full_name").focus();
-                        return false;
-                    }
-                    return true;
-                }
+            // < (less than sign) script (s c r i p t) > (greater than sign) starts 
+            // the browser-side interactive logic.
 
-                function validateID() {
-                    var val = document.getElementById("national_id").value.trim();
-                    if (val.length < 5) {
-                        alert("ID/PASSPORT/BIRTH CERT. NO is required (min 5 characters).");
-                        document.getElementById("national_id").focus();
-                        return false;
-                    }
-                    return true;
-                }
+                function toggleDriverEdit(did) {
+                // function (function) defines a reusable tool named toggleDriverEdit. 
+                // ( did ) is the identification number of the staff member. { (curly 
+                // bracket) starts the execution block.
 
-                function validatePhone() {
-                    var val = document.getElementById("phone").value.trim();
-                    if (val.length < 9 || isNaN(val)) {
-                        alert("Please enter a valid numeric phone number.");
-                        document.getElementById("phone").focus();
-                        return false;
-                    }
-                    return true;
-                }
+                    var views = document.querySelectorAll('.view-driver-' + did);
+                    // var (variable) creates a list. document (web page) . (dot) 
+                    // querySelectorAll (find multiple) tool collects all read-only labels. 
+                    // ; (semicolon) terminates the instruction.
 
-                function validateEmail() {
-                    var email = document.getElementById("email").value.trim();
-                    if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
-                        alert("Please enter a valid work email address.");
-                        document.getElementById("email").focus();
-                        return false;
-                    }
-                    return true;
+                    var edits = document.querySelectorAll('.edit-driver-' + did);
+                    // var (variable) creates a list of all hidden input boxes for the 
+                    // specific staff member. ; (semicolon).
+
+                    views.forEach(v => v.style.display = (v.style.display === 'none' ? 'inline' : 'none'));
+                    // views (list) . (dot) forEach (for each) runs a loop. v (item) 
+                    // => (arrow) logic. if display is none, show it, otherwise hide it.
+
+                    edits.forEach(e => e.style.display = (e.style.display === 'none' ? 'inline' : 'none'));
+                    // edits (list) . (dot) forEach (for each) toggles the visibility 
+                    // of all typing boxes.
+
+                    document.getElementById('ops-m-' + did).style.display = (document.getElementById('ops-m-' + did).style.display === 'none' ? 'inline-block' : 'none');
+                    // document (page) . (dot) getElementById (find one) toggles the 
+                    // main action buttons (Edit/Delete).
+
+                    document.getElementById('ops-s-' + did).style.display = (document.getElementById('ops-s-' + did).style.display === 'none' ? 'inline-block' : 'none');
+                    // document (page) . (dot) getElementById (find one) toggles the 
+                    // secondary action buttons (Update/Cancel).
                 }
+                // } (closing curly bracket) ends the toggle function.
 
                 function validateForm() {
-                    if (!validateFullName()) return false;
-                    if (!validateID()) return false;
-                    if (!validatePhone()) return false;
-                    if (!validateEmail()) return false;
+                // function (function) defines the validateForm tool. { (curly bracket) 
+                // starts the data verification logic.
+
+                    var n = document.getElementById("full_name").value.trim();
+                    // var (variable) n (label). = (equals sign) assignment. trim() 
+                    // removes empty spaces from the name.
+
+                    if (n == "") { alert("Name Required"); return false; }
+                    // if (if) check for empty name. alert (alert) shows a pop-up. 
+                    // return false (return false) stops the form submission.
+                    
                     return true;
+                    // return (return) true (true) allows the data to be sent.
                 }
+                // } (closing curly bracket) ends the validation function.
+
             </script>
+            <!-- < / (slash) script > (greater than sign) ends the interactive logic. -->
 
+            <table class="crud-table">
+            <!-- < (less than sign) table (t a b l e) class (class) = (equals sign) 
+            "crud-table" > (greater than sign) starts the data grid. -->
 
-            <table class="crud-table">                                   <!-- [79] Start registry grid. -->
-                <thead><tr><th>Ref ID</th><th>Name</th><th>ID Number</th><th>Phone</th><th>Email</th><th>Operating Vehicle</th><th>Actions</th></tr></thead> <!-- [80] Head. -->
-                <tbody>                                                  <!-- [81] Staff list start. -->
-                    <?php $sql_list = "SELECT d.*, b.bus_name FROM drivers d LEFT JOIN buses b ON d.driver_id = b.driver_id ORDER BY d.driver_id DESC"; $res_list = $conn->query($sql_list); while($crew_row = $res_list->fetch_assoc()): ?> <!-- [82] Loop through personnel records with vehicle JOIN. -->
-                    <tr><td><?= $crew_row['driver_id'] ?></td><td style="font-weight: 600; color: #333;"><?= htmlspecialchars($crew_row['full_name']) ?></td> <!-- [83] ID/Name. -->
-                        <td><?= htmlspecialchars($crew_row['national_id']) ?></td><td><?= htmlspecialchars($crew_row['phone']) ?></td><td><?= htmlspecialchars($crew_row['email']) ?></td> <!-- [84] ID/Contact details. -->
-                        <td><?php if($crew_row['bus_name']): ?><span style="color: #2e7d32; font-weight: bold;">( <?= htmlspecialchars($crew_row['bus_name']) ?> )</span><?php else: ?><span style="color: #999; font-style: italic;">No Bus Assigned</span><?php endif; ?></td> <!-- [85] Vehicle status. -->
-                        <td><a href="?remove_driver=<?= $crew_row['driver_id'] ?>" class="action-btn btn-delete" onclick="return confirm('CRITICAL: This will permanently remove this driver from the active staff list. \n\nAre you absolutely sure?')">Delete Record</a></td> <!-- [86] Delete path. -->
-                    </tr>                                                <!-- [87] End row. -->
-                    <?php endwhile; ?>                                   <!-- [88] End loop. -->
-                </tbody>                                                 <!-- [89] End body. -->
-            </table>                                                     <!-- [90] End grid. -->
-        </div>                                                           <!-- [91] End view container. -->
-    </div>                                                               <!-- [92] End main container. -->
-    <div style="height: 100px;"></div><script src="js/footer.js"></script> <!-- [93] Layout/Footer. -->
-</body>                                                              <!-- [94] End body. -->
-</html>                                                              <!-- [95] End document. -->
+                <thead><tr><th>ID</th><th>Full Name</th><th>ID Number</th><th>Phone</th><th>Email</th><th>Vehicle</th><th>Actions</th></tr></thead>
+                <!-- thead (table head) defines the labels for each column. -->
+
+                <tbody>
+                <!-- tbody (table body) starts the container for the data rows. -->
+
+                    <?php 
+                    $res = mysqli_query($conn, "SELECT d.*, b.bus_name FROM drivers d LEFT JOIN buses b ON d.driver_id = b.driver_id ORDER BY d.driver_id DESC");
+                    /* $res (result list) = (assignment). 
+                       mysqli_query (MySQL Improved query) is the command that sends 
+                       the instruction to the database. "Improved" (mysqli) is used 
+                       everywhere in the system to ensure modern security and 
+                       faster performance. ( starts. $conn (bridge) , (comma) 
+                       "SELECT..." (instruction) ) ends. ; (semicolon). */
+
+                    while($row = mysqli_fetch_assoc($res)): $did = $row['driver_id'];
+                        /* while (while) starts a loop. $row (row container) pulls data. 
+                           mysqli_fetch_assoc (fetch associative) converts raw data 
+                           into labeled pieces for easy use. ( starts. $res (result source). ) ends. */
+                    ?>
+
+                    <tr>
+                    <!-- tr (table row) starts the display row for one staff member. -->
+
+                        <form method="POST">
+                        <!-- form (f o r m) tag inside the row allows editing individual 
+                        staff data. method (method) = (equals sign) "POST". -->
+
+                            <input type="hidden" name="driver_id" value="<?= $did ?>">
+                            <!-- input (i n p u t) of type (type) "hidden" (invisible) 
+                            stores the user ID to ensure the correct record is updated. -->
+
+                            <td><?= $did ?></td>
+                            <!-- td (table data) displaying the unique staff ID number. -->
+
+                            <td>
+                                <span class="view-driver-<?= $did ?>"><?= htmlspecialchars($row['full_name']) ?></span>
+                                <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                                     that converts dangerous symbols like < into safe text so hackers cannot 
+                                     run scripts. ( starts the tool. $row (row variable) ['full_name'] (column name) 
+                                     is the data being protected. ) ends the tool. -->
+
+                                <input type="text" name="full_name" value="<?= htmlspecialchars($row['full_name']) ?>" class="edit-driver-<?= $did ?>" style="display:none;">
+                                <!-- value (initial text) = [echo] htmlspecialchars (security tool) 
+                                     ( $row ['full_name'] ) ensures the text in the box is safe. -->
+                            </td>
+
+                            <td>
+                                <span class="view-driver-<?= $did ?>"><?= htmlspecialchars($row['national_id']) ?></span>
+                                <!-- htmlspecialchars (security tool) ( $row ['national_id'] (ID number data) ) -->
+
+                                <input type="text" name="national_id" value="<?= htmlspecialchars($row['national_id']) ?>" class="edit-driver-<?= $did ?>" style="display:none;">
+                                <!-- value = [echo] htmlspecialchars (security tool) ( $row ['national_id'] ) -->
+                            </td>
+
+                            <td>
+                                <span class="view-driver-<?= $did ?>"><?= htmlspecialchars($row['phone']) ?></span>
+                                <!-- htmlspecialchars (security tool) ( $row ['phone'] (contact number data) ) -->
+
+                                <input type="text" name="phone" value="<?= htmlspecialchars($row['phone']) ?>" class="edit-driver-<?= $did ?>" style="display:none;">
+                                <!-- value = [echo] htmlspecialchars (security tool) ( $row ['phone'] ) -->
+                            </td>
+
+                            <td>
+                                <span class="view-driver-<?= $did ?>"><?= htmlspecialchars($row['email']) ?></span>
+                                <!-- htmlspecialchars (security tool) ( $row ['email'] (electronic mail data) ) -->
+
+                                <input type="text" name="email" value="<?= htmlspecialchars($row['email']) ?>" class="edit-driver-<?= $did ?>" style="display:none;">
+                                <!-- value = [echo] htmlspecialchars (security tool) ( $row ['email'] ) -->
+                            </td>
+
+                            <td><?= $row['bus_name'] ? htmlspecialchars($row['bus_name']) : 'None' ?></td>
+                            <!-- cell for vehicle assignment. prints 'None' if the staff 
+                                 member is not linked to a bus. htmlspecialchars (security tool) 
+                                 protects the vehicle name. -->
+
+                            <td>
+                                <div id="ops-m-<?= $did ?>">
+                                <!-- < (less than sign) div (box) id (identity) = "ops-m- [echo] $did" (unique number) > starts the visible action box. -->
+
+                                    <button type="button" class="action-btn btn-update" onclick="toggleDriverEdit(<?= $did ?>)">Edit</button>
+                                    <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                         class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                         onclick (on click event) = "toggleDriverEdit (run the toggle tool) ( [echo] $did (for this driver) )" 
+                                         > (greater than sign) Edit (label) < / (slash) button > (ends item). -->
+
+                                    <a href="?remove_driver=<?= $did ?>" class="action-btn btn-delete" onclick="return confirm('Delete?')">Del</a>
+                                    <!-- < (less than sign) a (anchor link) href (destination) = "?remove_driver = [echo] $did" (sends ID to URL) 
+                                         class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                         onclick (on click event) = "return confirm (ask a question) ( 'Delete?' )" 
+                                         > (greater than sign) Del (label) < / (slash) a > (ends link). -->
+
+                                </div>
+                                <!-- < / (slash) div > ends main button box. -->
+
+                                <div id="ops-s-<?= $did ?>" style="display:none;">
+                                <!-- < (less than sign) div (box) id (identity) = "ops-s- [echo] $did" (unique number) 
+                                     style (visual) = "display:none;" (starts hidden) > starts the edit action box. -->
+
+                                    <button type="submit" name="update_driver" class="action-btn btn-update">Update</button>
+                                    <!-- < (less than sign) button (clickable item) type (nature) = "submit" (sends the form data) 
+                                         name (server label) = "update_driver" (tells PHP which logic to run) 
+                                         class (style) = "action-btn (standard look) btn-update (blue color)" 
+                                         > (greater than sign) Update (label) < / (slash) button > (ends item). -->
+
+                                    <button type="button" class="action-btn btn-delete" onclick="toggleDriverEdit(<?= $did ?>)">Cancel</button>
+                                    <!-- < (less than sign) button (clickable item) type (nature) = "button" (does not submit) 
+                                         class (style) = "action-btn (standard look) btn-delete (red color)" 
+                                         onclick (on click event) = "toggleDriverEdit (run the toggle tool) ( [echo] $did (for this driver) )" 
+                                         > (greater than sign) Cancel (label) < / (slash) button > (ends item). -->
+
+                                </div>
+                                <!-- < / (slash) div > ends edit button box. -->
+                            </td>
+
+                        </form>
+                        <!-- < / (slash) form > (greater than sign) ends the row form. -->
+
+                    </tr>
+                    <!-- < / (slash) tr > (greater than sign) ends the staff row. -->
+
+                    <?php endwhile; ?>
+                    <!-- endwhile (end while) ends the staff list loop. -->
+
+                </tbody>
+                <!-- < / (slash) tbody > (greater than sign) ends data rows. -->
+
+            </table>
+            <!-- < / (slash) table > (greater than sign) ends the data grid. -->
+
+        </div>
+        <!-- < / (slash) div > (greater than sign) ends the content box. -->
+
+    </div>
+    <!-- < / (slash) div > (greater than sign) ends the wrapper. -->
+
+    <div style="height: 100px;"></div>
+    <!-- spacer div for vertical padding at the bottom. -->
+
+    <script src="js/footer.js"></script>
+    <!-- script tag that imports the footer logic. -->
+
+</body>
+<!-- < / (slash) body > (greater than sign) ends page content. -->
+
+</html>
+<!-- < / (slash) html > (greater than sign) ends the document. -->
+
+<?php mysqli_close($conn); ?>
+<!-- mysqli (MySQL Improved) _ (underscore) close (close) tool that shuts the 
+bridge to the database. ( $conn (bridge) ) (bracket). ; (semicolon). -->

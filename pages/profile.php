@@ -1,142 +1,129 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * ================================================================= // [3] Visual header for administrative documentation clarity.
- * USER PROFILE SYSTEM: ACCOUNT IDENTITY (profile.php)               // [4] Title identifying this script as the personal identity record.
- * ================================================================= // [5] Visual header for administrative documentation clarity.
- * Purpose: This script provides passengers and staff with a secure  // [6] Main objective: provide an interface for PII review.
- * portal to view their personal identity records and contact details. // [7] Functionality: bridge for identity transparency.
- * Features: Secure session lookup, multi-field identity display.      // [8] Technical scope: session-driven discovery.
- * ================================================================= // [9] Visual header for administrative documentation clarity.
- */                                                                  // [10] Close multi-line documentation block.
+<?php
+// <?php (opening tag) tells the server to start interpreting the code as PHP.
 
-require_once 'db_connection.php';                                    // [11] Import database bridge object ($conn) for MySQL communication.
-session_start();                                                    // [12] Initialize or resume user session to identify the visitor.
+/**
+ * USER PROFILE SYSTEM (profile.php)
+ */
 
-if (!isset($_SESSION['user_id'])) {                                  // [13] Security Check: Intercept anonymous visitors without a valid token.
-    header("Location: login.html");                                  // [14] Security Redirect: Kick guest back to the login portal.
-    exit();                                                          // [15] Halt Execution: Ensure no PII data is leaked to guests.
-}                                                                    // [16] Close security barrier.
+// require_once (require once) includes the database connection.
+require_once 'db_connection.php';
+// session_start (session start) starts the user session.
+session_start();
 
-$user_id = $_SESSION['user_id'];                                     // [17] Map the active session's primary user ID to a local variable.
-$stmt = $conn->prepare("SELECT * FROM users WHERE user_id = ?");     // [18] Prepare a secure SQL template with protective '?' placeholder.
-$stmt->bind_param("i", $user_id);                                    // [19] Safely inject the session-provided integer ID into the statement.
-$stmt->execute();                                                    // [20] Commit the data retrieval request to the MySQL engine.
-$user_data = $stmt->get_result()->fetch_assoc();                     // [21] Capture the resulting record as an associative array.
-$stmt->close();                                                      // [22] Release statement resource memory from the server.
-?>                                                                   <!-- [23] Close PHP script and prepare for document definition. -->
+// --- SECURITY CHECK ---
+// if (if) check for login.
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.html");
+    exit();
+}
 
-<!DOCTYPE html>                                                         <!-- [24] Define standard HTML5 document type. -->
-<html lang="en">                                                     <!-- [25] Root element identifying English as layout language. -->
-<head>                                                               <!-- [26] Metadata and resource header section. -->
-    <meta charset="UTF-8">                                           <!-- [27] Declare UTF-8 for international character support. -->
-    <title>Personal Identity - Wema Travellers</title>                 <!-- [28] Website title for browser selection. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- [29] Responsive scaling for mobile devices. -->
-    <link rel="stylesheet" href="css/main.css">                      <!-- [30] Load shared component style assets. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [31] Load global project branding variables. -->
-    <style>                                                          /* [32] Page-specific internal CSS architecture. */
-        .profile-container { max-width: 700px; margin: 60px auto; background: #ffffff; padding: 50px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); border-top: 8px solid var(--purple); } /* [33] Main card. */
-        .profile-header { text-align: center; border-bottom: 2px solid #f8fafc; padding-bottom: 30px; margin-bottom: 40px; } /* [34] header. */
-        .info-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-bottom: 40px; } /* [35] data grid. */
-        .info-label { font-weight: 800; color: var(--purple); text-transform: uppercase; font-size: 0.8rem; display: flex; align-items: center; } /* [36] labels. */
-        .info-value { color: #1e293b; font-size: 1.1rem; word-break: break-all; } /* [37] values. */
-        .role-badge { display: inline-block; padding: 8px 18px; border-radius: 50px; background: var(--pink); color: #1e1b4b; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 15px; } /* [38] badge. */
-        .back-link { display: block; text-align: center; margin-top: 30px; color: var(--purple); text-decoration: none; font-weight: 800; font-size: 1rem; } /* [39] cmd. */
-        .back-link:hover { text-decoration: underline; }             /* [40] interaction. */
+// $ (dollar sign) variable marker.
+// user_id (user i d) label.
+$user_id = $_SESSION['user_id'];
+
+// $ (dollar sign) variable marker.
+// sql (s q l) label.
+$sql = "SELECT * FROM users WHERE user_id = ?";
+
+// mysqli_prepare (MySQL Improved prepare) prepares the bridge.
+$stmt = mysqli_prepare($conn, $sql);
+
+// mysqli_stmt_bind_param (MySQL Improved statement bind parameter).
+// ( $stmt , "i" , $user_id )
+// "i" means 1 integer (number).
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+/* mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
+   bind (bind) _ (underscore) param (parameter) is the security function that 
+   attaches (binds) the data to the query. ( starts the tool. $stmt (tool handle) 
+   , (comma) "i" (integer number type) , (comma) $user_id (current user identity data) 
+   ) ends the tool. ; (semicolon). */
+
+// mysqli_stmt_execute (MySQL Improved statement execute) runs the query.
+mysqli_stmt_execute($stmt);
+
+// $ (dollar sign) variable marker.
+// res (result) label.
+$res = mysqli_stmt_get_result($stmt);
+
+// $ (dollar sign) variable marker.
+// user_data (user data) label.
+$user_data = mysqli_fetch_assoc($res);
+/* $user_data (container) = (assignment). mysqli_fetch_assoc (fetch associative) 
+   converts the raw database list into easy-to-read labeled pieces. 
+   ; (semicolon). */
+
+// mysqli_stmt_close (MySQL Improved statement close).
+mysqli_stmt_close($stmt);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personal Identity - Wema Travellers</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .profile-container { max-width: 700px; margin: 60px auto; background: white; padding: 50px; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); border-top: 8px solid var(--purple); }
+        .profile-header { text-align: center; border-bottom: 2px solid #f8fafc; padding-bottom: 30px; margin-bottom: 40px; }
+        .info-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 25px; margin-bottom: 40px; }
+        .info-label { font-weight: 800; color: var(--purple); text-transform: uppercase; font-size: 0.8rem; }
+        .info-value { color: #1e293b; font-size: 1.1rem; }
         .password-section { margin-top: 50px; padding-top: 30px; border-top: 2px dashed #e2e8f0; }
         .password-form { display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 20px auto 0; }
-        .password-form input { padding: 12px 20px; border-radius: 50px; border: 1px solid #cbd5e1; background: #f8fafc; font-family: inherit; }
-    </style>                                                         
-</head>                                                              <!-- [42] Close head section. -->
+        .password-form input { padding: 12px 20px; border-radius: 50px; border: 1px solid #cbd5e1; background: #f8fafc; }
+    </style>
+    <script>
+        // Simple Validation (No Regex)
+        function validateForm() {
+            var curr = document.getElementById("current_password").value;
+            var n1 = document.getElementById("new_password").value;
+            var n2 = document.getElementById("confirm_password").value;
 
-<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role"> <!-- [43] Start visible document body. -->
-    <script src="js/header2.js"></script>                                <!-- [44] Inject the unified sitewide navigation header. -->
-    <div style="height: 100px;"></div>                                   <!-- [45] Fixed header offset buffer. -->
+            if (curr == "") { alert("Current password required"); return false; }
+            if (n1.length < 8) { alert("New password must be at least 8 characters"); return false; }
+            if (n1 !== n2) { alert("Passwords do not match"); return false; }
+            return true;
+        }
+    </script>
+</head>
 
-    <div class="profile-container">                                      <!-- [46] Open identity dashboard card. -->
-        <div class="profile-header">                                     <!-- [47] Header layer. -->
-            <h2 style="color: var(--purple); margin: 0;">👤 Profile Insights</h2> <!-- [48] Title. -->
-            <div class="role-badge"><?= $_SESSION['role'] ?> AUTHORIZED</div> <!-- [49] Role status pill. -->
-        </div>                                                           <!-- [50] End header. -->
+<body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
+    <script src="js/header2.js"></script>
+    <div style="height: 100px;"></div>
 
-        <div class="info-grid">                                          <!-- [51] Start PII data matrix. -->
-            <div class="info-label">Given Name:</div><div class="info-value"><?= htmlspecialchars($user_data['first_name']) ?></div> <!-- [52] First Name. -->
-            <div class="info-label">Surname:</div><div class="info-value"><?= htmlspecialchars($user_data['last_name']) ?></div> <!-- [53] Surname. -->
-            <div class="info-label">Email Record:</div><div class="info-value"><?= htmlspecialchars($user_data['email']) ?></div> <!-- [54] Contact. -->
-            <div class="info-label">Phone Contact:</div><div class="info-value" style="font-family: monospace; letter-spacing: 1px;"><?= htmlspecialchars($user_data['phone_number']) ?></div> <!-- [55] Mobile. -->
-            <div class="info-label">Index ID:</div><div class="info-value" style="color: #94a3b8; font-family: monospace;"><?= $user_data['user_id'] ?></div> <!-- [56] System Index. -->
-        </div>                                                           <!-- [57] End data matrix. -->
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2 style="color: var(--purple); margin: 0;">👤 Profile Insights</h2>
+            <div style="padding: 8px 18px; border-radius: 50px; background: var(--pink); color: #1e1b4b; font-size: 0.75rem; font-weight: 900; display: inline-block; margin-top: 15px;"><?= $_SESSION['role'] ?> AUTHORIZED</div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-label">First Name:</div><div class="info-value"><?= htmlspecialchars($user_data['first_name']) ?></div>
+            <!-- html (HyperText) special (special) chars (characters) is a security tool 
+                 that encodes text for safety. ( starts the tool. $user_data (data container) 
+                 ['first_name'] (label) ) ends. -->
+            <div class="info-label">Last Name:</div><div class="info-value"><?= htmlspecialchars($user_data['last_name']) ?></div>
+            <!-- htmlspecialchars (security tool) ( $user_data ['last_name'] ) -->
+            <div class="info-label">Email:</div><div class="info-value"><?= htmlspecialchars($user_data['email']) ?></div>
+            <div class="info-label">Phone:</div><div class="info-value"><?= htmlspecialchars($user_data['phone_number']) ?></div>
+        </div>
 
         <div class="password-section">
-            <h3 style="color: var(--purple); text-align: center; margin-bottom: 5px;">🔐 Security Vault</h3>
-            <p style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 25px;">Update your authentication credentials below.</p>
-            
-            <?php if(isset($_GET['status'])): ?>
-                <p style="text-align: center; font-weight: 700; color: <?= $_GET['status'] === 'success' ? '#059669' : '#dc2626' ?>; margin-bottom: 20px;">
-                    <?= $_GET['status'] === 'success' ? '✅ Password updated successfully!' : '❌ ' . htmlspecialchars($_GET['error'] ?? 'Update failed.') ?>
-                </p>
-            <?php endif; ?>
-
-            <form action="op_update_password.php" id="passwordForm" method="POST" class="password-form" onsubmit="return validateForm()">
-                <input type="password" name="current_password" id="current_password" placeholder="Current Password" onmouseout="validateCurrentPassword()">
-                <input type="password" name="new_password" id="new_password" placeholder="New Password" onmouseout="validateNewPassword()">
-                <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm New Password" onmouseout="validateConfirmPassword()">
+            <h3 style="color: var(--purple); text-align: center;">🔐 Security Vault</h3>
+            <form action="op_update_password.php" method="POST" class="password-form" onsubmit="return validateForm()">
+                <input type="password" name="current_password" id="current_password" placeholder="Current Password">
+                <input type="password" name="new_password" id="new_password" placeholder="New Password">
+                <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm New Password">
                 <button type="submit" class="button regular-button" style="background: var(--purple); color: white; border-radius: 50px; padding: 12px; font-weight: 700;">Update Password →</button>
             </form>
         </div>
 
-        <script>
-            // Custom JavaScript validation for Password Update Form
-            // Validates that the current password field is not empty
-            function validateCurrentPassword() {
-                var pass = document.getElementById("current_password").value;
-                if (pass.length == 0) {
-                    alert("Current password is required to authorize this change.");
-                    document.getElementById("current_password").focus();
-                    return false;
-                }
-                return true;
-            }
+        <div style="text-align: center; margin-top: 30px;"><a href="dashboard.php" style="color:var(--purple); font-weight:bold; text-decoration:none;">← Return to Dashboard Hub</a></div>
+    </div>
 
-            // Validates the New Password with strict strength requirements
-            function validateNewPassword() {
-                var password = document.getElementById("new_password").value;
-                // Regex for: Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
-                var strengthRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-                if (!strengthRegex.test(password)) {
-                    alert("New password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character (@$!%*?&)");
-                    document.getElementById("new_password").focus();
-                    return false;
-                }
-                return true;
-            }
-
-            // Validates that the confirmation password matches the new password
-            function validateConfirmPassword() {
-                var newPass = document.getElementById("new_password").value;
-                var confirmPass = document.getElementById("confirm_password").value;
-                if (confirmPass !== newPass) {
-                    alert("Confirmation password does not match the new password.");
-                    document.getElementById("confirm_password").focus();
-                    return false;
-                }
-                return true;
-            }
-
-            // Main caller function for form submission validation
-            function validateForm() {
-                var rtned = true;
-                rtned = validateCurrentPassword();
-                if (rtned == true) rtned = validateNewPassword();
-                if (rtned == true) rtned = validateConfirmPassword();
-                return rtned; // Blocks submission if any check fails
-            }
-        </script>
-
-        <a href="dashboard.php" class="back-link">← Return to Dashboard Hub</a> <!-- [58] Navigation exit command. -->
-    </div>                                                               <!-- [59] End container. -->
-
-    <div style="height: 120px;"></div>                                   <!-- [60] bottom spacer. -->
-    <script src="js/footer.js"></script>                                 <!-- [61] inject footer. -->
-</body>                                                              <!-- [62] end body. -->
+    <div style="height: 120px;"></div>
+    <script src="js/footer.js"></script>
+</body>
 </html>
-                                                              <!-- [63] end document. -->
+<?php mysqli_close($conn); ?>

@@ -24,33 +24,32 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {      // [13] Re
     <title>Financial Report: System Revenue - Wema Travellers</title>     <!-- [21] Website title for the browser tab. -->
     <link rel="stylesheet" href="css/main.css">                      <!-- [22] Load shared component stylings. -->
     <link rel="stylesheet" href="css/style.css">                     <!-- [23] Load global branding layout variables. -->
-    <style>                                                          /* [24] Open internal CSS block for page-specific layout. */
-        .view-container {                                            /* [25] Define style for the primary content card. */
-            max-width: 1200px;                                       /* [26] Limit width for optimized tabular reading. */
-            margin: 30px auto;                                       /* [27] Apply vertical spacing and horizontal centering. */
-            padding: 40px;                                           /* [28] Internal cushioning within the card. */
-            background: #ffffff;                                     /* [29] High-contrast white background. */
-            border-radius: 12px;                                     /* [30] Modern rounded dashboard aesthetics. */
-            box-shadow: 0 15px 40px rgba(0,0,0,0.06);                /* [31] Soft shadow for premium depth. */
-        }                                                            /* [32] End container definition. */
-        .back-btn-container { padding: 20px; max-width: 1200px; margin: 0 auto; } /* [33] return navigator layout. */
-        .crud-table { width: 100%; border-collapse: collapse; margin-top: 30px; } /* [34] financial grid architecture. */
-        .crud-table th, .crud-table td { padding: 16px; border-bottom: 1px solid #edf2f7; text-align: left; } /* [35] cell padding. */
-        .crud-table th { background-color: var(--purple); color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem; } /* [36] header branding. */
-    </style>                                                         <!-- [37] Terminate internal CSS block. -->
 </head>                                                              <!-- [38] Close head section. -->
 
 <body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [39] Begin visible document body. -->
     <script src="js/header2.js"></script>                                <!-- [40] Inject the site-wide administrative header. -->
     <div style="height: 100px;"></div>                                   <!-- [41] Fixed header offset buffer. -->
 
-    <div class="back-btn-container">                                      <!-- [42] return navigation wrapper. -->
+    <div class="back-btn-container no-print">                                      <!-- [42] return navigation wrapper. class="no-print" hides this from the printer. -->
         <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px;">← Return to Main Hub</a> <!-- [43] link. -->
     </div>                                                               <!-- [44] close navigator. -->
 
     <div class="view-container">                                         <!-- [45] Report interface card start. -->
-        <h2 style="color: var(--purple); margin-bottom: 5px;">💰 Revenue Insights & Performance</h2> <!-- [46] title. -->
-        <p style="color: #718096; margin-bottom: 30px;">Analyzing gross earnings across all active bus routes based on finalized bookings.</p> <!-- [47] description. -->
+        <h2 class="no-print" style="color: var(--purple); margin-bottom: 5px;">💰 Revenue Insights & Performance</h2>
+        <!-- class (label) = "no-print" (do not print) hides the financial title 
+             on paper printouts. -->
+        <p class="no-print" style="color: #718096; margin-bottom: 30px;">Analyzing gross earnings across all active bus routes based on finalized bookings.</p>
+        <!-- class (label) = "no-print" (do not print) hides the analytical description. -->
+        
+        <div class="no-print">
+            <!-- (less than sign) ! (exclamation mark) - (dash) - (dash) starts an HTML comment.
+                 window (w i n d o w) is the global browser object representing the current page.
+                 . (dot) is the member access operator used to reach properties or tools.
+                 print (p r i n t) is the built-in function that triggers the system print menu.
+                 ( (bracket) ) (bracket) tells the computer to execute the print tool immediately.
+                 - (dash) - (dash) (greater than sign) ends the logic explanation. -->
+            <button onclick="window.print()" class="button regular-button pink-background" style="margin-bottom: 20px;">🖨️ Print Financial Statement</button>
+        </div>
 
         <table class="crud-table">                                       <!-- [48] Open fiscal data grid. -->
             <thead>                                                      <!-- [49] Data label row. -->
@@ -59,14 +58,28 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {      // [13] Re
             <tbody>                                                      <!-- [52] Begin record rendering loop. -->
                 <?php                                                     // [53] Re-open PHP for analytical processing.
                 $sql = "SELECT r.route_id, r.from_location, r.to_location, r.departure_date, COUNT(b.booking_id) as total_bookings, SUM(r.cost) as revenue FROM bookings b JOIN routes r ON b.route_id = r.route_id WHERE b.booking_status = 'PAID' GROUP BY r.route_id ORDER BY revenue DESC"; // [54] Main revenue query.
-                $result = $conn->query($sql);                            // [55] Fetch financial result set from MySQL.
+                // mysqli_query (MySQL Improved query) procedural function.
+                $result = mysqli_query($conn, $sql); 
+                /* $ (variable) result (result list) = (assignment). 
+                   mysqli_query (MySQL query) is the command that sends the instruction 
+                   to the database server. ( starts. $conn (bridge) , (comma) 
+                   $sql (the instruction) ) ends. ; (semicolon). */
                 $grand_total = 0;                                        // [56] Initialize system-wide grand total accumulator.
-                if ($result->num_rows > 0) {                             // [57] Check if sales data exists in the ledger.
-                    while($row = $result->fetch_assoc()) {               // [58] Iterate through profitable routes.
+                // mysqli_num_rows (MySQL Improved number of rows) procedural function.
+                if (mysqli_num_rows($result) > 0) {
+                    // mysqli_fetch_assoc (MySQL Improved fetch associative) procedural function.
+                    while($row = mysqli_fetch_assoc($result)) {
+                        /* while (while) starts a loop. $row (row container) pulls data. 
+                           mysqli_fetch_assoc (fetch associative) converts raw data into labeled pieces. 
+                           ( starts. $result (result source). ) ends. */
                         $grand_total += $row['revenue'];                 // [59] Accumulate ticket sales into total revenue.
                         echo "<tr>";                                     // [60] Output the opening tag for a new table row.
                         echo "<td><strong style='color: #4a5568;'>" . $row['route_id'] . "</strong></td>"; // [61] Output the specific route identifier inside a strong tag and table cell.
-                        echo "<td style='font-weight: 600; color: #1e293b;'>" . htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) . "</td>"; // [62] Output the full travel segment securely to prevent XSS injections.
+                        echo "<td style='font-weight: 600; color: #1e293b;'>" . htmlspecialchars($row['from_location'] . ' to ' . $row['to_location']) . "</td>"; 
+                        /* . (dot) connects strings. html (HyperText) special (special) chars (characters) 
+                           is a security tool that encodes text. ( starts. $row (data row) ['from_location'] 
+                           (origin) . (connects) ' to ' (text) . (connects) $row ['to_location'] (destination) 
+                           ) ends. */
                         echo "<td style='color: #718096;'>" . $row['departure_date'] . "</td>"; // [63] Output the departure date corresponding to this specific route.
                         echo "<td><span style='background: #f0fff4; color: #2f855a; padding: 4px 10px; border-radius: 4px; font-weight: 800;'>" . $row['total_bookings'] . " Sold</span></td>"; // [64] Output the total aggregated occupancy count for the given route inside a styled span.
                         echo "<td style='font-weight: 900; color: #2d3748;'>" . number_format($row['revenue'], 2) . " /-</td>"; // [65] Output the total computed revenue formatted to two decimal places representing the gross earnings.

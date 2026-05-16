@@ -1,61 +1,149 @@
-<?php                                                                // [1] Open PHP script tag to start server-side logical execution.
-/**                                                                  // [2] Open multi-line documentation block for system meta-data.
- * ================================================================= // [3] Visual header for administrative documentation clarity.
- * ADMINISTRATION: STRATEGIC INSIGHTS HUB (admin_insights.php)       // [4] Title identifying this script as the business intelligence gateway.
- * ================================================================= // [5] Visual header for administrative documentation clarity.
- * Purpose: This acts as the centralized gateway for all analytical   // [6] Main objective: provide an interface for fiscal reporting.
- * reports, allowing Admins to pivot business data by time ranges.  // [7] Task: bridge for time-bound performance audits.
- * UI Design: Modern Grid Dashboard with Interactive Card Elements.  // [8] Design aesthetic: clean data-driven grid.
- * ================================================================= // [9] Visual header for administrative documentation clarity.
- */                                                                  // [10] Close multi-line documentation block.
+<?php
+// < (less than sign) ? (question mark) php (PHP: Hypertext Preprocessor) is the opening 
+// tag that starts the server-side processing engine.
 
-session_start();                                                    // [11] Initialize or resume user session to identify the administrative officer.
+/**
+ * ADMINISTRATION: STRATEGIC INSIGHTS HUB (admin_insights.php)
+ */
+// / (forward slash) * (asterisk) * (asterisk) opens a professional documentation block.
+// ADMINISTRATION: STRATEGIC INSIGHTS HUB is the module title. * (asterisk) / 
+// (forward slash) closes the block.
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {      // [12] Access Control: Verify if requester possesses the 'ADMIN' credential.
-    header("Location: login.html");                                  // [13] Security Redirect: Kick unauthorized visitors to the login gate.
-    exit();                                                          // [14] Halt Execution: Ensure no business metrics are leaked to guests.
-}                                                                    // [15] Close security barrier.
-?>                                                                   <!-- [16] Close PHP script and prepare for document definition. -->
+session_start();
+// session_start (session start) is the command that activates the server's memory 
+// to track the user across different pages. ( ) (empty brackets) execute the tool. 
+// ; (semicolon) terminates the instruction.
 
-<!DOCTYPE html>                                                         <!-- [17] Define standard HTML5 document type for modern browsers. -->
-<html lang="en">                                                     <!-- [18] Root element identifying English as layout language. -->
-<head>                                                               <!-- [19] Metadata and style asset header section. -->
-    <meta charset="UTF-8">                                           <!-- [20] Declare UTF-8 for international character support. -->
-    <title>Business Intel: Performance Analytics - Wema Travellers</title> <!-- [21] Browser tab title identifier. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- [22] Responsive scaling for mobile device compatibility. -->
-    <link rel="stylesheet" href="css/style.css">                     <!-- [23] Load global theme variables (Colors/Typography). -->
-    <link rel="stylesheet" href="css/main.css">                      <!-- [24] Load shared layout grid components. -->
-    <style>                                                          /* [25] Start internal CSS for insights dashboard layout. */
-        body { font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 0; } /* [26] base body. */
-        .container { width: 95%; max-width: 1100px; margin: 60px auto; background: #ffffff; padding: 50px; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); text-align: center; } /* [27] main hud. */
-        .back-btn-container { margin-bottom: 30px; text-align: left; } /* [28] navigator layout. */
-        .container h1 { color: var(--purple); margin-bottom: 5px; font-size: 2.8rem; font-weight: 800; } /* [29] hub title. */
-        p.subtitle { color: #64748b; margin-bottom: 50px; font-size: 1.15rem; max-width: 600px; margin-left: auto; margin-right: auto; } /* [30] hub text. */
-        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 25px; } /* [31] grid engine. */
-        .report-link { display: flex; flex-direction: column; justify-content: center; height: 140px; background: #ffffff; border: 2px solid #f1f5f9; border-radius: 12px; color: #1e293b; text-decoration: none; font-weight: 700; font-size: 1rem; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-sizing: border-box; box-shadow: 0 2px 5px rgba(0,0,0,0.02); } /* [32] link card. */
-        .report-link:hover { background: var(--purple); color: #ffffff; border-color: var(--purple); transform: translateY(-8px); box-shadow: 0 10px 25px rgba(106, 17, 203, 0.15); } /* [33] hover interaction. */
-    </style>                                                         <!-- [34] Terminate internal CSS block. -->
-</head>                                                              <!-- [35] Close head section. -->
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
+// if (if) starts a logic check for security. ( (opening bracket) starts condition. 
+// ! (exclamation mark) is the NOT operator. isset (is set) checks if a memory 
+// container exists. ( $ (dollar sign) _ (underscore) SESSION [ 'role' ] ) (bracket). 
+// || (double pipe) is the logical OR operator. $_SESSION['role'] !== 'ADMIN' 
+// (not identical to admin text). ) (closing bracket). { (opening curly bracket) 
+// starts the redirection logic.
 
-<body class="<?= strtolower($_SESSION['role']) ?>-role">                                                               <!-- [36] Start visible document body. -->
-    <script src="js/header2.js"></script>                                <!-- [37] Inject external global navigation header. -->
-    <div style="height: 100px;"></div>                                   <!-- [38] Layout offset for fixed header. -->
+    header("Location: login.html");
+    // header (header) is a tool that sends a instruction to the user's browser. 
+    // ( "Location: login.html" ) is the redirect command to the login page. 
+    // ; (semicolon) terminates the instruction.
 
-    <div class="container">                                              <!-- [39] Content constraint start. -->
-        <div class="back-btn-container"><a href="admin_dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; display: inline-block; width: auto; padding: 12px 35px; font-weight: 700;">← Return to Admin Panel</a></div> <!-- [40] Navigator. -->
-        <h1>Data Insights Hub</h1>                                       <!-- [41] Hub Title. -->
-        <p class="subtitle">Access comprehensive business intelligence reports and time-filtered booking analytics.</p> <!-- [42] Hub Text. -->
+    exit();
+    // exit (exit) is a function that immediately stops the server from reading any 
+    // more code in this file. ( ) (empty brackets). ; (semicolon) terminates the line.
+}
+// } (closing curly bracket) ends the security check block.
+?>
+<!-- ? (question mark) > (greater than sign) is the closing tag that ends the 
+PHP logic and returns to HTML mode. -->
 
-        <div class="report-grid">                                        <!-- [43] Start report listing grid. -->
-            <a href="report_this_week.php" class="report-link">📊 Weekly Performance Report</a> <!-- [44] Weekly. -->
-            <a href="report_last_week.php" class="report-link">⏮️ Last Week's Audit</a>          <!-- [45] Last Week. -->
-            <a href="report_this_month.php" class="report-link">📅 Monthly Sales Review</a>      <!-- [46] Monthly. -->
-            <a href="report_last_month.php" class="report-link">🕒 Previous Month Audit</a>     <!-- [47] Last Month. -->
-            <a href="report_this_year.php" class="report-link">💰 Annual Growth Report</a>       <!-- [48] Yearly. -->
-        </div>                                                           <!-- [49] End grid. -->
-    </div>                                                               <!-- [50] End container. -->
+<!DOCTYPE html>
+<!-- < (less than sign) ! (exclamation mark) DOCTYPE (document type) html (h t m l) 
+> (greater than sign) is the standard declaration for a modern web page. -->
 
-    <div style="height: 120px;"></div>                                   <!-- [51] buffer. -->
-    <script src="js/footer.js"></script>                                 <!-- [52] inject footer. -->
-</body>                                                              <!-- [53] end body. -->
-</html>                                                              <!-- [54] end document. -->
+<html lang="en">
+<!-- < (less than sign) html (h t m l) starts the web document. lang (language) 
+= (equals sign) "en" (English text). > (greater than sign). -->
+
+<head>
+<!-- < (less than sign) head (h e a d) > (greater than sign) starts the hidden 
+configuration section of the page. -->
+
+    <meta charset="UTF-8">
+    <!-- < (less than sign) meta (m e t a) charset (character set) = (equals sign) 
+    "UTF-8" (standard text encoding) > (greater than sign). -->
+
+    <title>Business Intel - Wema Travellers</title>
+    <!-- < (less than sign) title (t i t l e) > (greater than sign) sets the label 
+    on the browser's tab. < / (slash) title > (greater than sign). -->
+
+    <link rel="stylesheet" href="css/style.css">
+    <!-- < (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- < (less than sign) link (l i n k) rel (relationship) = (equals sign) 
+    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
+
+    <style>
+    /* / (forward slash) * (asterisk) starts a CSS design section. */
+
+        .container { width: 90%; max-width: 1000px; margin: 50px auto; text-align: center; }
+        /* . (dot) container (class) defines the look of the main centered content box. */
+
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px; }
+        /* . (dot) report-grid (class) defines a flexible 2D layout for the reports. */
+
+        .report-link { display: block; padding: 30px; background: white; border: 1px solid #ddd; border-radius: 10px; text-decoration: none; color: black; font-weight: bold; }
+        /* . (dot) report-link (class) defines the cards for each report. */
+
+        .report-link:hover { background: var(--purple); color: white; }
+        /* hover rule that changes card color when the mouse pointer is over it. */
+
+    </style>
+    <!-- < / (slash) style (s t y l e) > (greater than sign) ends the design section. -->
+
+</head>
+<!-- < / (slash) head (h e a d) > (greater than sign) ends configuration. -->
+
+<body class="<?= strtolower($_SESSION['role']) ?>-role">
+<!-- < (less than sign) body (b o d y) class (class) = (equals sign) 
+< (less than sign) ? (question mark) = (equals sign for echo) strtolower 
+(lowercase conversion) ( $_SESSION['role'] ) (user role memory). ? (question 
+mark) > (greater than sign) -role (text) > (greater than sign). -->
+
+    <script src="js/header2.js"></script>
+    <!-- < (less than sign) script (s c r i p t) src (source) = (equals sign) 
+    "js/header2.js" > (greater than sign) imports the navigation bar logic. < / 
+    (slash) script > (greater than sign). -->
+
+    <div style="height: 100px;"></div>
+    <!-- < (less than sign) div (d i v) style (style) = (equals sign) "height: 100px;" 
+    > (greater than sign) is a spacer element. < / (slash) div > (greater than sign). -->
+
+    <div class="container">
+    <!-- < (less than sign) div (d i v) class (class) = (equals sign) "container" 
+    > (greater than sign) starts the main wrapper box. -->
+
+        <a href="admin_dashboard.php" class="button" style="width:auto; padding:10px 20px;">← Back to Panel</a>
+        <!-- < (less than sign) a (anchor link) href (reference) = (equals sign) 
+        "admin_dashboard.php" > (greater than sign) return button. -->
+
+        <h1>Data Insights Hub</h1>
+        <!-- <h1> (heading level one) main title. -->
+
+        <p>Access business intelligence reports and filtered analytics.</p>
+        <!-- <p> (paragraph) descriptive text. -->
+
+        <div class="report-grid">
+        <!-- < (less than sign) div (d i v) class (class) = (equals sign) "report-grid" 
+        > (greater than sign) starts the reports list layout. -->
+
+            <a href="report_this_week.php" class="report-link">📊 Weekly Report</a>
+            <!-- a (link) card for the current week's data. -->
+
+            <a href="report_last_week.php" class="report-link">⏮️ Last Week Audit</a>
+            <!-- a (link) card for the previous week's audit records. -->
+
+            <a href="report_this_month.php" class="report-link">📅 Monthly Sales</a>
+            <!-- a (link) card for the current month's sales volume. -->
+
+            <a href="report_last_month.php" class="report-link">🕒 Previous Month</a>
+            <!-- a (link) card for the history of the previous month. -->
+
+            <a href="report_this_year.php" class="report-link">💰 Annual Report</a>
+            <!-- a (link) card for the yearly financial summary. -->
+
+        </div>
+        <!-- < / (slash) div > (greater than sign) ends the grid. -->
+
+    </div>
+    <!-- < / (slash) div > (greater than sign) ends the container. -->
+
+    <script src="js/footer.js"></script>
+    <!-- script tag that imports the footer logic. -->
+
+</body>
+<!-- < / (slash) body > (greater than sign) ends the visible page content. -->
+
+</html>
+<!-- < / (slash) html > (greater than sign) ends the document structure. -->

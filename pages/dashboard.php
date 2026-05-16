@@ -1,32 +1,30 @@
 <?php
+// <?php (opening tag) tells the server to start interpreting the code as PHP.
+
 /**
  * PASSENGER DASHBOARD (dashboard.php)
- * Purpose: This is the primary control panel for registered passengers.
- * It provides shortcuts to core traveler functions like Booking, Ticket Viewing, and History.
- * Accessible to: LOGGED-IN PASSENGERS ONLY.
  */
 
-// --- BOOTSTRAP: CORE SYSTEM ACCESS ---
-// Include the database connection so we can fetch specific user data.
+// require_once (require once) includes the database connection.
 require_once 'db_connection.php';
 
-// Start the PHP session to track the user's login state.
+// session_start (session start) starts the user session.
 session_start();
 
-// --- SECURITY CHECK: AUTHENTICATION ---
-// We check if the 'user_id' exists in the current session.
-// If it's missing, the person is not logged in, so we kick them back to the login page.
+// --- SECURITY CHECK ---
+// if (if) check for login.
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
-    exit(); // Stop all execution immediately.
+    exit();
 }
 
-// Extract the user's role from the session.
+// $ (dollar sign) variable marker.
+// role (role) label.
+// = (equals sign) assignment.
+// $_SESSION['role'] (session data).
 $role = $_SESSION['role'];
 
-// --- SECURITY CHECK: ROLE REDIRECTION ---
-// This dashboard is specifically designed for the 'PASSENGER' layout.
-// If an Admin or Agent accidentally lands here, we redirect them to their respective specialized portals.
+// --- REDIRECTION LOGIC ---
 if ($role === 'ADMIN') {
     header("Location: admin_dashboard.php");
     exit();
@@ -35,140 +33,82 @@ if ($role === 'ADMIN') {
     exit();
 }
 
-// --- DATA FETCHING ---
-// Capture the logged-in ID.
+// $ (dollar sign) variable marker.
+// user_id (user i d) label.
 $user_id = $_SESSION['user_id'];
 
-// Prepare a secure query to get the user's first name to create a personalized greeting.
-$stmt = $conn->prepare("SELECT first_name FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
+// $ (dollar sign) variable marker.
+// sql (s q l) label.
+$sql = "SELECT first_name FROM users WHERE user_id = ?";
 
-// Fetch the associative array result from the database.
-$user_data = $stmt->get_result()->fetch_assoc();
+// mysqli_prepare (MySQL Improved prepare) prepares the bridge.
+// ( $conn , $sql ) (connection variable , SQL variable).
+$stmt = mysqli_prepare($conn, $sql);
 
-// Close the statement to free up resources.
-$stmt->close();
+// mysqli_stmt_bind_param (MySQL Improved statement bind parameter).
+// ( $stmt , "i" , $user_id )
+// "i" means 1 integer (number).
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+
+// mysqli_stmt_execute (MySQL Improved statement execute) runs the query.
+mysqli_stmt_execute($stmt);
+
+// $ (dollar sign) variable marker.
+// res (result) label.
+$res = mysqli_stmt_get_result($stmt);
+
+// $ (dollar sign) variable marker.
+// user_data (user data) label.
+$user_data = mysqli_fetch_assoc($res);
+
+// mysqli_stmt_close (MySQL Improved statement close).
+mysqli_stmt_close($stmt);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- DOCUMENT SETUP -->
     <meta charset="UTF-8">
     <title>Passenger Dashboard - Wema Travellers</title>
-    
-    <!-- THEME DEPENDENCIES -->
-    <link rel="stylesheet" href="css/main.css"> <!-- Site-wide structure -->
-    <link rel="stylesheet" href="css/style.css"> <!-- Colors and fonts -->
-    
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* DASHBOARD COMPONENT STYLING */
-        .dashboard-container {
-            max-width: 1000px;           /* Limits width for better readability on desktop */
-            margin: 40px auto;          /* Centers the card on the screen */
-            background: white;          /* Clean white dashboard card */
-            padding: 40px;
-            border-radius: 12px;        /* Soft rounded corners */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Subtle premium shadow for depth */
-        }
-
-        /* HEADER SECTION: Title and personalized greeting */
-        .dashboard-header {
-            text-align: center;
-            border-bottom: 2px solid #f0f0f0; /* Light separator line */
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-        }
-
-        /* ACTION GRID: Layout for the three main navigation cards */
-        .action-grid {
-            display: flex;
-            justify-content: center;
-            gap: 30px;                  /* Gap between cards */
-            flex-wrap: wrap;            /* Allows cards to stack on mobile phones */
-        }
-
-        /* INDIVIDUAL ACTION CARD */
-        .action-card {
-            flex: 1;
-            min-width: 250px;           /* Prevents cards from getting too thin */
-            text-align: center;
-        }
-
-        /* Title inside the card (e.g., "Book trip") */
-        .action-card h3 {
-            color: var(--purple);       /* Thematic color */
-            margin-bottom: 15px;
-            font-size: 1.4em;
-        }
-
-        /* GIANT ACTION BUTTONS */
-        .action-card .btn {
-            display: block;             /* Makes the link fill the container area */
-            padding: 20px;
-            font-size: 1.1em;
-            font-weight: bold;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: opacity 0.3s;   /* Smooth hover effect */
-        }
-
-        /* Hover interaction: makes the button slightly transparent */
-        .action-card .btn:hover {
-            opacity: 0.9;
-        }
+        .dashboard-container { max-width: 1000px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .dashboard-header { text-align: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; margin-bottom: 40px; }
+        .action-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .action-card { flex: 1; min-width: 250px; text-align: center; }
+        .action-card h3 { color: var(--purple); margin-bottom: 15px; font-size: 1.4em; }
     </style>
 </head>
 <body class="<?= strtolower($_SESSION['role']) ?>-role">
-    <!-- HEADER INJECTION -->
-    <!-- Loads the communal navigation bar (Home, Profile, etc.) -->
     <script src="js/header2.js"></script>
-    
-    <!-- SPACER: Adjusts for fixed header height -->
     <div style="height: 100px;"></div>
 
-    <!-- MAIN DASHBOARD CARD -->
     <div class="dashboard-container">
-        
-        <!-- TOP SECTION: Welcome Greeting -->
         <div class="dashboard-header">
             <h2>Passenger Dashboard</h2>
-            <!-- Personalized greeting using data fetched from PHP at the top -->
             <p>Welcome back, <?= htmlspecialchars($user_data['first_name']) ?>! What would you like to do today?</p>
         </div>
 
-        <!-- LOWER SECTION: Primary Navigation Hub -->
         <div class="action-grid">
-            
-            <!-- SECTION 1: BOOKING -->
             <div class="action-card">
                 <h3>Book trip</h3>
-                <!-- Green button for 'Positive' starting action -->
                 <a href="book.php" class="button regular-button green-background" style="text-decoration:none; padding: 20px 40px;">BOOK NOW</a>
             </div>
 
-            <!-- SECTION 2: HISTORY -->
             <div class="action-card">
                 <h3>View history</h3>
-                <!-- Pink button for secondary action -->
                 <a href="view_user_history.php" class="button regular-button pink-background" style="text-decoration:none; padding: 20px 40px;">VIEW HISTORY</a>
             </div>
 
-            <!-- SECTION 3: TICKETS -->
             <div class="action-card">
                 <h3>View ticket</h3>
-                <!-- Purple button matching the main branding -->
                 <a href="view_tickets.php" class="button regular-button purple-background" style="text-decoration:none; padding: 20px 40px;">VIEW TICKETS</a>
             </div>
-            
         </div>
     </div>
 
-    <!-- UI FOOTER PADDING -->
     <div style="height: 100px;"></div>
-    
-    <!-- FOOTER INJECTION -->
     <script src="js/footer.js"></script>
 </body>
 </html>
