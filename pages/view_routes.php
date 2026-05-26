@@ -316,7 +316,184 @@ if (isset($_POST['update_route'])) {
                     if (from == "" || to == "") { alert("Please enter valid path."); return false; }
                     return true;
                 }
+
+                function filterTable() {
+                // function (keyword) filterTable (name) starts local search algorithm.
+                    var input = document.getElementById("search-input");
+                    // var (variable) input (label) gets reference to search text input box.
+                    var filter = input.value.toLowerCase();
+                    // var (variable) filter (label) holds lowercase version of input query.
+                    var select = document.getElementById("search-column");
+                    // var (variable) select (label) holds search target column dropdown menu element.
+                    var colIndex = select.value;
+                    // var (variable) colIndex (label) gets active search column index.
+                    
+                    var table = document.querySelector(".crud-table");
+                    // var (variable) table (label) gets the target route CRUD table.
+                    var tbody = table.getElementsByTagName("tbody")[0];
+                    // var (variable) tbody (label) gets first table body.
+                    var trs = tbody.getElementsByTagName("tr");
+                    // var (variable) trs (label) gets all table rows inside routes table body.
+                    
+                    var headerRow = null;
+                    // var (variable) headerRow (label) tracks the current Region Header row (e.g. Kisumu).
+                    var headerHasMatch = false;
+                    // var (variable) headerHasMatch (label) tracks if current region has matching route rows.
+                    
+                    for (var i = 0; i < trs.length; i++) {
+                    // loops through each row indexing variable i from 0 up to trs length.
+                        var tr = trs[i];
+                        // var (variable) tr (label) holds current row.
+                        
+                        // Check if it's a section/region header row (e.g. td with colspan)
+                        var isHeader = tr.querySelector("td[colspan]");
+                        // var (variable) isHeader (label) checks for td containing colspan attribute.
+                        if (isHeader) {
+                        // if row is a Region Header.
+                            if (headerRow && !headerHasMatch && filter !== "") {
+                            // if previous region header has no match under active search.
+                                headerRow.style.display = "none";
+                                // hide previous region header row.
+                            }
+                            headerRow = tr;
+                            // headerRow tracks current region header row.
+                            headerHasMatch = false;
+                            // reset matching tracking to false.
+                            tr.style.display = ""; // default visible
+                            // set display visible.
+                            continue;
+                            // skip evaluating this header row for standard column filters.
+                        }
+                        
+                        var match = false;
+                        // var (variable) match (label) set to false initially.
+                        
+                        if (colIndex === "all") {
+                        // if searching all fields.
+                            var tds = tr.getElementsByTagName("td");
+                            // var (variable) tds (label) gets all table cells inside current row.
+                            for (var j = 0; j < tds.length - 1; j++) { // exclude actions column
+                            // loops cell index j from 0 up to last cell, excluding Operations cell.
+                                var td = tds[j];
+                                // var (variable) td holds current cell.
+                                if (td) {
+                                // if td exists.
+                                    var txtValue = getCellText(td);
+                                    // var (variable) txtValue isolates cell's display text.
+                                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                                    // if matches search filter query.
+                                        match = true;
+                                        // match set to true.
+                                        break;
+                                        // break stops checking cells.
+                                    }
+                                }
+                            }
+                        } else {
+                        // else specific column filter is active.
+                            var td = tr.getElementsByTagName("td")[colIndex];
+                            // var td gets table cell at exact index.
+                            if (td) {
+                            // if td exists.
+                                var txtValue = getCellText(td);
+                                // var txtValue isolates cell display text.
+                                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                                // if matches filter query.
+                                    match = true;
+                                    // match set to true.
+                                }
+                            }
+                        }
+                        
+                        if (match) {
+                        // if matched.
+                            tr.style.display = "";
+                            // set row visible.
+                            headerHasMatch = true;
+                            // set header match to true.
+                            if (headerRow) {
+                            // if header exists.
+                                headerRow.style.display = "";
+                                // set region header row visible.
+                            }
+                        } else {
+                        // else no match.
+                            tr.style.display = "none";
+                            // set row hidden.
+                        }
+                    }
+                    
+                    if (headerRow && !headerHasMatch && filter !== "") {
+                    // if last region header row has no match under active search.
+                        headerRow.style.display = "none";
+                        // hide last region header row.
+                    }
+                }
+                // } ends filterTable function.
+
+                function getCellText(td) {
+                // function getCellText extracts displayed cell values safely.
+                    var selectElement = td.querySelector("select");
+                    // var selectElement checks for select dropdown selector.
+                    if (selectElement && selectElement.style.display !== "none") {
+                    // if dropdown exists and is visible.
+                        if (selectElement.selectedIndex >= 0) {
+                        // if valid selection.
+                            return selectElement.options[selectElement.selectedIndex].text;
+                            // return selected text value.
+                        }
+                        return "";
+                        // return blank.
+                    }
+                    var viewSpan = td.querySelector("span[class^='view-']");
+                    // var viewSpan checks for display view span.
+                    if (viewSpan) {
+                    // if viewSpan exists.
+                        return viewSpan.textContent || viewSpan.innerText;
+                        // return span text content.
+                    }
+                    return td.innerText || td.textContent || "";
+                    // fallback return cell raw text content.
+                }
+                // } ends getCellText function.
             </script>
+
+            <!-- Search Bar -->
+            <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
+            <!-- <div style="..."> starts the retro themed routes search box panel. -->
+
+                <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
+                <!-- <span style="..."> sets search text styles. -->
+                    🔍 Search By:
+                </span>
+                <!-- </span> ends search indicator label. -->
+
+                <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
+                <!-- <select> dropdown specifies target route search column field. -->
+                    <option value="all">All Fields</option>
+                    <!-- option for general scanning. -->
+                    <option value="0">Ref ID</option>
+                    <!-- option for Ref ID search. -->
+                    <option value="1">From</option>
+                    <!-- option for From location search. -->
+                    <option value="2">To</option>
+                    <!-- option for To location search. -->
+                    <option value="3">Date</option>
+                    <!-- option for Date search. -->
+                    <option value="4">Time</option>
+                    <!-- option for Time search. -->
+                    <option value="5">Fleet</option>
+                    <!-- option for Fleet search. -->
+                    <option value="6">Cost</option>
+                    <!-- option for Cost search. -->
+                </select>
+                <!-- </select> ends dropdown menu options. -->
+
+                <input type="text" id="search-input" placeholder="Type to filter routes..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
+                <!-- <input> element tracks user search keystrokes and runs local filterTable JS immediately. -->
+
+            </div>
+            <!-- </div> ends search container. -->
 
             <table class="crud-table">
                 <thead><tr><th>Ref ID</th><th>From</th><th>To</th><th>Date</th><th>Time</th><th>Fleet</th><th>Cost</th><th>Operations</th></tr></thead>

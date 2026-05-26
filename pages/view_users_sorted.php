@@ -395,6 +395,107 @@ if (isset($_POST['update_user'])) {
             /* [99] return true. ; (semicolon). */
         }
         /* [100] } ends function. */
+
+        function filterTable() {
+        // [101] function filterTable() starts search filter logic.
+            var input = document.getElementById("search-input");
+            // [102] var input grabs text box reference.
+            var filter = input.value.toLowerCase();
+            // [103] var filter converts query to lowercase.
+            var select = document.getElementById("search-column");
+            // [104] var select grabs column select reference.
+            var colIndex = select.value;
+            // [105] var colIndex gets search target column value.
+            
+            var table = document.querySelector(".crud-table");
+            // [106] var table gets the target data grid table.
+            var tbody = table.getElementsByTagName("tbody")[0];
+            // [107] var tbody gets table's body.
+            var trs = tbody.getElementsByTagName("tr");
+            // [108] var trs gets all table rows inside tbody.
+            
+            for (var i = 0; i < trs.length; i++) {
+            // [109] loops through each table row from 0 to trs length.
+                var tr = trs[i];
+                // [110] var tr holds current data row.
+                var match = false;
+                // [111] var match set to false initially.
+                
+                if (colIndex === "all") {
+                // [112] if checking all columns.
+                    var tds = tr.getElementsByTagName("td");
+                    // [113] var tds gets all table cells inside current row.
+                    for (var j = 0; j < tds.length - 1; j++) { // exclude actions column
+                    // [114] loops cell index j from 0, excluding Actions cell.
+                        var td = tds[j];
+                        // [115] var td holds current cell.
+                        if (td) {
+                        // [116] if td exists.
+                            var txtValue = getCellText(td);
+                            // [117] var txtValue isolates visible display text value.
+                            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                            // [118] if cell text matches search query.
+                                match = true;
+                                // [119] match set to true.
+                                break;
+                                // [120] break stops inner loop check.
+                            }
+                        }
+                    }
+                } else {
+                // [121] else specific column is selected.
+                    var td = tr.getElementsByTagName("td")[colIndex];
+                    // [122] var td gets table cell at exact index.
+                    if (td) {
+                    // [123] if td exists.
+                        var txtValue = getCellText(td);
+                        // [124] var txtValue isolates cell value.
+                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        // [125] if matches.
+                            match = true;
+                            // [126] match set to true.
+                        }
+                    }
+                }
+                
+                if (match) {
+                // [127] if match.
+                    tr.style.display = "";
+                    // [128] display set to visible.
+                } else {
+                // [129] else if no match.
+                    tr.style.display = "none";
+                    // [130] display set to hidden.
+                }
+            }
+        }
+        // [131] } ends filterTable function.
+
+        function getCellText(td) {
+        // [132] function getCellText(td) isolates cell's visible display value.
+            var selectElement = td.querySelector("select");
+            // [133] var selectElement looks for inner select element.
+            if (selectElement && selectElement.style.display !== "none") {
+            // [134] if select exists and is currently visible.
+                if (selectElement.selectedIndex >= 0) {
+                // [135] if valid choice.
+                    return selectElement.options[selectElement.selectedIndex].text;
+                    // [136] return selected option text value.
+                }
+                return "";
+                // [137] return blank if unselected.
+            }
+            var viewSpan = td.querySelector("span[class^='view-']");
+            // [138] var viewSpan checks for display mode span element.
+            if (viewSpan) {
+            // [139] if span exists.
+                return viewSpan.textContent || viewSpan.innerText;
+                // [140] return only span's displayed text value.
+            }
+            return td.innerText || td.textContent || "";
+            // [141] fallback return raw cell content.
+        }
+        // [142] } ends getCellText function.
     </script>
 </head>
 <!-- [102] </head> ends metadata. -->
@@ -477,6 +578,41 @@ if (isset($_POST['update_user'])) {
 
         </div>
         <!-- [129] </div> ends creation box. -->
+
+        <!-- Search Bar -->
+        <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
+        <!-- [129a] <div style="..."> starts the retro themed search panel box container. -->
+
+            <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
+            <!-- [129b] <span style="..."> sets text properties. -->
+                🔍 Search By:
+            </span>
+            <!-- [129c] </span> ends search indicator label. -->
+
+            <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
+            <!-- [129d] <select> dropdown specifies target field selection choice box. -->
+                <option value="all">All Fields</option>
+                <!-- [129d1] option for general scanning. -->
+                <option value="0">ID</option>
+                <!-- [129d2] option for ID search. -->
+                <option value="1">First Name</option>
+                <!-- [129d3] option for First Name search. -->
+                <option value="2">Last Name</option>
+                <!-- [129d4] option for Last Name search. -->
+                <option value="3">Email</option>
+                <!-- [129d5] option for Email search. -->
+                <option value="4">Phone</option>
+                <!-- [129d6] option for Phone search. -->
+                <option value="5">Role</option>
+                <!-- [129d7] option for Role search. -->
+            </select>
+            <!-- [129e] </select> ends the dropdown menu box. -->
+
+            <input type="text" id="search-input" placeholder="Type to filter users..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
+            <!-- [129f] <input> text box with onkeyup trigger runs local filterTable script on typing. -->
+
+        </div>
+        <!-- [129g] </div> ends the search panel container. -->
 
         <table class="crud-table">
         <!-- [130] <table> starts the user list grid. -->

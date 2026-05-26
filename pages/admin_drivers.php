@@ -394,8 +394,144 @@ to apply the correct design theme. -->
                 }
                 // } (closing curly bracket) ends the validation function.
 
+                function filterTable() {
+                // function (keyword) filterTable (name) starts local search algorithm.
+                    var input = document.getElementById("search-input");
+                    // var (variable) input (label) gets reference to search input.
+                    var filter = input.value.toLowerCase();
+                    // var (variable) filter (label) holds lowercase search filter text query.
+                    var select = document.getElementById("search-column");
+                    // var (variable) select (label) holds search target column dropdown menu element.
+                    var colIndex = select.value;
+                    // var (variable) colIndex (label) gets selected field search option.
+                    
+                    var table = document.querySelector(".crud-table");
+                    // var (variable) table (label) gets crud table grid element.
+                    var tbody = table.getElementsByTagName("tbody")[0];
+                    // var (variable) tbody (label) gets first tbody of the table grid.
+                    var trs = tbody.getElementsByTagName("tr");
+                    // var (variable) trs (label) gets all driver rows within table body.
+                    
+                    for (var i = 0; i < trs.length; i++) {
+                    // loops through table rows indexing variable i from 0 up to trs length.
+                        var tr = trs[i];
+                        // var (variable) tr (label) holds current row.
+                        var match = false;
+                        // var (variable) match (label) set to false initially.
+                        
+                        if (colIndex === "all") {
+                        // if searching all cells.
+                            var tds = tr.getElementsByTagName("td");
+                            // var (variable) tds (label) holds all td elements inside row.
+                            for (var j = 0; j < tds.length - 1; j++) { // exclude actions column
+                            // loops through td elements with index variable j, excluding last column.
+                                var td = tds[j];
+                                // var (variable) td (label) holds current cell.
+                                if (td) {
+                                // if td exists.
+                                    var txtValue = getCellText(td);
+                                    // var (variable) txtValue isolates cell's display value.
+                                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                                    // if matches search filter.
+                                        match = true;
+                                        // match set to true.
+                                        break;
+                                        // break stops checking other cells.
+                                    }
+                                }
+                            }
+                        } else {
+                        // else specific column filter is active.
+                            var td = tr.getElementsByTagName("td")[colIndex];
+                            // var (variable) td gets cell element at exact index.
+                            if (td) {
+                            // if td exists.
+                                var txtValue = getCellText(td);
+                                // var (variable) txtValue isolates cell display text.
+                                if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                                // if matches filter query.
+                                    match = true;
+                                    // match set to true.
+                                }
+                            }
+                        }
+                        
+                        if (match) {
+                        // if matched.
+                            tr.style.display = "";
+                            // row display set to visible.
+                        } else {
+                        // else.
+                            tr.style.display = "none";
+                            // row display set to hidden.
+                        }
+                    }
+                }
+                // } ends filterTable function.
+
+                function getCellText(td) {
+                // function getCellText extracts cell's visible display value.
+                    var selectElement = td.querySelector("select");
+                    // var selectElement checks for select dropdown.
+                    if (selectElement && selectElement.style.display !== "none") {
+                    // if select exists and is currently visible.
+                        if (selectElement.selectedIndex >= 0) {
+                        // if valid selection index.
+                            return selectElement.options[selectElement.selectedIndex].text;
+                            // return selected text value.
+                        }
+                        return "";
+                        // return blank.
+                    }
+                    var viewSpan = td.querySelector("span[class^='view-']");
+                    // var viewSpan checks for display view span element.
+                    if (viewSpan) {
+                    // if viewSpan exists.
+                        return viewSpan.textContent || viewSpan.innerText;
+                        // return displayed text content.
+                    }
+                    return td.innerText || td.textContent || "";
+                    // fallback return cell raw text.
+                }
+                // } ends getCellText function.
+
             </script>
             <!-- < / (slash) script > (greater than sign) ends the interactive logic. -->
+
+            <!-- Search Bar -->
+            <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
+            <!-- < div style="..." > starts search bar container with retro theme styles. -->
+
+                <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
+                <!-- < span > sets text styles. -->
+                    🔍 Search By:
+                </span>
+                <!-- < / span > ends label. -->
+
+                <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
+                <!-- < select > starts select dropdown element. -->
+                    <option value="all">All Fields</option>
+                    <!-- option for searching all cells. -->
+                    <option value="0">ID</option>
+                    <!-- option for ID search. -->
+                    <option value="1">Full Name</option>
+                    <!-- option for Full Name search. -->
+                    <option value="2">ID Number</option>
+                    <!-- option for ID Number search. -->
+                    <option value="3">Phone</option>
+                    <!-- option for Phone search. -->
+                    <option value="4">Email</option>
+                    <!-- option for Email search. -->
+                    <option value="5">Vehicle</option>
+                    <!-- option for Vehicle search. -->
+                </select>
+                <!-- < / select > ends dropdown menu. -->
+
+                <input type="text" id="search-input" placeholder="Type to filter drivers..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
+                <!-- < input > element takes user search query and triggers filterTable JS on keystroke. -->
+
+            </div>
+            <!-- < / div > ends container. -->
 
             <table class="crud-table">
             <!-- < (less than sign) table (t a b l e) class (class) = (equals sign) 
