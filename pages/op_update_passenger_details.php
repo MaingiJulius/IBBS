@@ -18,16 +18,17 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // [INPUT VALIDATION]
-// Check if the three core pieces of data (Booking ID, Passenger ID, and Age) are present.
+// Check if the four core pieces of data are present: Booking ID, Name, Passenger ID, and Age.
 if (!isset($_POST['booking_id']) || !isset($_POST['passenger_id_number']) || !isset($_POST['passenger_age'])) {
     header("Location: dashboard.php?msg=Error: Missing required update parameters.");
     exit();
 }
 
 // [DATA CACHING & SANITIZATION]
-$bid = intval($_POST['booking_id']);           // Ensure ID is a strict integer.
-$id_number = trim($_POST['passenger_id_number']); // Remove accidental whitespace.
-$age = intval($_POST['passenger_age']);        // Ensure age is a strict integer.
+$bid         = intval($_POST['booking_id']);              // Ensure ID is a strict integer.
+$pass_name   = trim($_POST['passenger_name'] ?? '');      // Capture passenger full name.
+$id_number   = trim($_POST['passenger_id_number']);       // Remove accidental whitespace.
+$age         = intval($_POST['passenger_age']);           // Ensure age is a strict integer.
 $redirect_to = $_POST['redirect_to'] ?? 'dashboard.php'; // Map return destination.
 
 // [AUTHORIZATION & OWNERSHIP VERIFICATION]
@@ -52,10 +53,10 @@ if ($role !== 'ADMIN' && $role !== 'AGENT') {
 }
 
 // [DATABASE PERSISTENCE]
-// Formulate and execute the update command for the identity document and age.
-$update_sql = "UPDATE bookings SET passenger_id_number = ?, passenger_age = ? WHERE booking_id = ?";
+// Formulate and execute the update command for all 3 traveler details: name, age, and ID/passport.
+$update_sql = "UPDATE bookings SET passenger_name = ?, passenger_id_number = ?, passenger_age = ? WHERE booking_id = ?";
 $stmt_update = $conn->prepare($update_sql);
-$stmt_update->bind_param("sii", $id_number, $age, $bid);
+$stmt_update->bind_param("ssii", $pass_name, $id_number, $age, $bid);
 
 if ($stmt_update->execute()) {
     $msg = "Passenger details updated successfully.";

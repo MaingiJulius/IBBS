@@ -283,11 +283,11 @@ if (isset($_POST['login'])) {
     // ) (closing bracket). ; (semicolon).
 
     $sql_login = "SELECT user_id, password, role, first_name, last_name FROM users WHERE email = ?";
-    // $ (dollar sign) variable marker. sql_login (s q l underscore l o g i n) 
+   /*  // $ (dollar sign) variable marker. sql_login (s q l underscore l o g i n) 
     // is a logical label chosen for the login search. = (equals sign) 
     // assignment. "SELECT..." (quote) starts the SQL instruction. ? (question 
     // mark) is a critical security placeholder that prevents SQL Injection 
-    // by isolating user data from the command. ; (semicolon).
+    // by isolating user data from the command. ; (semicolon). */
 
     $stmt_login = mysqli_prepare($conn, $sql_login);
     // $ (dollar sign) variable marker. stmt_login (s t m t underscore l o g i n) 

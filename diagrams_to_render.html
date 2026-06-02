@@ -12,6 +12,7 @@
         erDiagram
         USERS ||--o{ BOOKINGS : makes
         USERS ||--o{ FEEDBACK : gives
+        USERS ||--o{ LOGS : performs
         DRIVERS ||--o{ BUSES : drives
         BUSES ||--o{ ROUTES : assigned_to
         BUSES ||--o{ BOOKINGS : has
@@ -73,6 +74,15 @@
         int user_id FK
         int bus_id FK
         int route_id FK
+        }
+        LOGS {
+        int log_id PK
+        int user_id FK
+        string type
+        text description
+        string name
+        time time
+        date date
         }
     </div>
 

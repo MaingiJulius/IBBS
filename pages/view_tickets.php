@@ -11,25 +11,43 @@ if (!isset($_SESSION['user_id'])) {                                  // [7] if (
     exit();                                                          // [9] exit (exit). ( ). ; (semicolon).
 }                                                                    // [10] } (curly bracket) ends block.
 
-$user_id = $_SESSION['user_id'];                                     // [11] $user_id (variable). = (assign). $_SESSION['user_id']. ; (semicolon).
+$user_id = $_SESSION['user_id'];
+$role = $_SESSION['role'] ?? 'PASSENGER';
 
-// --- DATABASE FETCHING (Procedural Style) ---                      // [12] // (double slash) comment describing the next step.
-$sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name 
-        FROM bookings b 
-        JOIN routes r ON b.route_id = r.route_id 
-        JOIN buses bs ON b.bus_id = bs.bus_id 
-        WHERE b.user_id = ? AND b.booking_status IN ('PAID', 'CHECKED_IN') 
-        ORDER BY r.departure_date DESC";                             // [13] $sql (variable). = (assign). "SELECT..." (SQL command). ; (semicolon).
+// --- DATABASE FETCHING (Procedural Style) ---
+if ($role === 'ADMIN' || $role === 'AGENT') {
+    if (isset($_GET['user_id'])) {
+        $target_user_id = intval($_GET['user_id']);
+        $sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name 
+                FROM bookings b 
+                JOIN routes r ON b.route_id = r.route_id 
+                JOIN buses bs ON b.bus_id = bs.bus_id 
+                WHERE b.user_id = ? AND b.booking_status IN ('PAID', 'CHECKED_IN') 
+                ORDER BY r.departure_date DESC";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $target_user_id);
+    } else {
+        $sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name 
+                FROM bookings b 
+                JOIN routes r ON b.route_id = r.route_id 
+                JOIN buses bs ON b.bus_id = bs.bus_id 
+                WHERE b.booking_status IN ('PAID', 'CHECKED_IN') 
+                ORDER BY r.departure_date DESC";
+        $stmt = mysqli_prepare($conn, $sql);
+    }
+} else {
+    $sql = "SELECT b.*, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name 
+            FROM bookings b 
+            JOIN routes r ON b.route_id = r.route_id 
+            JOIN buses bs ON b.bus_id = bs.bus_id 
+            WHERE b.user_id = ? AND b.booking_status IN ('PAID', 'CHECKED_IN') 
+            ORDER BY r.departure_date DESC";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+}
 
-$stmt = mysqli_prepare($conn, $sql);                                 // [14] $stmt (variable). = (assign). mysqli_prepare (prepare). ( $conn (bridge) , $sql (query) ). ; (semicolon).
-mysqli_stmt_bind_param($stmt, "i", $user_id);                        
-/* mysqli (MySQL Improved) _ (underscore) stmt (statement) _ (underscore) 
-   bind (bind) _ (underscore) param (parameter) is the security function that 
-   attaches (binds) the data to the query. ( starts the tool. $stmt (tool handle) 
-   , (comma) "i" (integer number type) , (comma) $user_id (current user identity data) 
-   ) ends the tool. ; (semicolon). */
-mysqli_stmt_execute($stmt);                                          // [16] mysqli_stmt_execute (execute). ( $stmt ). ; (semicolon).
-$result = mysqli_stmt_get_result($stmt);                             // [17] $result (variable). = (assign). mysqli_stmt_get_result (get result). ( $stmt ). ; (semicolon).
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 ?>                                                                   <!-- [18] [?] (closing tag) ends PHP and starts HTML. -->
 
 <!DOCTYPE html>                                                      <!-- [19] <!DOCTYPE html> defines a standard modern web document. -->
@@ -40,133 +58,84 @@ $result = mysqli_stmt_get_result($stmt);                             // [17] $re
     <link rel="stylesheet" href="css/main.css">                      <!-- [24] <link> imports design rules. -->
     <link rel="stylesheet" href="css/style.css">                     <!-- [25] <link> imports branding colors. -->
     <style>                                                          /* [26] <style> starts CSS design. */
-        .ticket-container { max-width: 1200px; margin: 50px auto; padding: 20px; } /* [27] Wider centered box. */
-        .ticket-card { background: #ffffff; border-radius: 16px; padding: 30px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-left: 12px solid var(--purple); } /* [28] Ticket card design. */
-        .ticket-info h3 { margin: 0 0 10px 0; color: var(--purple); font-size: 1.4rem; } /* [29] Destination names design. */
-        .booking-id-badge { background: var(--purple); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px; display: inline-block; } /* [30] ID badge design. */
-        .action-btn { padding: 10px 20px; border-radius: 50px; cursor: pointer; font-size: 0.85rem; font-weight: 700; border: none; text-decoration: none; display: inline-block; text-align: center; } /* [31] Button design. */
-        @media print { .no-print { display: none; } }               /* [32] @media print (print mode) hides .no-print elements. */
+        .ticket-container { max-width: 820px; margin: 50px 30px 50px 15%; padding: 20px; } /* Narrowed box shifted right. */
+        .ticket-card { background: #ffffff; border-radius: 16px; padding: 22px 26px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: flex-start; box-shadow: 0 6px 20px rgba(0,0,0,0.07); border-left: 10px solid var(--purple); gap: 20px; } /* Ticket card design. */
+        .ticket-info { flex: 1; min-width: 0; } /* left column */
+        .ticket-info h3 { margin: 0 0 8px 0; color: var(--purple); font-size: 1.2rem; } /* Destination names. */
+        .ticket-info p { margin: 4px 0; font-size: 0.9rem; } /* tighter paragraph spacing */
+        .ticket-details-col { width: 160px; flex-shrink: 0; border-left: 1px solid #e2e8f0; padding-left: 14px; font-size: 0.82rem; color: #4a5568; display: flex; flex-direction: column; gap: 5px; } /* middle column */
+        .td-label { font-size: 0.82rem; color: #4a5568; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } /* compact detail row */
+        .booking-id-badge { background: var(--purple); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; display: inline-block; } /* ID badge. */
+        .action-btn { padding: 9px 16px; border-radius: 50px; cursor: pointer; font-size: 0.82rem; font-weight: 700; border: none; text-decoration: none; display: inline-block; text-align: center; } /* Button design. */
+        @media print { .no-print { display: none !important; } .ticket-details-print { display: block !important; } }
+        @media (max-width: 768px) { .ticket-container { margin: 30px 15px; } .ticket-card { flex-direction: column; } .ticket-details-col { width: 100%; border-left: none; border-top: 1px solid #e2e8f0; padding-left: 0; padding-top: 10px; } } /* responsive */
     </style>                                                         <!-- [33] </style> ends CSS. -->
     <script>
 // < (less than) s (s) c (c) r (r) i (i) p (p) t (t) > (greater than) starts 
 // the JavaScript logic block for browser-side interactions.
 
         function printTicket(bookingId) {
-// function (function keyword) defines a reusable task. printTicket 
-// (p r i n t T i c k e t) is the unique name of this logic block. ( (bracket) 
-// bookingId (b o o k i n g I d) is a variable input representing the 
-// specific ticket number. ) (bracket). { (opening curly bracket) marks the 
-// start of the print processing instructions.
+            // Temporarily show the hidden print-only details block so it gets captured in innerHTML
+            const printBlock = document.querySelector('#ticket-' + bookingId + ' .ticket-details-print');
+            if (printBlock) printBlock.style.display = 'block';
 
             const cardInfo = document.querySelector('#ticket-' + bookingId + ' .ticket-info');
-// const (constant) defines a variable that cannot be changed. cardInfo 
-// (c a r d I n f o) is the label for the ticket data we want to print. 
-// = (equals sign) is the assignment operator. document (the webpage object) 
-// . (dot) querySelector (query selector) is a powerful function used to 
-// find a specific element. ( (bracket) '#' (hash) + (plus sign) bookingId 
-// + (plus sign) ' .ticket-info' (the specific class inside the card) ) 
-// (bracket). ; (semicolon) terminates the line. This variable stores the 
-// "ticket-info" container to exclude buttons.
+            const content = cardInfo.innerHTML
+                          + (printBlock ? printBlock.outerHTML : '');
 
-            const content = cardInfo.innerHTML;
-// const (constant). content (c o n t e n t) is the label for the HTML text. 
-// = (equals sign). cardInfo (our found data box) . (dot) innerHTML 
-// (i n n e r H T M L) is the built-in property that retrieves all the tags 
-// and text inside that box. ; (semicolon).
+            // Hide it again after capturing
+            if (printBlock) printBlock.style.display = 'none';
 
-            const printWin = window.open('', '', 'height=600,width=800');
-// const (constant). printWin (p r i n t W i n) is the variable label for the 
-// new popup window. = (equals sign). window (the browser) . (dot) open 
-// (open) is the function that creates a new display area. ( (bracket) 
-// '' (empty URL) , (comma) '' (no name) , (comma) 'height=600,width=800' 
-// (size settings) ) (bracket). ; (semicolon).
-
-            printWin.document.write('<html><head><title>Ticket Printout</title>');
-// printWin (our new window) . (dot) document (its content object) . (dot) 
-// write (write) is the function that pours data into the window. ( (bracket) 
-// '<html>...' (the HTML header code) ) (bracket). ; (semicolon).
-
-            printWin.document.write('<style>.no-print { display: none !important; }</style>');
-// printWin.document.write adds a specific style rule to the new window. 
-// .no-print { display: none !important; } ensures that any element with 
-// the "no-print" class is hidden in the popup.
-
+            const printWin = window.open('', '', 'height=700,width=850');
+            printWin.document.write('<html><head><title>Wema Travellers - Boarding Pass</title>');
+            printWin.document.write('<style>');
+            printWin.document.write('body{font-family:Arial,sans-serif;background:#f9f6ff;display:flex;justify-content:center;padding:30px;}');
+            printWin.document.write('.wrapper{border:4px solid #8e44ad;border-radius:16px;max-width:620px;width:100%;background:white;overflow:hidden;}');
+            printWin.document.write('.t-header{background:#8e44ad;color:white;padding:20px 30px;text-align:center;}');
+            printWin.document.write('.t-header h1{margin:0;font-size:1.8rem;letter-spacing:2px;}');
+            printWin.document.write('.t-header p{margin:4px 0 0;font-size:0.85rem;opacity:0.85;letter-spacing:1px;}');
+            printWin.document.write('.t-body{padding:25px 30px;}');
+            printWin.document.write('.t-body p,.t-body h3{margin:8px 0;font-size:0.95rem;color:#2d3748;}');
+            printWin.document.write('.t-body h3{font-size:1.2rem;color:#8e44ad;margin-bottom:14px;}');
+            printWin.document.write('.t-body .booking-id-badge{background:#8e44ad;color:white;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:bold;display:inline-block;margin-bottom:10px;}');
+            printWin.document.write('hr{border:0;border-top:2px dashed #e2d9f3;margin:15px 0;}');
+            printWin.document.write('.t-footer{background:#f3f0fa;padding:12px 30px;font-size:0.78rem;color:#718096;text-align:center;border-top:1px solid #e2d9f3;}');
+            printWin.document.write('.no-print{display:none !important;} form{display:none !important;} .ticket-details-col{display:none !important;}');
+            printWin.document.write('.ticket-details-print{display:block !important;}');
+            printWin.document.write('</style>');
             printWin.document.write('</head><body>');
-// printWin.document.write closes the head and starts the body.
-
-            printWin.document.write('<div style="font-family:sans-serif; padding:40px; border:5px solid #8e44ad; border-radius:15px; position:relative;">');
-// printWin.document.write pours a styled <div> (box) with a purple border 
-// and padding into the window to make the ticket look professional.
-
-            printWin.document.write('<h1 style="color:#8e44ad; text-align:center; font-size: 2rem;">WEMA TRAVELLERS</h1>');
-// printWin.document.write adds the branding title in purple to the top of 
-// the printed page.
-
+            printWin.document.write('<div class="wrapper">');
+            printWin.document.write('<div class="t-header"><h1>&#x1F6A6; WEMA TRAVELLERS</h1><p>OFFICIAL BOARDING PASS</p></div>');
+            printWin.document.write('<div class="t-body">');
             printWin.document.write(content);
-// printWin.document.write (write). ( (bracket) content (our captured ticket 
-// data) ) (bracket). ; (semicolon). This is the CORE logic that places the 
-// passenger information into the print window.
-
             printWin.document.write('</div>');
-// printWin.document.write closes the styled box tags.
-
-            printWin.document.write('<script>window.onload = function() { window.print(); window.close(); };<\/script>');
-// printWin.document.write adds an automated script to the new window. 
-// window.onload (on load) waits for the text to appear. window.print() 
-// (print) triggers the printer. window.close() (close) shuts the popup 
-// automatically after printing.
-
+            printWin.document.write('<div class="t-footer">Please arrive 30 mins before departure &bull; Valid Government-Issued ID Required &bull; Non-Transferable</div>');
+            printWin.document.write('</div>');
+            printWin.document.write('<scr'+'ipt>window.onload=function(){window.print();window.close();};<\/scr'+'ipt>');
             printWin.document.write('</body></html>');
-// printWin.document.write closes the body and html tags.
-
             printWin.document.close();
-// printWin (window) . (dot) document (content) . (dot) close (close) 
-// is the function that finalizes the data stream so the browser knows 
-// everything is ready. ; (semicolon).
-
         }
 
 // } (closing curly bracket) ends the printTicket function block.
 
         function validateInlineForm(bookingId) {
-// function (function) validateInlineForm (v a l i d a t e I n l i n e F o r m) 
-// is the name of the check logic. ( bookingId ) { starts the instructions.
-
+            var name = document.getElementById("name-" + bookingId).value.trim();
             var pid = document.getElementById("pid-" + bookingId).value.trim();
-// var (variable). pid (p i d). = (assign). document . getElementById 
-// (find by ID). ( "pid-" + bookingId ). value (text). trim() (remove space). ;
-
             var age = document.getElementById("age-" + bookingId).value.trim();
-// var (variable). age (a g e). = (assign). value. trim(). ;
 
+            if (name == "") {
+                alert("Passenger Name is required");
+                return false;
+            }
             if (pid == "") {
-// if (if) check for emptiness. ( (bracket) pid == "" ) (bracket). { 
-// (bracket) starts error.
-
                 alert("ID Number is required");
-// alert (pop-up). ; (semicolon).
-
                 return false;
-// return (return) false (fail signal). ; (semicolon).
-
             }
-// } ends if.
-
-            if (age == "" || isNaN(age)) {
-// if (if) check for valid age. ( age is empty OR isNaN (is NOT a number) ).
-
+            if (age == "" || isNaN(age) || parseInt(age) <= 0) {
                 alert("Valid Age is required");
-// alert (pop-up). ; (semicolon).
-
                 return false;
-// return (return) false (fail signal). ; (semicolon).
-
             }
-// } ends if.
-
             return true;
-// return (return) true (success signal). ; (semicolon).
-
         }
 // } (closing curly bracket) ends the validation function.
     </script>
@@ -187,34 +156,74 @@ $result = mysqli_stmt_get_result($stmt);                             // [17] $re
                 <!-- while (while) starts a loop. $ticket (row container) pulls data. 
                      mysqli_fetch_assoc (fetch associative) converts raw data into labeled pieces. 
                      ( starts. $result (result source). ) ends. : (colon) starts the loop block. -->
-                <div class="ticket-card" id="ticket-<?= $ticket['booking_id'] ?>"> <!-- [66] Ticket box with unique ID. -->
-                    <div class="ticket-info">                        <!-- [67] Info section. -->
-                        <div class="booking-id-badge">Booking ID: #<?= $ticket['booking_id'] ?></div> <!-- [68] ID badge. -->
-                        <h3><?= htmlspecialchars($ticket['from_location']) ?> → <?= htmlspecialchars($ticket['to_location']) ?></h3> 
-                        <!-- html (HyperText) special (special) chars (characters) is a security tool 
-                             that encodes text for safety. ( starts the tool. $ticket (data row) 
-                             ['from_location'] (origin label) ) ends. -->
-                        <p><strong>📅 Date:</strong> <?= $ticket['departure_date'] ?> | <strong>⏰ Time:</strong> <?= $ticket['departure_time'] ?></p> <!-- [70] Date/Time. -->
-                        <p><strong>💺 Seat:</strong> <?= $ticket['seat_number'] ?> | <strong>🚌 Bus:</strong> <?= htmlspecialchars($ticket['bus_name']) ?></p> 
-                        <!-- htmlspecialchars (security tool) ( $ticket ['bus_name'] (vehicle label) ) -->
-                        <p><strong>👤 Traveler:</strong> <?= htmlspecialchars($ticket['passenger_name'] ?: $_SESSION['name']) ?></p> <!-- [72] Traveler Name. -->
+                <div class="ticket-card" id="ticket-<?= $ticket['booking_id'] ?>"> <!-- Ticket box -->
 
-                        <?php if (empty($ticket['passenger_id_number'])): ?> <!-- [73] if (empty). : (then). -->
-                            <form action="op_update_passenger_details.php" method="POST" onsubmit="return validateInlineForm(<?= $ticket['booking_id'] ?>)" class="no-print"> <!-- [74] <form> (form). class="no-print" hides the inputs from the printer. -->
-                                <input type="hidden" name="booking_id" value="<?= $ticket['booking_id'] ?>"> <!-- [75] Hidden input. -->
-                                <input type="text" name="passenger_id_number" id="pid-<?= $ticket['booking_id'] ?>" placeholder="ID No." style="width:100px;"> <!-- [76] Text input. -->
-                                <input type="text" name="passenger_age" id="age-<?= $ticket['booking_id'] ?>" placeholder="Age" style="width:50px;"> <!-- [77] Age input. -->
-                                <button type="submit" style="background:#48bb78; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer;">Save</button> <!-- [78] Submit button. -->
-                            </form>                                  <!-- [79] </form> ends form. -->
-                        <?php else: ?>                               <!-- [80] else (otherwise). -->
-                            <p><strong>🆔 ID:</strong> <?= htmlspecialchars($ticket['passenger_id_number']) ?> | <strong>🎂 Age:</strong> <?= htmlspecialchars($ticket['passenger_age']) ?></p> <!-- [81] Static info. -->
-                        <?php endif; ?>                              <!-- [82] endif (end check). -->
-                    </div>                                           <!-- [83] </div> ends info. -->
-                    
-                    <div class="no-print" style="display:flex; flex-direction:column; gap:10px;"> <!-- [84] Button section. -->
-                        <button onclick="printTicket(<?= $ticket['booking_id'] ?>)" class="action-btn" style="background:#9a4d9a; color:white;">🖨️ Print</button> <!-- [85] Print button. -->
-                        <a href="user_cancel_ticket.php?booking_id=<?= $ticket['booking_id'] ?>" class="action-btn" style="background:#f59e0b; color:white;" onclick="return confirm('Cancel this ticket?')">❌ Cancel</a> <!-- [86] Cancel link. -->
-                    </div>                                           <!-- [87] </div> ends buttons. -->
+                    <!-- COLUMN 1: Route & logistics info -->
+                    <div class="ticket-info">
+                        <div class="booking-id-badge">Booking ID: #<?= $ticket['booking_id'] ?></div>
+                        <h3><?= htmlspecialchars($ticket['from_location']) ?> → <?= htmlspecialchars($ticket['to_location']) ?></h3>
+                        <p><strong>📅 Date:</strong> <?= $ticket['departure_date'] ?> | <strong>⏰ Time:</strong> <?= $ticket['departure_time'] ?></p>
+                        <p><strong>💺 Seat:</strong> <?= $ticket['seat_number'] ?> | <strong>🚌 Bus:</strong> <?= htmlspecialchars($ticket['bus_name']) ?></p>
+                    </div>
+
+                    <!-- COLUMN 2: Traveler details (static) or compact edit form -->
+                    <?php
+                    $has_details = !empty($ticket['passenger_name'])
+                                && !empty($ticket['passenger_id_number'])
+                                && !empty($ticket['passenger_age'])
+                                && intval($ticket['passenger_age']) > 0;
+                    ?>
+                    <div class="ticket-details-col no-print">
+                        <?php if ($has_details): ?>
+                            <!-- All saved: compact static display -->
+                            <div class="td-label">👤 <?= htmlspecialchars($ticket['passenger_name']) ?></div>
+                            <div class="td-label">🎂 <?= htmlspecialchars($ticket['passenger_age']) ?> yrs</div>
+                            <div class="td-label">🆔 <?= htmlspecialchars($ticket['passenger_id_number']) ?></div>
+                        <?php else: ?>
+                            <!-- Missing details: compact inline form -->
+                            <form action="op_update_passenger_details.php" method="POST"
+                                  onsubmit="return validateInlineForm(<?= $ticket['booking_id'] ?>)"
+                                  style="display:flex; flex-direction:column; gap:6px;">
+                                <input type="hidden" name="booking_id"  value="<?= $ticket['booking_id'] ?>">
+                                <input type="hidden" name="redirect_to" value="view_tickets.php">
+                                <div class="td-label" style="color:var(--purple); font-weight:bold; margin-bottom:2px;">📋 Fill Details</div>
+                                <input type="text"   name="passenger_name"       id="name-<?= $ticket['booking_id'] ?>"
+                                       value="<?= htmlspecialchars($ticket['passenger_name'] ?: $_SESSION['name']) ?>"
+                                       placeholder="Full Name" required
+                                       style="padding:4px 7px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem; width:100%;">
+                                <div style="display:flex; gap:5px;">
+                                    <input type="number" name="passenger_age"    id="age-<?= $ticket['booking_id'] ?>"
+                                           value="<?= $ticket['passenger_age'] > 0 ? $ticket['passenger_age'] : '' ?>"
+                                           placeholder="Age" min="1" required
+                                           style="padding:4px 5px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem; width:55px;">
+                                    <input type="text"   name="passenger_id_number" id="pid-<?= $ticket['booking_id'] ?>"
+                                           value="<?= htmlspecialchars($ticket['passenger_id_number']) ?>"
+                                           placeholder="ID/Passport" required
+                                           style="padding:4px 7px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.8rem; flex:1;">
+                                </div>
+                                <button type="submit"
+                                        style="background:#48bb78; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.8rem; align-self:flex-start;">
+                                    💾 Save
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Also show static details in the print version (inside ticket-info for print capture) -->
+                    <?php if ($has_details): ?>
+                    <div class="ticket-details-print" style="display:none;">
+                        <p><strong>👤 Traveler Name:</strong> <?= htmlspecialchars($ticket['passenger_name']) ?></p>
+                        <p><strong>🎂 Age:</strong> <?= htmlspecialchars($ticket['passenger_age']) ?> years</p>
+                        <p><strong>🆔 ID/Passport:</strong> <?= htmlspecialchars($ticket['passenger_id_number']) ?></p>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- COLUMN 3: Action buttons -->
+                    <div class="no-print" style="display:flex; flex-direction:column; gap:10px; align-self:center;">
+                        <button onclick="printTicket(<?= $ticket['booking_id'] ?>)" class="action-btn" style="background:#9a4d9a; color:white;">🖨️ Print</button>
+                        <a href="user_cancel_ticket.php?booking_id=<?= $ticket['booking_id'] ?>" class="action-btn" style="background:#f59e0b; color:white;" onclick="return confirm('Cancel this ticket?')">❌ Cancel</a>
+                    </div>
+
                 </div>                                               <!-- [88] </div> ends card. -->
             <?php endwhile; ?>                                       <!-- [89] endwhile (end loop). -->
         <?php else: ?>                                               <!-- [90] else (no data). -->

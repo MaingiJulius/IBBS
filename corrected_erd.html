@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBBS Corrected ERD</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .erd-container {
+            position: relative;
+            width: 1100px;
+            height: 850px;
+            background: #ffffff;
+        }
+
+        /* SVG overlay for connectors */
+        .connector-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Table Card Styling */
+        .table-card {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            font-size: 13px;
+            width: 250px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            color: #ffffff;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        /* Color variations matching the screenshot */
+        .theme-blue {
+            border: 2px solid #337ab7;
+        }
+        .theme-blue .table-header {
+            background-color: #337ab7;
+        }
+
+        .theme-dark-grey {
+            border: 2px solid #4a4a4a;
+        }
+        .theme-dark-grey .table-header {
+            background-color: #4a4a4a;
+        }
+
+        .theme-muted-blue {
+            border: 2px solid #5c82a6;
+        }
+        .theme-muted-blue .table-header {
+            background-color: #5c82a6;
+        }
+
+        .theme-teal {
+            border: 2px solid #31708f;
+        }
+        .theme-teal .table-header {
+            background-color: #31708f;
+        }
+
+        /* Table Row Styling */
+        .table-rows {
+            padding: 4px 0;
+        }
+
+        .row {
+            display: flex;
+            padding: 4px 12px;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .row:last-child {
+            border-bottom: none;
+        }
+
+        .col-key {
+            width: 35px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .col-name {
+            flex-grow: 1;
+            color: #2c3e50;
+        }
+
+        .col-type {
+            color: #7f8c8d;
+            font-size: 11px;
+            text-align: right;
+        }
+
+        /* Positions of the tables on our 1100x850 canvas */
+        #card-users { top: 30px; left: 50px; }
+        #card-drivers { top: 30px; left: 425px; }
+        #card-buses { top: 30px; left: 800px; }
+        
+        #card-bookings { top: 250px; left: 425px; width: 260px; }
+        #card-routes { top: 320px; left: 800px; }
+        
+        #card-logs { top: 520px; left: 50px; }
+        #card-feedback { top: 550px; left: 425px; }
+
+        /* Marker & Line styles */
+        path {
+            fill: none;
+            stroke: #333333;
+            stroke-width: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="erd-container">
+        <!-- SVG Connections -->
+        <svg class="connector-svg">
+            <defs>
+                <!-- Crow's foot and relation markers -->
+                <!-- Zero-to-many (o{) or One-to-many (|{) style markers -->
+                <marker id="many" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                    <path d="M 0 2 L 10 5 L 0 8 M 10 5 L 0 5" stroke="#333" stroke-width="1.5" fill="none"/>
+                </marker>
+                <marker id="one" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+                    <line x1="5" y1="0" x2="5" y2="10" stroke="#333" stroke-width="1.5" />
+                    <line x1="8" y1="0" x2="8" y2="10" stroke="#333" stroke-width="1.5" />
+                </marker>
+                <marker id="one-start" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                    <line x1="5" y1="0" x2="5" y2="10" stroke="#333" stroke-width="1.5" />
+                </marker>
+            </defs>
+
+            <!-- 1. DRIVERS ||--o{ BUSES -->
+            <!-- Drivers right to Buses left -->
+            <path d="M 675 80 L 800 80" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 2. USERS ||--o{ LOGS -->
+            <!-- Users bottom to Logs top -->
+            <path d="M 175 285 L 175 520" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 3. USERS ||--o{ BOOKINGS -->
+            <!-- Users right to Bookings left -->
+            <path d="M 300 150 L 370 150 L 370 350 L 425 350" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 4. USERS ||--o{ FEEDBACK -->
+            <!-- Users right, down to Feedback left -->
+            <path d="M 300 200 L 350 200 L 350 630 L 425 630" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 5. BUSES ||--o{ ROUTES -->
+            <!-- Buses bottom to Routes top -->
+            <path d="M 925 240 L 925 320" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 6. BUSES ||--o{ BOOKINGS -->
+            <!-- Buses bottom, left to Bookings right -->
+            <path d="M 850 240 L 850 290 L 685 290" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 7. ROUTES ||--o{ BOOKINGS -->
+            <!-- Routes left to Bookings right -->
+            <path d="M 800 400 L 730 400 L 730 380 L 685 380" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 8. ROUTES ||--o{ FEEDBACK -->
+            <!-- Routes bottom to Feedback right -->
+            <path d="M 925 500 L 925 660 L 675 660" marker-start="url(#one-start)" marker-end="url(#many)" />
+
+            <!-- 9. BUSES ||--o{ FEEDBACK -->
+            <!-- Buses bottom-left to Feedback right -->
+            <path d="M 950 240 L 970 240 L 970 610 L 675 610" marker-start="url(#one-start)" marker-end="url(#many)" />
+        </svg>
+
+        <!-- USERS -->
+        <div class="table-card theme-blue" id="card-users">
+            <div class="table-header">users</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">user_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">first_name</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">last_name</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">email</span>
+                    <span class="col-type">[Unique]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">phone_number</span>
+                    <span class="col-type">[Unique]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">password</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">role</span>
+                    <span class="col-type">[Enum]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRIVERS -->
+        <div class="table-card theme-dark-grey" id="card-drivers">
+            <div class="table-header">drivers</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">driver_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">national_id</span>
+                    <span class="col-type">[Unique]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">full_name</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">phone</span>
+                    <span class="col-type">[Unique]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">email</span>
+                    <span class="col-type">[Unique]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSES -->
+        <div class="table-card theme-muted-blue" id="card-buses">
+            <div class="table-header">buses</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">bus_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">reg_no</span>
+                    <span class="col-type">[Unique]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">bus_name</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">max_passengers</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">seat_layout</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">driver_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOOKINGS -->
+        <div class="table-card theme-teal" id="card-bookings">
+            <div class="table-header">bookings</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">booking_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">booking_time</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">seat_number</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">booking_status</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">qr_token</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">user_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">route_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">bus_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">passenger_name</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">passenger_age</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">passenger_id_number</span>
+                    <span class="col-type"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROUTES -->
+        <div class="table-card theme-muted-blue" id="card-routes">
+            <div class="table-header">routes</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">route_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">from_location</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">to_location</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">departure_date</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">departure_time</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">cost</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">bus_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEEDBACK -->
+        <div class="table-card theme-dark-grey" id="card-feedback">
+            <div class="table-header">feedback</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">feedback_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">rating</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">comments</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">feedback_date</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">user_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">bus_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">route_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGS -->
+        <div class="table-card theme-blue" id="card-logs">
+            <div class="table-header">logs</div>
+            <div class="table-rows">
+                <div class="row">
+                    <span class="col-key">PK</span>
+                    <span class="col-name">log_id</span>
+                    <span class="col-type">[PK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key">FK</span>
+                    <span class="col-name">user_id</span>
+                    <span class="col-type">[FK]</span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">type</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">description</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">name</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">time</span>
+                    <span class="col-type"></span>
+                </div>
+                <div class="row">
+                    <span class="col-key"></span>
+                    <span class="col-name">date</span>
+                    <span class="col-type"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

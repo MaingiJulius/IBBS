@@ -49,9 +49,9 @@ $search_id = isset($_GET['search_id']) ? $_GET['search_id'] : '';
 // [ 'search_id' ] ) (bracket). ? (question mark) ternary if (short check). 
 // : (colon) ternary else (fallback). '' (empty quote). ; (semicolon).
 
-$ticket = null;
-// $ (dollar sign) variable. ticket label. = (equals sign) assignment. null 
-// (n u l l) is a special value meaning "empty" or "not found yet". ; (semicolon).
+$tickets = [];
+// $ (dollar sign) variable. tickets label. = (equals sign) assignment. [] 
+// initializes an empty array to hold passenger bookings. ; (semicolon).
 
 $error = '';
 // $ (dollar sign) variable. error label. = (equals sign) assignment. '' 
@@ -168,18 +168,32 @@ if ($search_id) {
     // ( (opening bracket) $ (dollar sign) stmt_s (handle) ) (closing bracket). 
     // ; (semicolon).
 
-    $ticket = mysqli_fetch_assoc($res_s);
-    // $ (dollar sign) variable. ticket (ticket) label. = (equals sign). 
+    $tickets = [];
+    // $ (dollar sign) variable. tickets (tickets) label. = (equals sign). 
+    // [ ] (empty brackets) initializes an empty list container. ; (semicolon).
+
+    while ($row = mysqli_fetch_assoc($res_s)) {
+    // while (while) starts a loop that runs as long as rows are found. ( (bracket) 
+    // $ (dollar sign) row (row) label. = (equals sign) assignment. 
     // mysqli_fetch_assoc (fetch associative) converts results into a labeled 
-    // list. ( (opening bracket) $ (dollar sign) res_s (container) ) (closing 
-    // bracket). ; (semicolon).
+    // list. ( (bracket) $ (dollar sign) res_s (container) ) (bracket) ) (bracket). 
+    // { starts the loop block.
+
+        $tickets[] = $row;
+        // $ (dollar sign) tickets (tickets) variable. [ ] (empty brackets) 
+        // appends the current row to the list. = (equals sign). $ (dollar sign) 
+        // row (row). ; (semicolon).
+    }
+    // } ends the loop block.
 
     mysqli_stmt_close($stmt_s);
     // mysqli_stmt_close releases server resources. ( (opening bracket) 
     // $ (dollar sign) stmt_s (handle) ) (closing bracket). ; (semicolon).
 
-    if (!$ticket) { $error = "No booking found."; }
-    // if (if) check for empty result. ( ! (not) $ticket ) { assign error message }.
+    if (empty($tickets)) { $error = "No booking found."; }
+    // if (if) checks if the tickets list is empty. ( (bracket) empty (empty) tool. 
+    // ( (bracket) $ (dollar sign) tickets ) (bracket) ) (bracket). { starts. 
+    // $ (dollar sign) error = (equals) "No booking found.". } ends.
 }
 // } (closing curly bracket) ends the search logic.
 ?>
@@ -252,8 +266,12 @@ if ($search_id) {
         </form>
         <!-- < (less than) / (slash) form (form) > closes the search container. -->
 
-        <?php if ($ticket): ?>
-        <!-- [php] if (if). ( (bracket) $ (dollar sign) ticket (data found) ) (bracket) : (then). -->
+        <?php if (!empty($tickets)): ?>
+        <!-- [php] if (if). ( (bracket) ! (not) empty (empty) tool. ( (bracket) 
+             $ (dollar sign) tickets ) (bracket) ) (bracket) : (then). -->
+            <?php foreach ($tickets as $ticket): ?>
+            <!-- [php] foreach (for each) loops through the list. ( (bracket) 
+                 $ (dollar sign) tickets as $ (dollar sign) ticket ) (bracket) : (then). -->
             <div class="result-card">
             <!-- < (less than) div (div) class (class) = (equals) "result-card" (box) >. -->
                 <h3 style="margin-top:0; color:var(--purple);"><?= htmlspecialchars($ticket['first_name'] . ' ' . $ticket['last_name']) ?></h3>
@@ -292,6 +310,8 @@ if ($search_id) {
                 <!-- [php] endif (end check). -->
             </div>
             <!-- < (less than) / (slash) div (div) > ends result card. -->
+            <?php endforeach; ?>
+            <!-- [php] endforeach ends the loop. -->
         <?php endif; ?>
         <!-- [php] endif (end check). -->
     </div>

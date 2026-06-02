@@ -136,6 +136,103 @@ if (isset($_GET['delete_user'])) {
 }
 // } (closing curly bracket) ends the deletion block.
 
+if (isset($_GET['reset_password'])) {
+// if (if) starts a logic check to determine if a password reset request has been 
+// transmitted through the URL. ( (opening bracket) starts the condition. 
+// isset (is set) is a built-in tool that verifies if a variable exists. ( (bracket) 
+// $ (dollar sign) is the variable prefix. _ (underscore) connects to the 
+// array name. GET (G E T) is a Superglobal Array used by the server to 
+// collect data sent via the URL query string. [ (opening square bracket) 
+// starts the index pointer. 'reset_password' (quote r e s e t underscore 
+// p a s s w o r d quote) is the specific key attached to the reset link. ] 
+// (closing square bracket) ends the pointer. ) (bracket) ends the isset tool. 
+// ) (closing bracket) ends the if condition. { (opening curly bracket) marks 
+// the beginning of the password reset processing logic.
+
+    $uid = $_GET['reset_password'];
+    // $ (dollar sign) variable marker. uid (u i d) is the logical label chosen 
+    // to represent the User Identification number targeted for password reset. 
+    // = (equals sign) is the assignment operator. $ (dollar sign) _ (underscore) 
+    // GET [ 'reset_password' ] retrieves the ID from the URL. ; (semicolon) 
+    // terminates the instruction.
+
+    $sql_get = "SELECT first_name FROM users WHERE user_id = ?";
+    // $ (dollar sign) variable marker. sql_get (s q l underscore g e t) is a 
+    // logical identifier chosen to describe the query to fetch user information. 
+    // = (equals sign) assignment operator. "SELECT first_name FROM..." (quote) 
+    // starts the SQL command. ? (question mark) is a security placeholder. ; (semicolon).
+
+    $stmt_get = mysqli_prepare($conn, $sql_get);
+    // $ (dollar sign) variable marker. stmt_get (s t m t underscore g e t) is 
+    // the statement handle. = (equals sign) assignment. mysqli_prepare (prepare) 
+    // pre-compiles the query. ( starts the function. $conn , $sql_get ) ends. ; (semicolon).
+
+    mysqli_stmt_bind_param($stmt_get, "i", $uid);
+    // mysqli_stmt_bind_param binds the targeted user ID as an integer. 
+    // ; (semicolon) terminates the instruction.
+
+    mysqli_stmt_execute($stmt_get);
+    // mysqli_stmt_execute executes the fetch query. ; (semicolon).
+
+    $res_get = mysqli_stmt_get_result($stmt_get);
+    // mysqli_stmt_get_result retrieves the result set. ; (semicolon).
+
+    if ($row_get = mysqli_fetch_assoc($res_get)) {
+    // if (if) check to see if the user was found. ( $row_get = mysqli_fetch_assoc ) 
+    // starts. { (opening curly bracket) starts block.
+
+        $first_name = $row_get['first_name'];
+        // $ (dollar sign) variable marker. first_name (f i r s t underscore n a m e) 
+        // retrieves the user's first name. = (equals sign) assignment. ; (semicolon).
+
+        $plain_pass = ucfirst($first_name) . "123";
+        // $ (dollar sign) variable marker. plain_pass (p l a i n underscore p a s s) 
+        // formats password to Firstname123. ucfirst (upper case first) capitalizes the first letter. 
+        // . (dot) is the concatenation operator. "123" is appended. ; (semicolon).
+
+        $hashed_pass = password_hash($plain_pass, PASSWORD_DEFAULT);
+        // $ (dollar sign) variable. hashed_pass label. = (equals sign) assignment. 
+        // password_hash hashes the plain password using standard bcrypt. ; (semicolon).
+
+        $sql_reset = "UPDATE users SET password = ? WHERE user_id = ?";
+        // $ (dollar sign) variable. sql_reset label. = (equals sign) assignment. 
+        // "UPDATE users SET password..." starts the update command. ; (semicolon).
+
+        $stmt_reset = mysqli_prepare($conn, $sql_reset);
+        // $ (dollar sign) variable. stmt_reset label. = (equals sign) assignment. 
+        // mysqli_prepare pre-compiles the update statement. ; (semicolon).
+
+        mysqli_stmt_bind_param($stmt_reset, "si", $hashed_pass, $uid);
+        // mysqli_stmt_bind_param binds the new hashed password and the user ID. ; (semicolon).
+
+        mysqli_stmt_execute($stmt_reset);
+        // mysqli_stmt_execute executes the update statement. ; (semicolon).
+
+        logActivity($_SESSION['user_id'], $_SESSION['name'], 'PASSWORD_RESET', "Reset password for user ID $uid to " . $plain_pass);
+        // logActivity records this security event in the logs. ; (semicolon).
+
+        mysqli_stmt_close($stmt_reset);
+        // mysqli_stmt_close closes the update statement handle. ; (semicolon).
+
+        header("Location: view_users_sorted.php?msg=Password reset to " . htmlspecialchars($plain_pass) . " successfully.");
+        // header redirection back to list with success message. ; (semicolon).
+
+    } else {
+    // } else block. { starts block.
+
+        header("Location: view_users_sorted.php?err=User not found.");
+        // header redirection with error message. ; (semicolon).
+    }
+    // } ends check.
+
+    mysqli_stmt_close($stmt_get);
+    // mysqli_stmt_close closes the fetch statement handle. ; (semicolon).
+
+    exit();
+    // exit stops further execution. ; (semicolon).
+}
+// } ends the reset password block.
+
 if (isset($_POST['add_user'])) {
 // if (if) starts a logic check to determine if the user creation form has been 
 // submitted. ( (opening bracket) starts the condition. isset (is set) is a 
@@ -792,6 +889,13 @@ if (isset($_POST['update_user'])) {
                                      class (style) = "action-btn (standard look) btn-delete (red color)" 
                                      onclick (on click event) = "return confirm (ask a question) ( 'Delete user?' )" 
                                      > (greater than sign) Delete (label) < / (slash) a > (ends link). -->
+
+                                <a href="?reset_password=<?= $uid ?>" class="action-btn btn-reset" style="background-color: var(--purple);" onclick="return confirm('Reset password for this user?')">Reset</a>
+                                <!-- < (less than sign) a (anchor link) href (destination) = "?reset_password = [echo] $uid" (sends ID to URL) 
+                                     class (style) = "action-btn (standard look) btn-reset (purple color)" 
+                                     style (visual layout) = "background-color: var(--purple);" (forces background color to brand purple) 
+                                     onclick (on click event) = "return confirm (ask a question) ( 'Reset password for this user?' )" 
+                                     > (greater than sign) Reset (label) < / (slash) a > (ends link). -->
 
                             </div>
                             <!-- < / (slash) div > ends main button box. -->

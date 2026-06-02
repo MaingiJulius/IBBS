@@ -73,76 +73,51 @@ if (isset($_GET['delete_booking'])) {
     <link rel="stylesheet" href="css/style.css">
 
     <script>
-        // [Extreme Audit-Ready Documentation]
-        function printTicket(id, name, from, to, date, time, bus, seat) {
-// function (function keyword) starts the definition. printTicket (p r i n t T i c k e t) 
-// is the logical label for the printing task. ( (opening bracket) starts the input 
-// list. id (booking reference) , (comma) name (passenger) , (comma) from (origin) 
-// , (comma) to (destination) , (comma) date (travel day) , (comma) time (hour) 
-// , (comma) bus (vehicle) , (comma) seat (assignment) ) (closing bracket) 
-// { (opening curly bracket) marks the start of the instructions.
-
-            const printWin = window.open('', '', 'height=600,width=800');
-// const (constant). printWin (variable name). = (assignment). window (browser) 
-// . (dot) open (open tool). ( (bracket) '' (empty URL) , '' (no name) , 
-// 'height=600,width=800' (window size) ) (bracket). ; (semicolon).
-
-            printWin.document.write('<html><head><title>Ticket Printout</title>');
-// printWin.document.write (write). ( '<html>...' ) ; This pours the header 
-// code into the new window.
-
-            printWin.document.write('<style>.no-print { display: none !important; } body { font-family: sans-serif; }</style>');
-// printWin.document.write (write). ( '<style>...' ) ; This adds the visual rules.
-
-            printWin.document.write('</head><body>');
-// printWin.document.write (write). ( '</head><body>' ) ; Closes head, starts body.
-
-            printWin.document.write('<div style="padding:40px; border:5px solid #9a4d9a; border-radius:15px; max-width:600px; margin:20px auto;">');
-// printWin.document.write (write). ( '<div style="..."' ) ; Creates a purple 
-// bordered box to act as the physical ticket frame.
-
-            printWin.document.write('<h1 style="color:#9a4d9a; text-align:center;">WEMA TRAVELLERS</h1>');
-// printWin.document.write (write). ( '<h1 style="..."' ) ; Adds the company branding.
-
-            printWin.document.write('<h2 style="text-align:center; border-bottom:2px solid #eee; padding-bottom:10px;">OFFICIAL TRAVEL TICKET</h2>');
-// printWin.document.write (write). ( '<h2 style="..."' ) ; Adds the document title.
-
-            printWin.document.write('<p><strong>Booking Ref:</strong> #' + id + '</p>');
-// printWin.document.write (write). ( '<p>... #' + id + '</p>' ) ; Displays the ID.
-
-            printWin.document.write('<p><strong>Passenger:</strong> ' + name + '</p>');
-// printWin.document.write (write). ( '<p>... ' + name + '</p>' ) ; Displays the name.
-
-            printWin.document.write('<p><strong>Route:</strong> ' + from + ' &rarr; ' + to + '</p>');
-// printWin.document.write (write). ( '<p>... ' + from + ' &rarr; ' + to + '</p>' ) ; 
-// Displays the travel path using the HTML arrow symbol (&rarr;).
-
-            printWin.document.write('<p><strong>Departure:</strong> ' + date + ' at ' + time + '</p>');
-// printWin.document.write (write). ( '<p>... ' + date + ' at ' + time + '</p>' ) ; 
-// Displays the schedule.
-
-            printWin.document.write('<p><strong>Vehicle:</strong> ' + bus + ' | <strong>Seat:</strong> ' + seat + '</p>');
-// printWin.document.write (write). ( '<p>... ' + bus + ' | ... ' + seat + '</p>' ) ; 
-// Displays the logistics info.
-
-            printWin.document.write('<div style="margin-top:30px; text-align:center; font-size:0.8em; color:#666;">Please arrive 30 mins before departure. Valid ID required.</div>');
-// printWin.document.write (write). ( '<div style="..."' ) ; Adds the legal disclaimer.
-
-            printWin.document.write('</div>');
-// printWin.document.write (write). ( '</div>' ) ; Closes the ticket box.
-
-            printWin.document.write('<script>window.onload = function() { window.print(); window.close(); };<\/script>');
-// printWin.document.write (write). ( '<script>...' ) ; Adds the automated 
-// print-and-close behavior.
-
-            printWin.document.write('</body></html>');
-// printWin.document.write (write). ( '</body></html>' ) ; Finalizes the HTML structure.
-
-            printWin.document.close();
-// printWin.document.close (close) ; This signals to the browser that the data 
-// stream is complete and the page is ready to render.
+        // Validates the inline passenger details form before submission
+        function validateDetails(bookingId) {
+            var name = document.getElementById('pname-' + bookingId).value.trim();
+            var age  = document.getElementById('page-'  + bookingId).value.trim();
+            var pid  = document.getElementById('ppid-'  + bookingId).value.trim();
+            if (name === '') { alert('Passenger Name is required'); return false; }
+            if (age === '' || isNaN(age) || parseInt(age) <= 0) { alert('Valid Age is required'); return false; }
+            if (pid === '') { alert('ID/Passport Number is required'); return false; }
+            return true;
         }
-// } (closing curly bracket) ends the function block.
+
+        // Prints a full boarding pass including the 3 traveler details
+        function printTicket(id, name, from, to, date, time, bus, seat, age, pid) {
+            const printWin = window.open('', '', 'height=700,width=850');
+            printWin.document.write('<html><head><title>Wema Travellers - Boarding Pass</title>');
+            printWin.document.write('<style>');
+            printWin.document.write('body{font-family:Arial,sans-serif;background:#f9f6ff;display:flex;justify-content:center;padding:30px;}');
+            printWin.document.write('.wrapper{border:4px solid #8e44ad;border-radius:16px;max-width:620px;width:100%;background:white;overflow:hidden;}');
+            printWin.document.write('.t-header{background:#8e44ad;color:white;padding:20px 30px;text-align:center;}');
+            printWin.document.write('.t-header h1{margin:0;font-size:1.8rem;letter-spacing:2px;}');
+            printWin.document.write('.t-header p{margin:4px 0 0;font-size:0.85rem;opacity:0.85;}');
+            printWin.document.write('.t-body{padding:25px 30px;}');
+            printWin.document.write('.t-body p{margin:8px 0;font-size:0.95rem;color:#2d3748;}');
+            printWin.document.write('hr{border:0;border-top:2px dashed #e2d9f3;margin:15px 0;}');
+            printWin.document.write('.t-footer{background:#f3f0fa;padding:12px 30px;font-size:0.78rem;color:#718096;text-align:center;border-top:1px solid #e2d9f3;}');
+            printWin.document.write('</style>');
+            printWin.document.write('</head><body>');
+            printWin.document.write('<div class="wrapper">');
+            printWin.document.write('<div class="t-header"><h1>&#x1F6A6; WEMA TRAVELLERS</h1><p>OFFICIAL BOARDING PASS</p></div>');
+            printWin.document.write('<div class="t-body">');
+            printWin.document.write('<p><strong>Booking Ref:</strong> #' + id + '</p>');
+            printWin.document.write('<p><strong>Route:</strong> ' + from + ' &rarr; ' + to + '</p>');
+            printWin.document.write('<p><strong>Departure:</strong> ' + date + ' at ' + time + '</p>');
+            printWin.document.write('<p><strong>Vehicle:</strong> ' + bus + ' &nbsp;|&nbsp; <strong>Seat:</strong> ' + seat + '</p>');
+            printWin.document.write('<hr>');
+            printWin.document.write('<p><strong>&#x1F464; Traveler Name:</strong> ' + name + '</p>');
+            printWin.document.write('<p><strong>&#x1F382; Traveler Age:</strong> ' + age + ' years</p>');
+            printWin.document.write('<p><strong>&#x1F194; ID/Passport No:</strong> ' + pid + '</p>');
+            printWin.document.write('</div>');
+            printWin.document.write('<div class="t-footer">Please arrive 30 mins before departure &bull; Valid Government-Issued ID Required &bull; Non-Transferable</div>');
+            printWin.document.write('</div>');
+            printWin.document.write('<scr'+'ipt>window.onload=function(){window.print();window.close();};<\/scr'+'ipt>');
+            printWin.document.write('</body></html>');
+            printWin.document.close();
+        }
     </script>
 </head>
 
@@ -158,16 +133,20 @@ if (isset($_GET['delete_booking'])) {
         <table class="crud-table">
             <thead>
                 <tr>
-                    <th>Ref ID</th><th>Date</th><th>Passenger</th><th>Route</th><th>Seat</th><th>Status</th><th>Actions</th>
+                    <th>Ref ID</th><th>Date</th><th>Passenger (Account)</th><th>Route</th><th>Seat</th><th>Traveler Details</th><th>Status</th><th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
-                $sql_list = "SELECT b.*, u.first_name, u.last_name, r.from_location, r.to_location, r.departure_date, r.departure_time, bs.bus_name 
-                             FROM bookings b 
-                             JOIN users u ON b.user_id = u.user_id 
-                             JOIN routes r ON b.route_id = r.route_id 
-                             JOIN buses bs ON b.bus_id = bs.bus_id
+                $sql_list = "SELECT b.booking_id, b.booking_time, b.seat_number, b.booking_status,
+                                    b.passenger_name, b.passenger_age, b.passenger_id_number,
+                                    u.first_name, u.last_name,
+                                    r.from_location, r.to_location, r.departure_date, r.departure_time,
+                                    bs.bus_name
+                             FROM bookings b
+                             JOIN users u  ON b.user_id  = u.user_id
+                             JOIN routes r ON b.route_id = r.route_id
+                             JOIN buses bs ON b.bus_id   = bs.bus_id
                              ORDER BY b.booking_id DESC";
                 $res_list = mysqli_query($conn, $sql_list);
                 /* $res_list (result list) = (assignment). 
@@ -185,27 +164,71 @@ if (isset($_GET['delete_booking'])) {
                     <td><?= $row['booking_id'] ?></td>
                     <td><?= $row['booking_time'] ?></td>
                     <td>
-                        <strong><?= htmlspecialchars($row['passenger_name']) ?></strong>
-                        <!-- html (HyperText) special (special) chars (characters) is a security tool 
-                             that encodes text for safety. ( starts the tool. $row (row data) 
-                             ['passenger_name'] (specific label) ) ends. -->
+                        <strong><?= htmlspecialchars($row['passenger_name'] ?: '—') ?></strong>
                         <div style="font-size:0.8em; color:grey;">By: <?= htmlspecialchars($row['first_name'].' '.$row['last_name']) ?></div>
-                        <!-- htmlspecialchars (security tool) ( $row ['first_name'] . ' ' . $row ['last_name'] ) -->
                     </td>
-                    <td><?= htmlspecialchars($row['from_location'].' to '.$row['to_location']) ?></td>
-                    <!-- htmlspecialchars (security tool) ( $row ['from_location'] . ' to ' . $row ['to_location'] ) -->
+                    <td><?= htmlspecialchars($row['from_location'].' → '.$row['to_location']) ?></td>
                     <td><?= $row['seat_number'] ?></td>
+
+                    <!-- TRAVELER DETAILS CELL: shows update form if incomplete, static text if complete -->
+                    <td>
+                        <?php
+                        $has_all = !empty($row['passenger_name'])
+                                && !empty($row['passenger_id_number'])
+                                && !empty($row['passenger_age'])
+                                && intval($row['passenger_age']) > 0;
+                        ?>
+                        <?php if ($has_all): ?>
+                            <!-- All 3 details saved — show static text only, no button -->
+                            <div style="font-size:0.85rem; line-height:1.7;">
+                                <div>👤 <strong><?= htmlspecialchars($row['passenger_name']) ?></strong></div>
+                                <div>🎂 Age: <?= htmlspecialchars($row['passenger_age']) ?></div>
+                                <div>🆔 <?= htmlspecialchars($row['passenger_id_number']) ?></div>
+                            </div>
+                        <?php else: ?>
+                            <!-- Missing details — show compact inline update form -->
+                            <form action="op_update_passenger_details.php" method="POST"
+                                  onsubmit="return validateDetails(<?= $row['booking_id'] ?>)"
+                                  style="display:flex; flex-direction:column; gap:5px; min-width:170px;">
+                                <input type="hidden" name="booking_id"   value="<?= $row['booking_id'] ?>">
+                                <input type="hidden" name="redirect_to"  value="view_admin_bookings.php">
+                                <input type="text"   name="passenger_name"       id="pname-<?= $row['booking_id'] ?>"
+                                       value="<?= htmlspecialchars($row['passenger_name']) ?>"
+                                       placeholder="Full Name"
+                                       style="padding:4px 7px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.82rem;">
+                                <div style="display:flex; gap:5px;">
+                                    <input type="number" name="passenger_age"    id="page-<?= $row['booking_id'] ?>"
+                                           value="<?= $row['passenger_age'] > 0 ? $row['passenger_age'] : '' ?>"
+                                           placeholder="Age" min="1"
+                                           style="padding:4px 6px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.82rem; width:60px;">
+                                    <input type="text"   name="passenger_id_number" id="ppid-<?= $row['booking_id'] ?>"
+                                           value="<?= htmlspecialchars($row['passenger_id_number']) ?>"
+                                           placeholder="ID/Passport"
+                                           style="padding:4px 7px; border:1px solid #cbd5e0; border-radius:4px; font-size:0.82rem; flex:1;">
+                                </div>
+                                <button type="submit"
+                                        style="background:#48bb78; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer; font-weight:bold; font-size:0.82rem; align-self:flex-start;">
+                                    💾 Save
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
+
                     <td><span style="color:<?= ($row['booking_status']=='CANCELLED'?'red':'green') ?>; font-weight:bold;"><?= $row['booking_status'] ?></span></td>
                     <td>
                         <?php if($row['booking_status'] != 'CANCELLED'): ?>
-                            <button onclick="printTicket('<?= $row['booking_id'] ?>', '<?= addslashes(htmlspecialchars($row['passenger_name'])) ?>', '<?= addslashes(htmlspecialchars($row['from_location'])) ?>', '<?= addslashes(htmlspecialchars($row['to_location'])) ?>', '<?= $row['departure_date'] ?>', '<?= $row['departure_time'] ?>', '<?= addslashes(htmlspecialchars($row['bus_name'])) ?>', '<?= $row['seat_number'] ?>')" class="action-btn btn-print">PRINT</button>
-<!-- [new] < (less than) button (button element) onclick (on click event) = (equals) 
-     "printTicket( ... )" (the function call) > (greater than) PRINT (label) 
-     < (less than) / (slash) button (button) > (greater than). 
-     This button triggers the virtual ticket generator. We pass the row data 
-     (id, name, locations, times, bus, seat) as arguments so the printer 
-     knows exactly what to display on the physical paper. -->
-
+                            <button onclick="printTicket(
+                                '<?= $row['booking_id'] ?>',
+                                '<?= addslashes(htmlspecialchars($row['passenger_name'])) ?>',
+                                '<?= addslashes(htmlspecialchars($row['from_location'])) ?>',
+                                '<?= addslashes(htmlspecialchars($row['to_location'])) ?>',
+                                '<?= $row['departure_date'] ?>',
+                                '<?= $row['departure_time'] ?>',
+                                '<?= addslashes(htmlspecialchars($row['bus_name'])) ?>',
+                                '<?= $row['seat_number'] ?>',
+                                '<?= $row['passenger_age'] ?>',
+                                '<?= addslashes(htmlspecialchars($row['passenger_id_number'])) ?>'
+                            )" class="action-btn btn-print">PRINT</button>
                             <a href="?cancel_booking=<?= $row['booking_id'] ?>" class="action-btn btn-cancel" onclick="return confirm('Cancel this?')">CANCEL</a>
                         <?php endif; ?>
                         <a href="?delete_booking=<?= $row['booking_id'] ?>" class="action-btn btn-delete" onclick="return confirm('Delete permanently?')">DELETE</a>

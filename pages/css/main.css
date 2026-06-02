@@ -673,3 +673,6 @@ a:hover {
 
 .btn-cancel { background-color: #718096; }
 /* Grey color for cancel buttons. */
+
+.btn-reset { background-color: #9a4d9a; }
+/* Purple color for password reset buttons. */
