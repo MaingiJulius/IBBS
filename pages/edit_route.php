@@ -29,14 +29,8 @@ if (!$route) {                                                       // [49] Che
     die("Route not found in our records.");                          // [50] Terminate if the provided ID doesn't exist in the table.
 }
 ?>
-<!DOCTYPE html>                                                         <!-- [53] Define the document type as standard HTML5. -->
-<html lang="en">                                                     <!-- [54] Root element defining the content language as English. -->
-<head>                                                               <!-- [55] Head section containing non-visible document metadata. -->
-    <meta charset="UTF-8">                                           <!-- [56] Declare UTF-8 character encoding for global data support. -->
-    <title>Edit Route</title>                                        <!-- [57] Website title displayed in the browser tab. -->
     <link rel="stylesheet" href="css/style.css">
     <style>
-    </style>                                                         <!-- [125] Terminate internal CSS block. -->
 </head>
 <body class="<?= strtolower($_SESSION['role'] ?? 'admin') ?>-role">
 <script src="js/header2.js"></script>
@@ -48,27 +42,14 @@ if (!$route) {                                                       // [49] Che
             <label>From Location</label>
             <input type="text" name="from_location" id="from_location" value="<?= htmlspecialchars($route['from_location']) ?>" onmouseout="validateFrom()">
         </div>
-        <div class="form-group">                                     <!-- [136] Group container for the 'Destination' input. -->
-            <label>To Location</label>                               <!-- [137] Textual label identifying the arrival city field. -->
-            <input type="text" name="to_location" id="to_location" value="<?= htmlspecialchars($route['to_location']) ?>" onmouseout="validateTo()"> <!-- [138] Text input pre-filled with existing arrival data (XSS protected). -->
         </div>
-        <div class="form-group">                                     <!-- [140] Group container for the 'Departure Date' input. -->
             <label>Departure Date</label>
-            <input type="text" name="departure_date" id="departure_date" value="<?= $route['departure_date'] ?>" placeholder="YYYY-MM-DD" onmouseout="validateDate()"> <!-- [142] Date input. -->
         </div>
-        <div class="form-group">                                     <!-- [144] Group container for the 'Departure Time' input. -->
-            <label>Departure Time</label>                            <!-- [145] Textual label for the clock-time scheduling field. -->
-            <input type="text" name="departure_time" id="departure_time" value="<?= $route['departure_time'] ?>" placeholder="HH:MM" onmouseout="validateTime()"> <!-- [146] Time input. -->
         </div>
         <div class="form-group">
-            <label>Cost</label>                                      <!-- [149] Textual label for the pricing adjustment field. -->
-            <input type="text" name="cost" id="cost" value="<?= $route['cost'] ?>" onmouseout="validateCost()"> <!-- [150] Text input for fare value to avoid browser validation. -->
         </div>
         <div class="form-group">
-            <label>Bus ID</label>                                    <!-- [153] Textual label for the vehicle association field. -->
-            <input type="text" name="bus_id" id="bus_id" value="<?= $route['bus_id'] ?>" onmouseout="validateBusId()"> <!-- [154] Text input for the specific vehicle ID. -->
         </div>
-        <button type="submit" name="edit_route" class="btn-submit">Update Route</button> <!-- [156] Finalize submission button to trigger the POST action. -->
     </form>
     <script>
         function validateFrom() {
@@ -141,4 +122,3 @@ if (!$route) {                                                       // [49] Che
 </div>
 <script src="js/footer.js"></script>
 </body>
-</html>                                                              <!-- [162] Terminate the HTML document. -->

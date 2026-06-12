@@ -5,12 +5,8 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {
     die("Access Denied: High-Level Personnel Performance Data. Administrator Authorization Required for Audit.");
 }
 ?>
-<!DOCTYPE html>                                                         <!-- [17] Define standard HTML5 document type for modern browsers. -->
 <html lang="en">
 <head>
-    <meta charset="UTF-8">                                           <!-- [20] Declare UTF-8 for international character support. -->
-    <title>Agent Productivity Report - Wema Travellers</title>          <!-- [21] Website title. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- [22] Responsive scaling for mobile device compatibility. -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -25,7 +21,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {
         <h2 class="no-print" style="color: var(--purple); margin-bottom: 5px;">📈 Agent Productivity Leaderboard</h2>
         <p class="no-print" style="color: #718096; margin-bottom: 30px;">Auditing ticket sales volume and gross fiscal contribution per staff member.</p>
         <table class="crud-table">
-            <thead><tr><th>Staff Identity (Agent)</th><th>Sales Volume (Tickets)</th><th>Fiscal Contribution (KES)</th></tr></thead> <!-- [43] Head. -->
             <tbody>
                 <?php
                 $sql = "SELECT u.first_name, u.last_name, COUNT(b.booking_id) as total_bookings, SUM(r.cost) as total_sales FROM users u JOIN bookings b ON u.user_id = b.user_id JOIN routes r ON b.route_id = r.route_id WHERE u.role = 'AGENT' GROUP BY u.user_id ORDER BY total_sales DESC";

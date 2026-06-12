@@ -5,11 +5,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {
     die("Access Denied: Highly Sensitive Financial Data. Administrator Authorization Required.");
 }
 ?>
-<!DOCTYPE html>                                                         <!-- [17] Define the document type as standard HTML5. -->
-<html lang="en">                                                     <!-- [18] Root element defining English as the content language. -->
-<head>                                                               <!-- [19] Metadata and resource head section. -->
-    <meta charset="UTF-8">                                           <!-- [20] Declare UTF-8 encoding for currency and textual symbols. -->
-    <title>Financial Report: System Revenue - Wema Travellers</title>     <!-- [21] Website title for the browser tab. -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,17 +12,14 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] != 'ADMIN') {
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
     <div class="back-btn-container no-print">
-        <a href="dashboard.php" class="button regular-button" style="text-decoration:none; background-color: var(--purple); color: white; border-radius: 50px; padding: 12px 30px;">← Return to Main Hub</a> <!-- [43] link. -->
     </div>
     <div class="view-container">
         <h2 class="no-print" style="color: var(--purple); margin-bottom: 5px;">💰 Revenue Insights & Performance</h2>
-             on paper printouts. -->
         <p class="no-print" style="color: #718096; margin-bottom: 30px;">Analyzing gross earnings across all active bus routes based on finalized bookings.</p>
         <div class="no-print">
             <button onclick="window.print()" class="button regular-button pink-background" style="margin-bottom: 20px;">🖨️ Print Financial Statement</button>
         </div>
         <table class="crud-table">
-            <thead>                                                      <!-- [49] Data label row. -->
                 <tr><th>Route ID</th><th>Travel Segment</th><th>Schedule Date</th><th>Occupancy (Seats)</th><th>Gross Earnings (KES)</th></tr>
             </thead>
             <tbody>

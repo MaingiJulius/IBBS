@@ -1,34 +1,15 @@
-<!DOCTYPE html> <!-- Declares this as an HTML5 document. -->
-<html lang="en"> <!-- Root element for the HTML page, using English as the base language. -->
-<head> <!-- Metadata section for scripts, styles, and page titles. -->
-  <meta charset="UTF-8"> <!-- Uses standard UTF-8 encoding for text characters. -->
-  <title>Feedback - Wema Transport Company</title> <!-- The page title shown in the browser tab. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css"> <!-- Links the global theme variables and common styles. -->
   <link rel="stylesheet" href="Feedback.css">
 </head>
 <body>
   <div id="navbar-placeholder"></div>
-  <div class="container"> <!-- Main content wrapper for centered formatting. -->
-    <div class="text"> <!-- Heading text container. -->
       Dear esteemed customer, kindly rate us
     </div>
     <div class="post">
-      <div class="text">Thanks for rating us!</div> <!-- Success message. -->
       <div class="edit">EDIT</div>
     </div>
     <div class="star-widget">
       <div class="stars-container">
-        <input type="radio" name="rating" id="rate-5" value="5"> <!-- Radio for 5 stars. -->
-        <label for="rate-5">★</label> <!-- Visual star symbol for 5/5. -->
-        <input type="radio" name="rating" id="rate-4" value="4"> <!-- Radio for 4 stars. -->
-        <label for="rate-4">★</label> <!-- Visual star symbol for 4/5. -->
-        <input type="radio" name="rating" id="rate-3" value="3"> <!-- Radio for 3 stars. -->
-        <label for="rate-3">★</label> <!-- Visual star symbol for 3/5. -->
-        <input type="radio" name="rating" id="rate-2" value="2"> <!-- Radio for 2 stars. -->
-        <label for="rate-2">★</label> <!-- Visual star symbol for 2/5. -->
-        <input type="radio" name="rating" id="rate-1" value="1"> <!-- Radio for 1 star. -->
-        <label for="rate-1">★</label> <!-- Visual star symbol for 1/5. -->
       </div>
       <form action="feedback.php" id="feedbackForm" method="post" onsubmit="return validateForm()">
         <header></header>
@@ -48,12 +29,10 @@
   <script src="js/header.js"></script>
   <script src="js/footer.js"></script>
   <script>
-<!-- Selected UI elements -->
     const btn = document.querySelector("button");
     const post = document.querySelector(".post");
     const widget = document.querySelector(".star-widget");
     const editBtn = document.querySelector(".edit");
-<!-- Function to validate the Rating selection -->
     function validateRating() {
       const ratingInputs = document.querySelectorAll('input[name="rating"]');
       let ratingValue = "";
@@ -69,7 +48,6 @@
       document.getElementById('rating-value').value = ratingValue; 
       return true;
     }
-<!-- Function to validate that a Bus ID is entered and is numeric -->
     function validateBusId() {
       const busId = document.getElementById("bus_id").value.trim();
       if (busId === "" || isNaN(busId)) {
@@ -79,7 +57,6 @@
       }
       return true;
     }
-<!-- Function to validate the comment text -->
     function validateComment() {
       const comment = document.getElementById("comment").value.trim();
       if (comment.length < 5) {
@@ -89,13 +66,10 @@
       }
       return true;
     }
-<!-- Main validation caller for form submission -->
     function validateForm() {
-<!-- Run all validations sequentially -->
       if (!validateRating()) return false;
       if (!validateBusId()) return false;
       if (!validateComment()) return false;
-<!-- Successful validation: Update UI to show 'Thank you' -->
       widget.style.display = "none";
       post.style.display = "block";
       editBtn.onclick = () => {

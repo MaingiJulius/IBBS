@@ -14,7 +14,6 @@ $passengers=mysqli_query($conn,$sql_p) or die(mysqli_error($conn));
 ?>
 <!DOCTYPE html>
 (greater than sign) is the standard declaration that tells the web browser
-this is a modern HTML5 document. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">

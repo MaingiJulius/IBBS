@@ -6,15 +6,12 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
 }
 ?>
 <!DOCTYPE html>
-> (greater than sign) is the standard declaration for a modern web page. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Business Intel - Wema Travellers</title>
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
     <style>
         .container { width: 90%; max-width: 1000px; margin: 50px auto; text-align: center; }
         .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 40px; }

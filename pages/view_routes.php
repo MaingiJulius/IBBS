@@ -167,28 +167,19 @@ if (isset($_POST['update_route'])) {
                     return td.innerText || td.textContent || "";
                 }
             </script>
-// Search Bar
             <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
                 <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
                     🔍 Search By:
                 </span>
                 <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
                     <option value="all">All Fields</option>
-// option for general scanning.
                     <option value="0">Ref ID</option>
-// option for Ref ID search.
                     <option value="1">From</option>
-// option for From location search.
                     <option value="2">To</option>
-// option for To location search.
                     <option value="3">Date</option>
-// option for Date search.
                     <option value="4">Time</option>
-// option for Time search.
                     <option value="5">Fleet</option>
-// option for Fleet search.
                     <option value="6">Cost</option>
-// option for Cost search.
                 </select>
                 <input type="text" id="search-input" placeholder="Type to filter routes..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
             </div>
@@ -213,27 +204,22 @@ if (isset($_POST['update_route'])) {
                         <form method="POST">
                             <input type="hidden" name="route_id" value="<?= $rid ?>">
                             <td style="font-weight: bold;"><?= $rid ?></td>
-// From
                             <td>
                                 <span class="view-route-<?= $rid ?>"><?= htmlspecialchars($row['from_location']) ?></span>
                                 <input type="text" name="from_location" value="<?= htmlspecialchars($row['from_location']) ?>" class="edit-route-<?= $rid ?> table-input" style="display:none;">
                             </td>
-// To
                             <td>
                                 <span class="view-route-<?= $rid ?>"><?= htmlspecialchars($row['to_location']) ?></span>
                                 <input type="text" name="to_location" value="<?= htmlspecialchars($row['to_location']) ?>" class="edit-route-<?= $rid ?> table-input" style="display:none;">
                             </td>
-// Date
                             <td>
                                 <span class="view-route-<?= $rid ?>"><?= $row['departure_date'] ?></span>
                                 <input type="text" name="departure_date" value="<?= $row['departure_date'] ?>" class="edit-route-<?= $rid ?> table-input" style="display:none; width: 100px;">
                             </td>
-// Time
                             <td>
                                 <span class="view-route-<?= $rid ?>"><?= $row['departure_time'] ?></span>
                                 <input type="text" name="departure_time" value="<?= $row['departure_time'] ?>" class="edit-route-<?= $rid ?> table-input" style="display:none; width: 70px;">
                             </td>
-// Fleet
                             <td>
                                 <span class="view-route-<?= $rid ?>"><?= htmlspecialchars($row['bus_name']) ?></span>
                                 <select name="bus_id" class="edit-route-<?= $rid ?> table-input" style="display:none;">
@@ -242,13 +228,11 @@ if (isset($_POST['update_route'])) {
                                     <?php endforeach; ?>
                                 </select>
                             </td>
-// Cost
                             <td>
                                 <span class="view-route-<?= $rid ?>"><?= $row['cost'] ?></span>
                                 <span class="edit-route-<?= $rid ?>" style="display:none;"><input type="text" name="cost" value="<?= $row['cost'] ?>" class="table-input" style="width: 80px;"> KES</span>
                             </td>
                             <td style="white-space: nowrap;">
-// Main Operations
                                  <div id="route-ops-main-<?= $rid ?>">
                                      <button type="button" class="action-btn btn-update" onclick="toggleRouteEdit(<?= $rid ?>)">Update</button>
                                      <a href="?delete_route=<?= $rid ?>" class="action-btn btn-delete" onclick="return confirm('Delete this route?')">Delete</a>

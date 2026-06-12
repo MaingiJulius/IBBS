@@ -38,34 +38,26 @@ if (isset($_GET['remove_driver'])) {
 }
 ?>
 <!DOCTYPE html>
-> (greater than sign) is the standard declaration for a modern web page. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Manage Drivers - Wema Travellers</title>
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
 </head>
 <body class="<?= strtolower($_SESSION['role']) ?>-role">
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
     <div class="container" style="margin: 0 auto;">
-    > (greater than sign) is the main page wrapper. -->
         <div class="view-container">
-        "view-container" > (greater than sign) is the white content box. -->
             <h2 style="color: var(--purple);">Staff Registry</h2>
-            is the main title of the module. -->
             <div style="background: #fdfdfd; padding: 20px; border: 1px solid #eee; margin-bottom: 30px;">
                 <h3>New Staff Registration</h3>
                 <form method="POST" onsubmit="return validateForm()">
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                         <div style="flex:1;"><label>Full Name</label><input type="text" name="full_name" id="full_name" class="input"></div>
                         <div style="flex:1;"><label>ID Number</label><input type="text" name="national_id" id="national_id" class="input"></div>
-// input field for the national identification number.
                         <div style="flex:1;"><label>Phone</label><input type="text" name="phone" id="phone" class="input"></div>
-// input field for the contact telephone number.
                         <div style="flex:1;"><label>Email</label><input type="text" name="email" id="email" class="input"></div>
                     </div>
                     <button type="submit" name="add_driver" class="button pink-background" style="margin-top: 15px;">Register Staff</button>
@@ -139,27 +131,18 @@ if (isset($_GET['remove_driver'])) {
                     return td.innerText || td.textContent || "";
                 }
             </script>
-// Search Bar
             <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
                 <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
-// < span > sets text styles.
                     🔍 Search By:
                 </span>
                 <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
                     <option value="all">All Fields</option>
-// option for searching all cells.
                     <option value="0">ID</option>
-// option for ID search.
                     <option value="1">Full Name</option>
-// option for Full Name search.
                     <option value="2">ID Number</option>
-// option for ID Number search.
                     <option value="3">Phone</option>
-// option for Phone search.
                     <option value="4">Email</option>
-// option for Email search.
                     <option value="5">Vehicle</option>
-// option for Vehicle search.
                 </select>
                 <input type="text" id="search-input" placeholder="Type to filter drivers..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
             </div>

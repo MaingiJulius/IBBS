@@ -6,16 +6,13 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
 }
 ?>
 <!DOCTYPE html>
-> (greater than sign) is the standard declaration for a modern web page. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Master Control Panel - Wema Travellers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f7f9fc; margin: 0; padding: 0; }
         .container { width: 90%; max-width: 1200px; margin: 30px auto; padding: 20px; }
@@ -27,7 +24,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'ADMIN') {
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
     <div class="container">
-    > (greater than sign) is the main page wrapper. -->
         <div class="welcome-banner">
             <h1>Administrative Operations</h1>
             <p>Authorized access granted to: <strong><?= htmlspecialchars($_SESSION['name']) ?></strong></p>

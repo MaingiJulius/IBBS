@@ -14,9 +14,7 @@ $result = mysqli_query($conn, $sql);
     <meta charset="UTF-8">
     <title>System Audit Logs - Wema Travellers</title>
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
     <style>
         .logs-container { max-width: 1200px; margin: 30px auto; padding: 25px; background: white; border-radius: 12px; }
         .logs-table { width: 100%; border-collapse: collapse; }
@@ -29,7 +27,6 @@ $result = mysqli_query($conn, $sql);
     <div style="height: 100px;"></div>
     <div class="logs-container">
         <h2 style="color: var(--purple);">📜 System Audit Trail</h2>
-        "color: var(--purple);" > (greater than sign) title with purple color. -->
         <table class="logs-table">
             <thead>
                 <tr>
@@ -45,7 +42,6 @@ $result = mysqli_query($conn, $sql);
                             <td><?= $row['type'] ?></td>
                             <td><?= htmlspecialchars($row['description']) ?></td>
                             <td><?= $row['time'] ?></td>
-// cell for the specific clock time of the action.
                             <td><?= $row['date'] ?></td>
                         </tr>
                     <?php endwhile; ?>
@@ -54,7 +50,6 @@ $result = mysqli_query($conn, $sql);
         </table>
     </div>
     <div style="height: 100px;"></div>
-// bottom spacer element.
     <script src="js/footer.js"></script>
 </body>
 </html>

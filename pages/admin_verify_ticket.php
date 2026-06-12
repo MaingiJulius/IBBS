@@ -11,7 +11,7 @@ $error = '';
 $success_msg = '';
 if (isset($_POST['confirm_boarding'])) {
     $bid = $_POST['booking_id'];
-    $sql_upd = "UPDATE bookings SET booking_status = 'CHECKED_IN' WHERE booking_id = ?";
+    $sql_upd = "UPDATE bookings SET booking_status = 'CHECKED_IN' WHERE booking_id = $bid";
     if (mysqli_query($conn,$sql_upd)) {
         $success_msg = "Boarding Authorized.";
     }
@@ -22,8 +22,8 @@ if ($search_id) {
             JOIN routes r ON b.route_id = r.route_id
             JOIN buses bs ON b.bus_id = bs.bus_id
             JOIN users u ON b.user_id = u.user_id
-            WHERE b.passenger_id_number = ?";
-    $res_s = mysqli_stmt_get_result($stmt_s);
+            WHERE b.passenger_id_number = '$search_id'";
+    $res_s = mysqli_query($conn, $sql_s);
     $tickets = [];
     while ($row = mysqli_fetch_assoc($res_s)) {
         $tickets[] = $row;
@@ -81,7 +81,6 @@ if ($search_id) {
         <?php endif; ?>
     </div>
     <div style="height: 100px;"></div>
-// Spacer at bottom.
     <script src="js/footer.js"></script>
 </body>
 </html>

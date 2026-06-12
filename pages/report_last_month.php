@@ -72,4 +72,3 @@ $total_revenue = 0;
 </body>
 </html>
 <?php mysqli_close($conn); ?>
-re. -->nt. -->

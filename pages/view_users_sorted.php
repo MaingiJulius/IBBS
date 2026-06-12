@@ -177,30 +177,20 @@ if (isset($_POST['update_user'])) {
                 <button type="submit" name="add_user" class="action-btn btn-update">Save New User</button>
             </form>
         </div>
-// Search Bar
         <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
             <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
                 🔍 Search By:
             </span>
             <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
-// [129d] <select> dropdown specifies target field selection choice box.
                 <option value="all">All Fields</option>
-// [129d1] option for general scanning.
                 <option value="0">ID</option>
-// [129d2] option for ID search.
                 <option value="1">First Name</option>
-// [129d3] option for First Name search.
                 <option value="2">Last Name</option>
-// [129d4] option for Last Name search.
                 <option value="3">Email</option>
-// [129d5] option for Email search.
                 <option value="4">Phone</option>
-// [129d6] option for Phone search.
                 <option value="5">Role</option>
-// [129d7] option for Role search.
             </select>
             <input type="text" id="search-input" placeholder="Type to filter users..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">
-// [129f] <input> text box with onkeyup trigger runs local filterTable script on typing.
         </div>
         <table class="crud-table">
             <thead>
@@ -225,27 +215,22 @@ if (isset($_POST['update_user'])) {
                     <form method="POST" onsubmit="return validateInline(<?= $uid ?>)">
                         <input type="hidden" name="user_id" value="<?= $uid ?>">
                         <td><?= $uid ?></td>
-// First Name Cell
                         <td>
                             <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['first_name']) ?></span>
                             <input type="text" name="first_name" id="f-<?= $uid ?>" value="<?= htmlspecialchars($row['first_name']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
                         </td>
-// Last Name Cell
                         <td>
                             <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['last_name']) ?></span>
                             <input type="text" name="last_name" id="l-<?= $uid ?>" value="<?= htmlspecialchars($row['last_name']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
                         </td>
-// Email Cell
                         <td>
                             <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['email']) ?></span>
                             <input type="email" name="email" id="e-<?= $uid ?>" value="<?= htmlspecialchars($row['email']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
                         </td>
-// Phone Cell
                         <td>
                             <span class="view-<?= $uid ?>"><?= htmlspecialchars($row['phone_number']) ?></span>
                             <input type="text" name="phone_number" value="<?= htmlspecialchars($row['phone_number']) ?>" class="edit-<?= $uid ?> input-inline" style="display:none;">
                         </td>
-// Role Cell
                         <td>
                             <span class="view-<?= $uid ?>"><?= $row['role'] ?></span>
                             <select name="role" class="edit-<?= $uid ?> input-inline" style="display:none;">
@@ -254,9 +239,7 @@ if (isset($_POST['update_user'])) {
                                 <option value="ADMIN" <?= $row['role']=='ADMIN'?'selected':'' ?>>ADMIN</option>
                             </select>
                         </td>
-// Actions Cell
                         <td>
-// Default Action Buttons
                             <div id="btn-main-<?= $uid ?>">
                                 <button type="button" class="action-btn btn-update" onclick="toggleEdit(<?= $uid ?>)">Update</button>
                                 <a href="?delete_user=<?= $uid ?>" class="action-btn btn-delete" onclick="return confirm('Delete user?')">Delete</a>

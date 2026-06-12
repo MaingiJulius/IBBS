@@ -1,21 +1,12 @@
 <!DOCTYPE html>
-(greater than sign) is the mandatory declaration that tells the web browser
-this is a modern HTML5 document. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    (view port) content (content) = (equals sign) "width=device-width,
-    initial-scale=1.0" (standard responsive design setting) (greater than sign). -->
     <title>Wema Travellers - Login</title>
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" (style sheet) href (hypertext reference) = (equals sign)
-    "css/main.css" (the path to the global design rules) (greater than sign). -->
     <link rel="stylesheet" href="css/entry-page.css">
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" (style sheet) href (hypertext reference) = (equals sign)
-    "css/style.css" (the path to the branding style overrides)
-    (greater than sign). -->
 </head>
 <body>
     <script src="js/header1.js"></script>
@@ -26,11 +17,6 @@ this is a modern HTML5 document. -->
             <form class="form" id="loginForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
                 <label for="email" class="label">Email</label>
                 <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();">
-                "text" (standard text entry) name (name) = (equals sign) "email"
-                (the key used by the PHP engine to find the data) id (unique ID)
-                = (equals sign) "email" class (class) = (equals sign) "input"
-                onmouseout (on mouse out) = (equals sign) "validateEmail();"
-                (triggers a check when the mouse leaves) (greater than sign). -->
                 <label for="password" class="label">Password</label>
                 <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();">
                 <button type="submit" name="login" class="button regular-button pink-background cta-btn">Log in</button>
@@ -38,22 +24,10 @@ this is a modern HTML5 document. -->
             <script>
                 function validateEmail() {
                     var email = document.getElementById("email").value;
-                    is the container label. = (equals sign) assignment operator.
-                    document (the web page) . (dot) getElementById (find the
-                    element by its unique ID) ( (bracket) "email" (the ID) )
-                    (bracket) . (dot) value (the text typed by the user).
                     if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
-                    (number of characters) == (is equal to) 0 (zero) ||
-                    (double pipe) is the logical OR operator. email . indexOf
-                    (find character position) ( (bracket) "@" (quote at quote)
-                    ) (bracket) == (is equal to) -1 (minus one means not found).
-                    || (or). email . indexOf ( (bracket) "." (quote dot quote)
-                    ) (bracket) == -1 (not found). ) (bracket) ends the check.
                         alert("You must enter a valid email address");
-                        pop-up message. ( (bracket) "You must..." (quote) )
                         document.getElementById("email").focus();
                         return false;
-                        is the logic signal meaning "Failed" or "No".
                     }
                     return true;
                 }
@@ -64,22 +38,17 @@ this is a modern HTML5 document. -->
                         document.getElementById("password").focus();
                         return false;
                     }
-<!-- } ends error. -->
                     return true;
                 }
-<!-- } ends function. -->
                 function validateForm() {
                     var rtned = validateEmail();
-                    result. = (assign). validateEmail ( ) (calls the first
                     if (rtned == true) {
                         rtned = validatePassword();
                     }
-<!-- } ends if. -->
                     return rtned;
                 }
-<!-- } ends function. -->
             </script>
-            <p class="sign-up-prompt">Don’t have an account? <a href="./signup.html" class="sign-up-link">Sign up</a></p>
+            <p class="sign-up-prompt">Don't have an account? <a href="./signup.html" class="sign-up-link">Sign up</a></p>
         </div>
         <div class="right-column"></div>
     </div>

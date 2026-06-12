@@ -35,14 +35,10 @@ if (isset($_POST['update_user'])) {
     } else { $err = "Critical Database Failure: " . $conn->error; }
 }
 ?>
-<!DOCTYPE html>                                                         <!-- [49] Define standard HTML5 document type for modern browsers. -->
 <html lang="en">
 <head>
-    <meta charset="UTF-8">                                           <!-- [52] Declare UTF-8 for international character support. -->
-    <title>Edit User - Wema Travellers</title>                          <!-- [53] Browser tab title identifier. -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/style.css">
-    </style>                                                         <!-- [61] Terminate internal CSS block. -->
 </head>
 <body class="<?= strtolower($_SESSION['role']) ?>-role">
     <script src="js/header2.js"></script>
@@ -53,15 +49,12 @@ if (isset($_POST['update_user'])) {
         <form method="POST" id="editUserForm" onsubmit="return validateForm()">
             <div class="form-group"><label>First Name</label><input type="text" name="first_name" id="first_name" value="<?= htmlspecialchars($user['first_name']) ?>" onmouseout="validateFirstName()"></div>
             <div class="form-group"><label>Last Name</label><input type="text" name="last_name" id="last_name" value="<?= htmlspecialchars($user['last_name']) ?>" onmouseout="validateLastName()"></div>
-            <div class="form-group"><label>Email Address</label><input type="text" name="email" id="email" value="<?= htmlspecialchars($user['email']) ?>" onmouseout="validateEmail()"></div> <!-- [72] Pre-filled email. -->
-            <div class="form-group"><label>Phone Number</label><input type="text" name="phone_number" id="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>" onmouseout="validatePhoneNumber()"></div> <!-- [73] Pre-filled phone. -->
             <div class="form-group"><label>Role</label><select name="role" id="role" onmouseout="validateRole()">
                 <option value="PASSENGER" <?= ($user['role'] == 'PASSENGER') ? 'selected' : '' ?>>PASSENGER</option>
                 <option value="AGENT" <?= ($user['role'] == 'AGENT') ? 'selected' : '' ?>>AGENT</option>
                 <option value="ADMIN" <?= ($user['role'] == 'ADMIN') ? 'selected' : '' ?>>ADMIN</option>
             </select></div>
             <div class="form-group"><label>New Password (Leave blank to keep current)</label><input type="password" name="password" id="password" placeholder="Enter new password only if changing" onmouseout="validatePassword()"></div>
-            <div style="display: flex; gap: 10px;"><button type="submit" name="update_user" class="button regular-button pink-background" style="flex: 1;">Update User</button><a href="view_users_sorted.php" class="button regular-button" style="background: #999; text-decoration: none; text-align: center;">Cancel</a></div> <!-- [80] Action controls. -->
         </form>
         <script>
             function validateFirstName() {

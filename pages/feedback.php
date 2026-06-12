@@ -45,14 +45,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-// Basic Meta Data
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rate Your Experience - Wema Travellers</title>
-    <link rel="stylesheet" href="css/style.css"> <!-- General project styles -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="Feedback.css">
-// Typography
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
@@ -85,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="rate-1" title="Hate it">★</label>
                 </div>
                 <div id="rating-label"></div>
-// SUBMISSION FORM
                 <form action="feedback.php" method="post" id="feedback-form" onsubmit="return validateForm()">
                     <input type="hidden" name="rating" id="rating-value" value="">
                     <div class="dropdown-container">
@@ -102,7 +98,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="textarea">
                         <textarea name="comment" id="comment" id="comment" placeholder="Describe your experience..." onmouseout="validateComment()"></textarea>
                     </div>
-// SUBMIT ACTION
                     <div class="btn">
                         <button type="submit">POST</button>
                     </div>

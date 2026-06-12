@@ -1,28 +1,20 @@
-   ENTRY PAGE STYLES is the module title. * (asterisk) / (forward slash) closes. */
 .row {
     display: flex;
-       places form and image side-by-side. */
     flex: 1;
     margin: 0 !important;
-       ensures the content touches the screen edges. */
     overflow: hidden;
-       (semicolon) prevents accidental scrollbars. */
 }
 .height-full {
     height: 100%;
 }
 .left-column {
-   { starts the style block. */
     flex: 1;
     padding: 40px;
-       from edges. */
     display: flex;
     flex-direction: column;
     align-items: center;
-       horizontally) ; (semicolon). */
     background-color: var(--body-bg);
     overflow-y: auto;
-       (semicolon). */
 }
 .welcoming-title {
     font-size: 2rem;
@@ -33,7 +25,6 @@
 .form {
     width: 100%;
     max-width: 400px;
-       prevents stretching on wide screens. */
 }
 .sign-up-prompt,
 .login-prompt {
@@ -45,23 +36,17 @@
     color: var(--text-color);
     font-weight: bold;
     text-decoration: underline;
-       (semicolon). */
 }
 .right-column {
-   { starts the style block. */
     flex: 1;
     background-image: url("../img/wema_bus_sunset.png");
-       ; (semicolon) loads the branding image. */
     background-size: cover;
     background-position: center;
     border-left: 5px solid white;
-       creates a divider line. */
     display: none;
-       hidden on small mobile devices by default. */
 }
 @media (min-width: 768px) {
     .right-column {
         display: block;
-           reveals the branding image on tablets and desktops. */
     }
 }

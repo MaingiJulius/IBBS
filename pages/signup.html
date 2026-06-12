@@ -1,21 +1,12 @@
 <!DOCTYPE html>
-(greater than sign) is the mandatory declaration that tells the web browser
-this is a modern HTML5 document. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    (view port) content (content) = (equals sign) "width=device-width,
-    initial-scale=1.0" (standard responsive design setting) (greater than sign). -->
     <title>Wema Travellers - Sign up</title>
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" (style sheet) href (hypertext reference) = (equals sign)
-    "css/main.css" (the path to the global design rules) (greater than sign). -->
     <link rel="stylesheet" href="css/entry-page.css">
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" (style sheet) href (hypertext reference) = (equals sign)
-    "css/style.css" (the path to the branding style overrides)
-    (greater than sign). -->
 </head>
 <body>
     <script src="js/header1.js"></script>
@@ -26,23 +17,12 @@ this is a modern HTML5 document. -->
             <form class="form" id="signupForm" action="account2.php" method="POST" autocomplete="off" onsubmit="return validateForm()">
                 <label for="first_name" class="label">First Name</label>
                 <input type="text" name="first_name" id="first_name" class="input" onmouseout="validateFirstName();">
-                "text" (standard text entry) name (name) = (equals sign)
-                "first_name" (the key used by the PHP engine to find the data)
-                id (unique ID) = (equals sign) "first_name" class (class)
-                = (equals sign) "input" onmouseout (on mouse out) = (equals
-                sign) "validateFirstName();" (triggers a check when the mouse
-                leaves) (greater than sign). -->
                 <label for="last_name" class="label">Last Name</label>
-                (visible text). -->
                 <input type="text" name="last_name" id="last_name" class="input" onmouseout="validateLastName();">
-                = (equals sign) "text" (entry box for the family name). -->
                 <label for="email" class="label">Email</label>
-                (visible text). -->
                 <input type="text" name="email" id="email" class="input" onmouseout="validateEmail();">
                 <label for="phone_number" class="label">Phone Number</label>
-                (visible text). -->
                 <input type="text" name="phone_number" id="phone_number" class="input" placeholder="e.g. 0712345678" onmouseout="validatePhoneNumber();">
-                (ghost text) = (equals sign) "e.g. 0712345678" (hint). -->
                 <label for="password" class="label">Password</label>
                 <input type="password" name="password" id="password" class="input" onmouseout="validatePassword();">
                 <p style="font-size: 0.85rem; color: gray; margin-bottom: 1rem;">Min 8 characters required.</p>
@@ -56,10 +36,8 @@ this is a modern HTML5 document. -->
                         document.getElementById("first_name").focus();
                         return false;
                     }
-<!-- } ends error. -->
                     return true;
                 }
-<!-- } ends function. -->
                 function validateLastName() {
                     var lname = document.getElementById("last_name").value.trim();
                     if (lname == "") {
@@ -67,10 +45,8 @@ this is a modern HTML5 document. -->
                         document.getElementById("last_name").focus();
                         return false;
                     }
-<!-- } ends if. -->
                     return true;
                 }
-<!-- } ends function. -->
                 function validateEmail() {
                     var email = document.getElementById("email").value;
                     if (email.length == 0 || email.indexOf("@") == -1 || email.indexOf(".") == -1) {
@@ -78,10 +54,8 @@ this is a modern HTML5 document. -->
                         document.getElementById("email").focus();
                         return false;
                     }
-<!-- } ends if. -->
                     return true;
                 }
-<!-- } ends function. -->
                 function validatePhoneNumber() {
                     var phone = document.getElementById("phone_number").value.trim();
                     if (phone.length < 9 || isNaN(phone)) {
@@ -89,10 +63,8 @@ this is a modern HTML5 document. -->
                         document.getElementById("phone_number").focus();
                         return false;
                     }
-<!-- } ends if. -->
                     return true;
                 }
-<!-- } ends function. -->
                 function validatePassword() {
                     var password = document.getElementById("password").value;
                     if (password.length < 8) {
@@ -100,10 +72,8 @@ this is a modern HTML5 document. -->
                         document.getElementById("password").focus();
                         return false;
                     }
-<!-- } ends if. -->
                     return true;
                 }
-<!-- } ends function. -->
                 function validateForm() {
                     var ok = validateFirstName();
                     if (ok == true) ok = validateLastName();
@@ -112,7 +82,6 @@ this is a modern HTML5 document. -->
                     if (ok == true) ok = validatePassword();
                     return ok;
                 }
-<!-- } ends function. -->
             </script>
             <p class="login-prompt">Already have an account? <a href="./login.html" class="log-in-link">Log in</a></p>
         </div>

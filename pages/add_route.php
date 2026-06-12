@@ -18,13 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_route'])) {
 }
 ?>
 <!DOCTYPE html>
-> (greater than sign) standard modern web document definition. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Add New Route - Wema Travellers</title>
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; background-color: #f9f9f9; }
         .container { width: 90%; margin: 50px auto; max-width: 800px; }
@@ -43,7 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_route'])) {
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
     <div class="container">
-    > (greater than sign) is the main page wrapper. -->
         <h2>Register New Trip Route</h2>
         <form method="POST" id="addRouteForm" onsubmit="return validateForm()">
             <div class="form-group">
@@ -53,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_route'])) {
             <div class="form-group">
                 <label>To (Destination City)</label>
                 <input type="text" name="to_location" id="to_location" placeholder="e.g. Kampala, Uganda" onmouseout="validateTo()">
-                trigger. -->
             </div>
             <div class="form-group">
                 <label>Departure Date</label>
@@ -62,12 +58,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_route'])) {
             <div class="form-group">
                 <label>Departure Time</label>
                 <input type="text" name="departure_time" id="departure_time" placeholder="HH:MM" onmouseout="validateTime()">
-// input field for the time. HH:MM is the 24-hour clock format.
             </div>
             <div class="form-group">
                 <label>Ticket Cost (KSH)</label>
                 <input type="text" name="cost" id="cost" placeholder="99.99" onmouseout="validateCost()">
-                decimal validation. -->
             </div>
             <div class="form-group">
                 <label>Assign Bus (System ID)</label>

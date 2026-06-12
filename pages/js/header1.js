@@ -11,5 +11,4 @@ document.addEventListener('DOMContentLoaded', function () {
       </div>
     `;
   document.body.insertAdjacentHTML('afterbegin', header);
-});
-// }             .. Closes the anonymous function body.
+});

@@ -131,23 +131,16 @@ if (isset($_GET['remove_bus'])) {
                     return td.innerText || td.textContent || "";
                 }
             </script>
-// Search Bar
             <div class="search-container no-print" style="margin-bottom: 20px; display: flex; gap: 15px; align-items: center; background: rgba(255, 255, 255, 0.9); padding: 15px 20px; border-radius: 25px; border: 2px solid var(--button-border); box-shadow: 3px 3px 0px rgba(0,0,0,1);">
                 <span style="font-weight: bold; color: var(--text-color); font-size: 1.1rem; display: flex; align-items: center; gap: 5px;">
                     🔍 Search By:
                 </span>
                 <select id="search-column" style="padding: 10px 15px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-weight: bold; outline: none; cursor: pointer;">
-// [96d] <select> dropdown specifies target search column field selection.
                     <option value="all">All Fields</option>
-// [96d1] option for general scanning.
                     <option value="0">ID</option>
-// [96d2] option for ID search.
                     <option value="1">Name</option>
-// [96d3] option for Name search.
                     <option value="2">Plate</option>
-// [96d4] option for Plate search.
                     <option value="3">Capacity</option>
-// [96d5] option for Capacity search.
                     <option value="4">Driver</option>
                 </select>
                 <input type="text" id="search-input" placeholder="Type to filter fleet..." onkeyup="filterTable()" style="flex: 1; padding: 10px 20px; border-radius: 20px; border: 2px solid var(--button-border); background-color: var(--input-bg); color: var(--text-color); font-size: 1rem; outline: none;">

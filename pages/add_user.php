@@ -18,13 +18,11 @@ if (isset($_POST['add_user'])) {
 }
 ?>
 <!DOCTYPE html>
-> (greater than sign) standard modern web document definition. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Manually Add User - Wema Travellers</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    to fit on mobile screens. -->
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f7f7f7; margin: 0; padding: 0; }
         .container { max-width: 400px; margin: 80px auto; padding: 30px; background-color: white; box-shadow: 0px 5px 15px rgba(0,0,0,0.1); border-radius: 10px; }
@@ -40,7 +38,6 @@ if (isset($_POST['add_user'])) {
 <script src="js/header2.js"></script>
 <div style="height: 100px;"></div>
 <div class="container">
-> (greater than sign) is the centered form wrapper. -->
     <h2>Add New User (Admin)</h2>
     <form method="POST" id="addUserForm" onsubmit="return validateForm()">
         <input type="text" name="first_name" id="first_name" placeholder="First Name" onmouseout="validateFirstName()">

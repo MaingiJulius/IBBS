@@ -16,15 +16,12 @@ $sql_t .= " ORDER BY r.departure_date ASC";
 $res_t = mysqli_query($conn, $sql_t);
 ?>
 <!DOCTYPE html>
-> (greater than sign) is the standard declaration for a modern web page. -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Passenger Manifests - IBBS</title>
     <link rel="stylesheet" href="css/main.css">
-    "stylesheet" href (reference) = (equals sign) "css/main.css" > (greater than sign). -->
     <link rel="stylesheet" href="css/style.css">
-    "stylesheet" href (reference) = (equals sign) "css/style.css" > (greater than sign). -->
     <style>
         .manifest-container { max-width: 1200px; margin: 30px auto; }
         .filter-section { background: white; padding: 20px; border-radius: 10px; display: flex; gap: 10px; align-items: flex-end; }
@@ -39,7 +36,6 @@ $res_t = mysqli_query($conn, $sql_t);
         <h2 style="color: var(--purple);">📋 Passenger Manifests</h2>
         <form class="filter-section" method="GET">
             <select name="country" class="input">
-             a dropdown menu for country selection. -->
                 <option value="">All Countries</option>
                 <?php while($c = mysqli_fetch_assoc($res_c)): ?>
                     <option value="<?= $c['country'] ?>" <?= $filter_country == $c['country'] ? 'selected' : '' ?>><?= $c['country'] ?></option>

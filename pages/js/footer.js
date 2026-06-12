@@ -5,5 +5,4 @@ document.addEventListener('DOMContentLoaded', function () {
       </div>
     `;
   document.body.insertAdjacentHTML('beforeend', footer);
-});
-// method call statement.
+});
