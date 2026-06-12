@@ -36,12 +36,13 @@ $user_id = $_SESSION['user_id'];
             </thead>
             <tbody>
                 <?php
+                $user_id_val = intval($user_id);
                 $sql = "SELECT b.*, r.from_location, r.to_location, r.cost, r.departure_date, bs.bus_name, u.first_name, u.last_name
                         FROM bookings b
                         JOIN routes r ON b.route_id = r.route_id
                         JOIN buses bs ON b.bus_id = bs.bus_id
                         JOIN users u ON b.user_id = u.user_id
-                        WHERE b.user_id = ?
+                        WHERE b.user_id = $user_id_val
                         ORDER BY b.booking_time DESC";
                 $result = mysqli_query($conn, $sql);
                 if (mysqli_num_rows($result) > 0) {

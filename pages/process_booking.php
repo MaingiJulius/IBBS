@@ -39,16 +39,16 @@ try {
         if (mysqli_num_rows($res_check) > 0) {
             throw new Exception("Collision Error: Seat $seat_id was just reserved by another customer.");
         }
-        $qr_token = NULL;
+        $qr_token = bin2hex(random_bytes(16));
         $sql_insert = "INSERT INTO bookings (user_id, route_id, bus_id, seat_number, passenger_name, passenger_age, passenger_id_number, booking_status, qr_token, booking_time) VALUES ($target_user_id, $route_id, $bus_id, '$seat_id', '$p_name', $p_age, '$p_doc', '$booking_status', '$qr_token', NOW())";
         if (!mysqli_query($conn, $sql_insert)) {
             throw new Exception("Persistence Error: Failed to record booking for seat " . $seat_id);
         }
     }
-    /* --- [9] FINALIZATION --- */                                   // [69] Marker for committing the entire data cluster to disk.
+    /* --- [9] FINALIZATION --- */
     $conn->commit();
     ob_get_clean();
-    echo json_encode(['success' => true, 'message' => 'Success! All seats reserved.', 'ticket_count' => count($passengersData)]); // [71] Emit success.
+    echo json_encode(['success' => true, 'message' => 'Success! All seats reserved.', 'redirect' => 'view_tickets.php', 'ticket_count' => count($passengersData)]);
 } catch (Throwable $e) {
     if (isset($conn) && $conn->connect_errno == 0 && ($conn->ping() ?? false)) { // [72.1] Rollback only if connection is still alive.
         $conn->rollback();                                           // [73] UNDO all database changes to maintain data integrity.

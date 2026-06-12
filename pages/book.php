@@ -37,6 +37,7 @@ if ($is_staff) {
         .crud-table { width: 100%; border-collapse: collapse; }
         .crud-table th, .crud-table td { padding: 18px; border-bottom: 1px solid #f1f5f9; text-align: left; }
         .crud-table th { background-color: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        #seat-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; overflow-y: auto; }
         .seat-content { background-color: #ffffff; margin: 3% auto; padding: 40px; border-radius: 20px; width: 90%; max-width: 850px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         .bus-layout { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; background: #f1f5f9; padding: 25px; border-radius: 18px; border: 1px solid #e2e8f0; margin: 30px auto; max-width: 450px; }
         .seat { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85em; font-weight: 700; cursor: pointer; transition: all 0.2s ease; border: 1px solid #cbd5e1; background: white; color: #475569; }
@@ -124,7 +125,6 @@ if ($is_staff) {
     function validatePaxName(input) {
         if (input.value.trim().length == 0) {
             alert("Passenger Name is required");
-            input.focus();
             return false;
         }
         return true;
@@ -133,7 +133,6 @@ if ($is_staff) {
         var age = input.value.trim();
         if (age.length == 0 || isNaN(age) || parseInt(age) < 0 || parseInt(age) > 120) {
             alert("Please enter a valid age (0-120)");
-            input.focus();
             return false;
         }
         return true;
@@ -141,7 +140,6 @@ if ($is_staff) {
     function validatePaxId(input) {
         if (input.value.trim().length == 0) {
             alert("ID/Passport/Birth Cert Number is required");
-            input.focus();
             return false;
         }
         return true;
@@ -228,15 +226,15 @@ if ($is_staff) {
                 <div class="info-grid">
                     <div class="info-group">
                         <label>Traveller Name</label>
-                        <input type="text" class="p-name" value="${saved.name}" placeholder="Enter name..." onblur="validatePaxName(this)">
+                        <input type="text" class="p-name" value="${saved.name}" placeholder="Enter name...">
                     </div>
                     <div class="info-group">
                         <label>Age</label>
-                        <input type="text" class="p-age" value="${saved.age}" placeholder="e.g. 25" onblur="validatePaxAge(this)">
+                        <input type="text" class="p-age" value="${saved.age}" placeholder="e.g. 25">
                     </div>
                     <div class="info-group">
                         <label>ID Number</label>
-                        <input type="text" class="p-id" value="${saved.id}" placeholder="ID/Passport" onblur="validatePaxId(this)">
+                        <input type="text" class="p-id" value="${saved.id}" placeholder="ID/Passport">
                     </div>
                 </div>`;
             container.appendChild(card);

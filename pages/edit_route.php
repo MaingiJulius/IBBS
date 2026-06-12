@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
     die("Access denied. Authorized Admins only.");
 }
 /* --- [B] DATA ACQUISITION: FETCH TARGET IDENTIFIER --- */         // [17] Marker for identifying which record is being modified.
-$route_id = $_GET['id'] ?? null;                                     // [18] Retrieve the 'id' from the URL query string using Null Coalescing.
+$route_id = isset($_GET['id']) ? intval($_GET['id']) : null;                                     // [18] Retrieve the 'id' from the URL query string using Null Coalescing.
 if (!$route_id) {
     die("Error: No route ID was provided for editing.");
 }
@@ -15,10 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_route'])) {
     $to = $_POST['to_location'];
     $date = $_POST['departure_date'];
     $time = $_POST['departure_time'];
-    $cost = $_POST['cost'];
-    $bus_id = $_POST['bus_id'];
-    $sql = "UPDATE routes SET from_location=?, to_location=?, departure_date=?, departure_time=?, cost=?, bus_id=? WHERE route_id=?";
-// "ssssdii" = 4 Strings, 1 Double/Decimal, 2 Integers.          // [35] Explaining the type definition string for bind_param.
+    $cost = floatval($_POST['cost']);
+    $bus_id = intval($_POST['bus_id']);
+    $sql = "UPDATE routes SET from_location='$from', to_location='$to', departure_date='$date', departure_time='$time', cost=$cost, bus_id=$bus_id WHERE route_id=$route_id";
     mysqli_query($conn,$sql);
     header("Location: admin_routes.php");
     exit();                                                          // [40] Halt further script execution to ensure redirect behavior.

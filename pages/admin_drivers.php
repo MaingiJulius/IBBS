@@ -10,29 +10,29 @@ if (isset($_POST['add_driver'])) {
     $full_name = $_POST['full_name'];
     $phone = $_POST['phone'];
     $email = $_POST['email'];
-    $sql_reg = "INSERT INTO drivers (national_id, full_name, phone, email) VALUES (?, ?, ?, ?)";
-    mysqli_stmt_execute($stmt_reg);
+    $sql_reg = "INSERT INTO drivers (national_id, full_name, phone, email) VALUES ('$national_id', '$full_name', '$phone', '$email')";
+    mysqli_query($conn, $sql_reg);
     header('Location: admin_drivers.php?msg=Driver Added');
     exit();
 }
 if (isset($_POST['update_driver'])) {
-    $driver_id = $_POST['driver_id'];
+    $driver_id = intval($_POST['driver_id']);
     $national_id = $_POST['national_id'];
     $full_name = $_POST['full_name'];
     $phone = $_POST['phone'];
     $email = $_POST['email'];
-    $sql_upd = "UPDATE drivers SET national_id=?, full_name=?, phone=?, email=? WHERE driver_id=?";
+    $sql_upd = "UPDATE drivers SET national_id='$national_id', full_name='$full_name', phone='$phone', email='$email' WHERE driver_id=$driver_id";
 // This ensures the data is treated only as text or numbers, never as a
     logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Updated Driver: $driver_id");
-    mysqli_stmt_execute($stmt_upd);
+    mysqli_query($conn, $sql_upd);
     header('Location: admin_drivers.php?msg=Updated');
     exit();
 }
 if (isset($_GET['remove_driver'])) {
-    $driver_id = $_GET['remove_driver'];
+    $driver_id = intval($_GET['remove_driver']);
     $sql_rem="DELETE FROM drivers WHERE driver_id=$driver_id";
     logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Driver: $driver_id");
-    mysqli_stmt_execute($stmt_rem);
+    mysqli_query($conn, $sql_rem);
     header("Location: admin_drivers.php?msg=Deleted");
     exit();
 }

@@ -59,13 +59,17 @@ $result = mysqli_query($conn, $sql) or die(mysqli_error($conn));
             if (name == "") {
                 alert("Passenger Name is required");
                 return false;
+            }
             if (pid == "") {
                 alert("ID Number is required");
                 return false;
+            }
             if (age == "" || isNaN(age) || parseInt(age) <= 0) {
                 alert("Valid Age is required");
                 return false;
+            }
             return true;
+        }
     </script>
 </head>
 <body class="<?= strtolower($_SESSION['role']) ?>-role">

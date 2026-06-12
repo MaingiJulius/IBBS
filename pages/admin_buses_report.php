@@ -9,31 +9,30 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'ADMIN') {
 if (isset($_POST['add_bus'])) {
     $reg_no = $_POST['reg_no'];
     $bus_name = $_POST['bus_name'];
-    $max_passengers = $_POST['max_passengers'];
-    $sql_add = "INSERT INTO buses (reg_no, bus_name, max_passengers) VALUES (?, ?, ?)";
+    $max_passengers = intval($_POST['max_passengers']);
+    $sql_add = "INSERT INTO buses (reg_no, bus_name, max_passengers) VALUES ('$reg_no', '$bus_name', $max_passengers)";
     mysqli_query($conn,$sql_add);
     header('Location: admin_buses_report.php?msg=Bus Added');
     exit();
 }
 if (isset($_POST['update_bus'])) {
-    $bus_id = $_POST['bus_id'];
+    $bus_id = intval($_POST['bus_id']);
     $reg_no = $_POST['reg_no'];
     $bus_name = $_POST['bus_name'];
-    $max_passengers = $_POST['max_passengers'];
-    $driver_id = !empty($_POST['driver_id']) ? $_POST['driver_id'] : null;
-    $sql_upd = "UPDATE buses SET reg_no=?, bus_name=?, max_passengers=?, driver_id=? WHERE bus_id=?";
+    $max_passengers = intval($_POST['max_passengers']);
+    $driver_id = !empty($_POST['driver_id']) ? intval($_POST['driver_id']) : 'NULL';
+    $sql_upd = "UPDATE buses SET reg_no='$reg_no', bus_name='$bus_name', max_passengers=$max_passengers, driver_id=$driver_id WHERE bus_id=$bus_id";
 // from injecting malicious code because the machine already knows the
-    mysqli_stmt_bind_param($stmt_upd, "ssiii", $reg_no, $bus_name, $max_passengers, $driver_id, $bus_id);
     logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Updated Bus: $bus_id");
-    mysqli_stmt_execute($stmt_upd);
+    mysqli_query($conn, $sql_upd);
     header('Location: admin_buses_report.php?msg=Updated');
     exit();
 }
 if (isset($_GET['remove_bus'])) {
-    $bus_id = $_GET['remove_bus'];
+    $bus_id = intval($_GET['remove_bus']);
     $sql_del="DELETE FROM buses WHERE bus_id=$bus_id";
     logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed Bus: $bus_id");
-    mysqli_stmt_execute($stmt_del);
+    mysqli_query($conn, $sql_del);
     header("Location: admin_buses_report.php?msg=Deleted");
     exit();
 }

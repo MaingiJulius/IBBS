@@ -32,15 +32,30 @@ if (isset($_GET['delete_feedback'])) {
         <?php if(isset($_GET['msg'])): ?>
         <?php endif; ?>
         <table class="crud-table">
-            <thead><tr><th>Processed</th><th>Traveler Identity</th><th>Sentiment</th><th>Written Dossier</th><th>Trip Path</th><th class="no-print">Control Deck</th></tr></thead>
+            <thead><tr><th>Processed</th><th>Traveler Identity</th><th>Sentiment</th><th>Comment</th><th>Trip Path</th><th class="no-print">Control Deck</th></tr></thead>
             <tbody>
-                <?php $sql = "SELECT f.*, u.first_name, u.last_name, r.from_location, r.to_location FROM feedback f JOIN users u ON f.user_id = u.user_id JOIN routes r ON f.route_id = r.route_id ORDER BY f.feedback_date DESC";
+                <?php
+                $sql = "SELECT f.*, u.first_name, u.last_name, u.email, r.from_location, r.to_location FROM feedback f JOIN users u ON f.user_id = u.user_id JOIN routes r ON f.route_id = r.route_id ORDER BY f.feedback_date DESC";
                 $result = mysqli_query($conn, $sql);
                 while($row = mysqli_fetch_assoc($result)): ?>
-                    <td style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td>
-                    <td style="color: #4a5568; line-height: 1.6; max-width: 300px;"><?= htmlspecialchars($row['comments']) ?></td>
-                    <td style="font-size: 0.85rem; color: #718096; font-weight: 600;"><?= htmlspecialchars($row['from_location'] . ' → ' . $row['to_location']) ?></td>
-                </tr>
+                    <tr>
+                        <td style="font-weight: 700; color: #2d3748;"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></td>
+                        <td style="font-size: 0.85rem; color: #4a5568;"><?= htmlspecialchars($row['email']) ?></td>
+                        <td style="font-size: 1.1rem; letter-spacing: 2px;">
+                            <?php
+                            $rating = intval($row['rating']);
+                            echo str_repeat('⭐', $rating) . str_repeat('☆', 5 - $rating);
+                            ?>
+                        </td>
+                        <td style="color: #4a5568; line-height: 1.6; max-width: 300px;"><?= htmlspecialchars($row['comments']) ?></td>
+                        <td style="font-size: 0.85rem; color: #718096; font-weight: 600;"><?= htmlspecialchars($row['from_location'] . ' → ' . $row['to_location']) ?></td>
+                        <td class="no-print">
+                            <a href="view_feedback.php?delete_feedback=<?= $row['feedback_id'] ?>"
+                               class="button regular-button"
+                               style="background:#ef4444; color:white; border-radius:50px; padding:6px 16px; font-size:0.8rem; text-decoration:none; font-weight:700;"
+                               onclick="return confirm('Delete this feedback entry?')">Delete</a>
+                        </td>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>

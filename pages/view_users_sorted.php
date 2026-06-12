@@ -6,26 +6,26 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['ADMIN', 'AGENT']
     die("Access Denied: Staff Authorization Required.");
 }
 if (isset($_GET['delete_user'])) {
-    $uid = $_GET['delete_user'];
+    $uid = intval($_GET['delete_user']);
     if ($uid == $_SESSION['user_id']) {
         header("Location: view_users_sorted.php?err=System Safety: You cannot delete yourself!");
         exit();
     }
-    $sql_del = "DELETE FROM users WHERE user_id = ?";
-    mysqli_stmt_execute($stmt_del);
+    $sql_del = "DELETE FROM users WHERE user_id = $uid";
+    mysqli_query($conn, $sql_del);
     logActivity($_SESSION['user_id'], $_SESSION['name'], 'DELETION', "Removed User UID: $uid");
     header("Location: view_users_sorted.php?msg=User deleted successfully.");
     exit();
 }
 if (isset($_GET['reset_password'])) {
-    $uid = $_GET['reset_password'];
-    $sql_get = "SELECT first_name FROM users WHERE user_id = ?";
+    $uid = intval($_GET['reset_password']);
+    $sql_get = "SELECT first_name FROM users WHERE user_id = $uid";
     $res_get=mysqli_query($conn,$sql_get);
     if ($row_get = mysqli_fetch_assoc($res_get)) {
         $first_name = $row_get['first_name'];
         $plain_pass = ucfirst($first_name) . "123";
         $hashed_pass = password_hash($plain_pass, PASSWORD_DEFAULT);
-        $sql_reset = "UPDATE users SET password = ? WHERE user_id = ?";
+        $sql_reset = "UPDATE users SET password = '$hashed_pass' WHERE user_id = $uid";
         mysqli_query($conn,$sql_reset);
         logActivity($_SESSION['user_id'], $_SESSION['name'], 'PASSWORD_RESET', "Reset password for user ID $uid to " . $plain_pass);
         header("Location: view_users_sorted.php?msg=Password reset to " . htmlspecialchars($plain_pass) . " successfully.");
@@ -41,8 +41,8 @@ if (isset($_POST['add_user'])) {
     $phone = $_POST['phone_number'];
     $role = $_POST['role'];
     $pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $sql_add = "INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?, ?)";
-    if(mysqli_stmt_execute($stmt_add)) {
+    $sql_add = "INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES ('$first', '$last', '$email', '$phone', '$pass', '$role')";
+    if(mysqli_query($conn, $sql_add)) {
         logActivity($_SESSION['user_id'], $_SESSION['name'], 'REGISTRATION', "Created new user: $email");
         header("Location: view_users_sorted.php?msg=New user added.");
     } else {
@@ -51,14 +51,14 @@ if (isset($_POST['add_user'])) {
     exit();
 }
 if (isset($_POST['update_user'])) {
-    $uid = $_POST['user_id'];
+    $uid = intval($_POST['user_id']);
     $first = $_POST['first_name'];
     $last = $_POST['last_name'];
     $email = $_POST['email'];
     $phone = $_POST['phone_number'];
     $role = $_POST['role'];
-    $sql_upd = "UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=? WHERE user_id=?";
-    if(mysqli_stmt_execute($stmt_upd)) {
+    $sql_upd = "UPDATE users SET first_name='$first', last_name='$last', email='$email', phone_number='$phone', role='$role' WHERE user_id=$uid";
+    if(mysqli_query($conn, $sql_upd)) {
         logActivity($_SESSION['user_id'], $_SESSION['name'], 'UPDATE', "Modified User UID: $uid");
         header("Location: view_users_sorted.php?msg=User updated.");
     } else {

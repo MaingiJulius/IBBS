@@ -7,9 +7,8 @@ if (!function_exists('logActivity')) {
         }
         $time = date('H:i:s');
         $date = date('Y-m-d');
-        $sql = "INSERT INTO Logs (user_id, type, description, name, time, date) VALUES (?, ?, ?, ?, ?, ?)";
-        mysqli_stmt_bind_param($stmt, "isssss", $userId, $type, $description, $userName, $time, $date);
-        mysqli_query($conn,$sql);
+        $sql = "INSERT INTO Logs (user_id, type, description, name, time, date) VALUES ($userId, '$type', '$description', '$userName', '$time', '$date')";
+        mysqli_query($conn, $sql);
     }
 }
 ?>

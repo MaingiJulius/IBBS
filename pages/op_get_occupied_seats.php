@@ -13,7 +13,7 @@ try {
     $result = mysqli_query($conn, $sql);
 // 5. Build Array of Seats.
     $occupiedCount = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = mysqli_fetch_assoc($result)) {
         $occupiedCount[] = $row['seat_number'];
     }
     echo json_encode(['occupied' => $occupiedCount]);

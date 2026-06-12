@@ -6,8 +6,8 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['ADMIN', 'AGEN
     exit();
 }
 if (isset($_GET['delete_route'])) {
-    $route_id = $_GET['delete_route'];
-    $sql_del = "DELETE FROM routes WHERE route_id = ?";
+    $route_id = intval($_GET['delete_route']);
+    $sql_del = "DELETE FROM routes WHERE route_id = $route_id";
     mysqli_query($conn,$sql_del);
     header("Location: view_routes.php?msg=Success: Route removed.");
     exit();
@@ -17,23 +17,23 @@ if (isset($_POST['add_route'])) {
     $to     = $_POST['to_location'];
     $date   = $_POST['departure_date'];
     $time   = $_POST['departure_time'];
-    $cost   = $_POST['cost'];
-    $bus_id = $_POST['bus_id'];
-    $sql_add = "INSERT INTO routes (from_location, to_location, departure_date, departure_time, cost, bus_id) VALUES (?, ?, ?, ?, ?, ?)";
-    mysqli_stmt_execute($stmt_add);
+    $cost   = floatval($_POST['cost']);
+    $bus_id = intval($_POST['bus_id']);
+    $sql_add = "INSERT INTO routes (from_location, to_location, departure_date, departure_time, cost, bus_id) VALUES ('$from', '$to', '$date', '$time', $cost, $bus_id)";
+    mysqli_query($conn, $sql_add);
     header("Location: view_routes.php?msg=Success: Route created.");
     exit();
 }
 if (isset($_POST['update_route'])) {
-    $route_id = $_POST['route_id'];
+    $route_id = intval($_POST['route_id']);
     $from     = $_POST['from_location'];
     $to       = $_POST['to_location'];
     $date     = $_POST['departure_date'];
     $time     = $_POST['departure_time'];
-    $cost     = $_POST['cost'];
-    $bus_id   = $_POST['bus_id'];
-    $sql_upd = "UPDATE routes SET from_location=?, to_location=?, departure_date=?, departure_time=?, cost=?, bus_id=? WHERE route_id=?";
-    mysqli_stmt_execute($stmt_upd);
+    $cost     = floatval($_POST['cost']);
+    $bus_id   = intval($_POST['bus_id']);
+    $sql_upd = "UPDATE routes SET from_location='$from', to_location='$to', departure_date='$date', departure_time='$time', cost=$cost, bus_id=$bus_id WHERE route_id=$route_id";
+    mysqli_query($conn, $sql_upd);
     header("Location: view_routes.php?msg=Success: Route updated.");
     exit();
 }
