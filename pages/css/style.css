@@ -1,145 +1,43 @@
-/* ========================================================================== */
-/* SECONDARY STYLESHEET (style.css) */
-/* This file is used for fine-tuning the theme and overriding global defaults for specific layouts. */
-/* ========================================================================== */
-/* Theme customization. */
-/* ========================================================================== */
-/* / (forward slash) * (asterisk) starts a professional documentation block.
-   SECONDARY STYLESHEET is the module title. * (asterisk) / (forward slash) closes. */
-
-/* --- GENERAL BODY OVERRIDES --- */
 :root {
-/* : (colon) root (r o o t) pseudo-class targets the document root (<html>). 
-   { (curly bracket) starts the global rules block. */
-
   background-color: var(--body-bg);
-  /* background-color (surface) : (colon) var(--body-bg) (pink) ; (semicolon) 
-     enforces the themed pink background. */
-
   color: var(--text-color);
-  /* color (text color) : (colon) var(--text-color) (dark purple) ; (semicolon) 
-     enforces high-contrast readability. */
-
   display: flex;
-  /* display (layout) : (colon) flex ; (semicolon) enables flexible 
-     container logic on the body. */
-
   flex-direction: column;
-  /* flex-direction (path) : (colon) column (vertical) ; (semicolon) 
-     organizes Header, Content, and Footer in a stack. */
-
   min-height: 100vh;
-  /* min-height (minimum height) : (colon) 100vh (100% of the screen) ; 
-     (semicolon) ensures the body fills the entire display. */
 }
-/* } ends root override style. */
-
-/* --- HEADER OVERRIDES --- */
 #banner {
-/* # (hash) banner (unique ID) targets the top branding bar. { starts. */
-
   background-color: var(--header-bg);
-  /* background-color (surface) : (colon) var(--header-bg) (purple) ; 
-     (semicolon). */
 }
-/* } ends banner override. */
-
 #nav-links {
-/* # (hash) nav-links (unique ID) targets the navigation container. { starts. */
-
   background-color: var(--nav-bg);
-  /* background-color (surface) : (colon) var(--nav-bg) (light purple) ; 
-     (semicolon). */
 }
-/* } ends nav-links override. */
-
 #nav-links a {
-/* Targets links inside the navigation container. { starts. */
-
   color: white !important;
-  /* color (text) : (colon) white !important (force) ; (semicolon) 
-     overrides any generic link color rules. */
 }
-/* } ends link override. */
-
-/* --- CONTENT BOXES --- */
 .view-container,
 .profile-container,
 .ticket-container {
-/* . (dot) class-names (labels) targets dashboard and profile panels. { starts. */
-
   background: rgba(255, 255, 255, 0.5) !important;
-  /* background (surface) : (colon) white at 50% transparency (rgba 0.5) 
-     !important (force) ; (semicolon). */
-
   border: 2px solid var(--header-bg);
-  /* border (outline) : (colon) 2px (size) solid (style) var(--header-bg) 
-     (purple) ; (semicolon). */
-
   border-radius: 15px;
-  /* border-radius (corner curvature) : (colon) 15px (pixels) ; (semicolon) 
-     softens the UI look. */
-
   margin-bottom: 40px;
-  /* margin-bottom (external space) : (colon) 40px ; (semicolon) 
-     prevents crowding between sections. */
 }
-/* } ends container boxes style. */
-
-/* --- TABLES --- */
 th {
-/* th (table heading) targets the header cells in data grids. { starts. */
-
   background-color: var(--header-bg) !important;
-  /* background-color (surface) : (colon) var(--header-bg) !important (force) 
-     ; (semicolon) ensures headings are always purple. */
-
   color: white !important;
-  /* color (text) : (colon) white !important (force) ; (semicolon) 
-     ensures headings are always readable. */
 }
-/* } ends th style. */
-
-/* --- FOOTER --- */
 footer,
 #footer {
-/* footer (tag) , (and) #footer (ID) target the bottom section. { starts. */
-
   background-color: #4a1a4a !important;
-  /* background-color (surface) : (colon) #4a1a4a (extremely dark purple) 
-     !important (force) ; (semicolon). */
-
   color: white !important;
-  /* color (text) : (colon) white !important (force) ; (semicolon). */
-
   text-align: center;
-  /* text-align (alignment) : (colon) center ; (semicolon). */
-
   padding: 15px;
-  /* padding (internal space) : (colon) 15px ; (semicolon). */
-
   margin-top: 0;
-  /* margin-top (external space) : (colon) 0 ; (semicolon) sits flush 
-     against content. */
-
   font-size: 0.9rem;
-  /* font-size (size) : (colon) 0.9rem (small) ; (semicolon). */
-
   width: 100%;
-  /* width (horizontal span) : (colon) 100% ; (semicolon). */
-
   box-sizing: border-box;
-  /* box-sizing (calculation) : (colon) border-box ; (semicolon) 
-     includes padding in the width calculation. */
 }
-/* } (closing curly bracket) ends the footer style. */
-
-/* --- PRINT MODE ARCHITECTURE --- */
 @media print {
-/* @ (at-sign) is the CSS rule prefix. media (m e d i a) is the keyword for 
-   responsive design. print (p r i n t) is the specific target for paper 
-   output. { (opening curly bracket) starts the logic block for the printer. */
-
     .no-print, 
     #search-hub, 
     header, 
@@ -151,21 +49,12 @@ footer,
     button { 
         display: none !important; 
     }
-    /* . (dot) is the class selector. no-print (label) , (comma) is the list 
-       separator. # (hash) is the ID selector. search-hub (identity label) 
-       is the search box. display (visual rule) : (colon) none (hidden) 
-       ! (exclamation) important (force rule) ; (semicolon). 
-       This tells the browser to KILL the visibility of these items when printing. */
-
     body { 
         background-color: white !important; 
         color: black !important;
         margin: 0;
         padding: 0;
     }
-    /* body (page body) { background-color (surface) : white (saves ink). 
-       color (text) : black (high contrast). !important (force). } */
-
     .view-container { 
         border: none !important; 
         box-shadow: none !important;
@@ -175,25 +64,16 @@ footer,
         padding: 0 !important;
         background: transparent !important;
     }
-    /* .view-container (report card) { removes decorative borders and 
-       shadows for a flat document appearance. width: 100% (full paper span). } */
-
     table { 
         width: 100% !important; 
         border-collapse: collapse !important;
     }
-    /* table (data grid) { border-collapse (clean lines) : collapse ; } */
-
     th { 
         background-color: #f8fafc !important; 
         color: black !important; 
         border: 1px solid #ddd !important;
     }
-    /* th (header) { background-color : light grey (visible contrast) ; } */
-
     td { 
         border: 1px solid #ddd !important; 
     }
-    /* td (cell) { border (boundary) : 1px solid (visible line) ; } */
 }
-/* } (closing curly bracket) ends the print mode logic. */

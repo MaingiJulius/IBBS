@@ -1,8 +1,4 @@
 <?php
-/**
- * CONTACT.PHP
- * Purpose: Provides commuters with official contact channels for Wema Travellers.
- */
 session_start();
 ?>
 <!DOCTYPE html>
@@ -26,11 +22,9 @@ session_start();
 <body class="<?= strtolower($_SESSION['role'] ?? 'guest') ?>-role">
     <script src="js/header1.js"></script>
     <div style="height: 100px;"></div>
-
     <div class="contact-container">
         <h1 style="color: var(--purple); font-size: 2.5rem; margin-bottom: 10px;">Get In Touch</h1>
         <p style="color: #64748b; font-size: 1.1rem;">We are here to assist you with your travels across East Africa.</p>
-
         <div class="contact-methods">
             <div class="method-card">
                 <h3>📞 Call Center</h3>
@@ -48,13 +42,11 @@ session_start();
                 <p>Nairobi, Kenya</p>
             </div>
         </div>
-
         <div style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 30px;">
             <h3>Operating Hours</h3>
             <p style="color: #64748b;">Monday - Sunday: 5:00 AM - 11:00 PM</p>
         </div>
     </div>
-
     <div style="height: 100px;"></div>
     <script src="js/footer.js"></script>
 </body>

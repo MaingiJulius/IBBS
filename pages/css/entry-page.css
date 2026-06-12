@@ -1,166 +1,67 @@
-/* ========================================================================== */
-/* ENTRY PAGE STYLES (entry-page.css) */
-/* This stylesheet manages the specific layout for high-trafficked portal pages like Login and Signup. */
-/* =========================================================================== */
-/* Specific layout for Login/Signup pages. */
-/* ========================================================================== */
-/* / (forward slash) * (asterisk) starts a professional documentation block.
    ENTRY PAGE STYLES is the module title. * (asterisk) / (forward slash) closes. */
-
-/* --- CONTAINER --- */
 .row {
-/* . (dot) row (class name) targets the main screen wrapper. { starts. */
-
     display: flex;
-    /* display (layout mode) : (colon) flex (activates flexbox) ; (semicolon) 
        places form and image side-by-side. */
-
     flex: 1;
-    /* flex (flexibility) : (colon) 1 (expand to fill space) ; (semicolon). */
-
     margin: 0 !important;
-    /* margin (external space) : (colon) 0 !important (force) ; (semicolon) 
        ensures the content touches the screen edges. */
-
     overflow: hidden;
-    /* overflow (overflow management) : (colon) hidden (hide extra) ; 
        (semicolon) prevents accidental scrollbars. */
 }
-/* } ends row style. */
-
 .height-full {
-/* . (dot) height-full (class) targets 100% height elements. { starts. */
-
     height: 100%;
-    /* height (vertical span) : (colon) 100% ; (semicolon) fills the container. */
 }
-/* } ends height-full style. */
-
-/* --- LEFT COLUMN (Form) --- */
 .left-column {
-/* . (dot) left-column (class) targets the interactive form half of the screen. 
    { starts the style block. */
-
     flex: 1;
-    /* flex (flexibility) : (colon) 1 (occupies 50% of the row) ; (semicolon). */
-
     padding: 40px;
-    /* padding (internal space) : (colon) 40px ; (semicolon) cushion 
        from edges. */
-
     display: flex;
-    /* display (layout) : (colon) flex ; (semicolon). */
-
     flex-direction: column;
-    /* flex-direction (path) : (colon) column (vertical stack) ; (semicolon). */
-
     align-items: center;
-    /* align-items (alignment) : (colon) center (centers content 
        horizontally) ; (semicolon). */
-
     background-color: var(--body-bg);
-    /* background-color (surface) : (colon) var(--body-bg) (pink) ; (semicolon). */
-
     overflow-y: auto;
-    /* overflow-y (vertical overflow) : (colon) auto (scroll if needed) ; 
        (semicolon). */
 }
-/* } ends left-column style. */
-
 .welcoming-title {
-/* . (dot) welcoming-title (class) targets the "Welcome" heading. { starts. */
-
     font-size: 2rem;
-    /* font-size (size) : (colon) 2rem (extra large) ; (semicolon). */
-
     color: var(--text-color);
-    /* color (text color) : (colon) var(--text-color) (dark purple) ; (semicolon). */
-
     margin-bottom: 30px;
-    /* margin-bottom (space below) : (colon) 30px ; (semicolon). */
-
     font-weight: bold;
-    /* font-weight (thickness) : (colon) bold ; (semicolon). */
 }
-/* } ends welcoming-title style. */
-
 .form {
-/* . (dot) form (class) targets the input box wrapper. { starts. */
-
     width: 100%;
-    /* width (horizontal span) : (colon) 100% ; (semicolon) responsive. */
-
     max-width: 400px;
-    /* max-width (maximum width) : (colon) 400px ; (semicolon) 
        prevents stretching on wide screens. */
 }
-/* } ends form style. */
-
 .sign-up-prompt,
 .login-prompt {
-/* Targets the "Don't have an account?" text links. { starts. */
-
     margin-top: 20px;
-    /* margin-top (space above) : (colon) 20px ; (semicolon). */
-
     font-size: 1rem;
-    /* font-size (text size) : (colon) 1rem ; (semicolon). */
 }
-/* } ends prompts style. */
-
 .sign-up-link,
 .log-in-link {
-/* Targets the specific clickable links. { starts. */
-
     color: var(--text-color);
-    /* color (text color) : (colon) var(--text-color) ; (semicolon). */
-
     font-weight: bold;
-    /* font-weight (thickness) : (colon) bold ; (semicolon). */
-
     text-decoration: underline;
-    /* text-decoration (line) : (colon) underline (mandatory signal) ; 
        (semicolon). */
 }
-/* } ends link style. */
-
-/* --- RIGHT COLUMN (Image Decor) --- */
 .right-column {
-/* . (dot) right-column (class) targets the visual image half of the screen. 
    { starts the style block. */
-
     flex: 1;
-    /* flex (flexibility) : (colon) 1 (occupies 50% of the row) ; (semicolon). */
-
     background-image: url("../img/wema_bus_sunset.png");
-    /* background-image (picture) : (colon) url (path) ( "../img/..." ) 
        ; (semicolon) loads the branding image. */
-
     background-size: cover;
-    /* background-size (scaling) : (colon) cover (fills container) ; (semicolon). */
-
     background-position: center;
-    /* background-position (alignment) : (colon) center ; (semicolon). */
-
     border-left: 5px solid white;
-    /* border-left (left outline) : (colon) 5px solid white ; (semicolon) 
        creates a divider line. */
-
     display: none;
-    /* display (visibility) : (colon) none (hidden) ; (semicolon) 
        hidden on small mobile devices by default. */
 }
-/* } ends right-column style. */
-
 @media (min-width: 768px) {
-/* @media (media query) targets devices with width >= 768 pixels. { starts. */
-
     .right-column {
-    /* Targets the image column only on larger screens. { starts. */
-
         display: block;
-        /* display (visibility) : (colon) block (visible) ; (semicolon) 
            reveals the branding image on tablets and desktops. */
     }
 }
-/* } ends media query block. */

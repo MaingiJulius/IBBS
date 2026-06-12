@@ -1,112 +1,75 @@
 <!DOCTYPE html> <!-- Declares this as an HTML5 document. -->
 <html lang="en"> <!-- Root element for the HTML page, using English as the base language. -->
-
 <head> <!-- Metadata section for scripts, styles, and page titles. -->
   <meta charset="UTF-8"> <!-- Uses standard UTF-8 encoding for text characters. -->
   <title>Feedback - Wema Transport Company</title> <!-- The page title shown in the browser tab. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Enables mobile responsiveness by setting viewport width. -->
-
-  <!-- Styles -->
   <link rel="stylesheet" href="css/style.css"> <!-- Links the global theme variables and common styles. -->
-  <link rel="stylesheet" href="Feedback.css"> <!-- Links specific styles for the rating system layout. -->
-
-  <!-- Redundant link removed in previous task, keeping as is for safety. -->
-</head> <!-- Closes the metadata container. -->
-
-<body> <!-- The visible body of the document. -->
-
-  <!-- Navbar placeholder - Used to dynamically inject the navigation bar via JavaScript. -->
+  <link rel="stylesheet" href="Feedback.css">
+</head>
+<body>
   <div id="navbar-placeholder"></div>
-
   <div class="container"> <!-- Main content wrapper for centered formatting. -->
     <div class="text"> <!-- Heading text container. -->
-      Dear esteemed customer, kindly rate us <!-- Instruction message to the user. -->
+      Dear esteemed customer, kindly rate us
     </div>
-
-    <div class="post"> <!-- Container for the "Thank you" state after a successful rating submission. -->
+    <div class="post">
       <div class="text">Thanks for rating us!</div> <!-- Success message. -->
-      <div class="edit">EDIT</div> <!-- Button to go back and edit the rating if needed. -->
+      <div class="edit">EDIT</div>
     </div>
-
-    <div class="star-widget"> <!-- The core rating interface container. -->
-      <!-- Star Rating Inputs - Using hidden radios and visible Unicode characters for interaction. -->
-      <div class="stars-container"> <!-- Flex container to manage the alignment and selection logic. -->
+    <div class="star-widget">
+      <div class="stars-container">
         <input type="radio" name="rating" id="rate-5" value="5"> <!-- Radio for 5 stars. -->
         <label for="rate-5">★</label> <!-- Visual star symbol for 5/5. -->
-
         <input type="radio" name="rating" id="rate-4" value="4"> <!-- Radio for 4 stars. -->
         <label for="rate-4">★</label> <!-- Visual star symbol for 4/5. -->
-
         <input type="radio" name="rating" id="rate-3" value="3"> <!-- Radio for 3 stars. -->
         <label for="rate-3">★</label> <!-- Visual star symbol for 3/5. -->
-
         <input type="radio" name="rating" id="rate-2" value="2"> <!-- Radio for 2 stars. -->
         <label for="rate-2">★</label> <!-- Visual star symbol for 2/5. -->
-
         <input type="radio" name="rating" id="rate-1" value="1"> <!-- Radio for 1 star. -->
         <label for="rate-1">★</label> <!-- Visual star symbol for 1/5. -->
       </div>
-
-      <!-- Feedback Form - The actual submission block. -->
-      <form action="feedback.php" id="feedbackForm" method="post" onsubmit="return validateForm()"> <!-- Sends data to feedback.php using the POST method. -->
-        <header></header> <!-- Empty header placeholder for dynamic JS messages. -->
-
-        <!-- Hidden input to store rating from JS - This value is read by PHP during submission. -->
+      <form action="feedback.php" id="feedbackForm" method="post" onsubmit="return validateForm()">
+        <header></header>
         <input type="hidden" name="rating" id="rating-value" value="">
-
-        <!-- Bus ID input - Allows users to tie feedback to a specific vehicle. -->
-        <!-- type="text" instead of "number" to avoid browser validation -->
-        <input type="text" name="bus_id" id="bus_id" placeholder="Enter Bus ID" 
+        <input type="text" name="bus_id" id="bus_id" placeholder="Enter Bus ID"
           style="margin: 10px 0; padding: 8px; width: 100%;" onmouseout="validateBusId()">
-
-        <!-- Comment textarea - The main text entry box for detailed reviews. -->
         <div class="textarea">
-          <!-- removed 'required' to use manual validation -->
           <textarea cols="30" name="comment" id="comment" placeholder="Describe your experience..." onmouseout="validateComment()"></textarea>
         </div>
-
-        <!-- Submit button - Triggers the JavaScript validation and subsequent POST submission. -->
         <div class="btn">
           <button type="submit">Post</button>
         </div>
-      </form> <!-- End of the feedback form. -->
-    </div> <!-- End of star-widget. -->
-  </div> <!-- End of main container. -->
-
-  <!-- Footer placeholder - Dynamically targets the injection of site-wide footer content. -->
+      </form>
+    </div>
+  </div>
   <div id="footer-placeholder"></div>
-
-  <!-- Scripts - These handle the dynamic loading of navigation components. -->
-  <script src="js/header.js"></script> <!-- Script for loading the top navbar. -->
-  <script src="js/footer.js"></script> <!-- Script for loading the bottom footer. -->
-
-  <!-- Rating logic - Custom JavaScript for UI transitions and data capturing. -->
+  <script src="js/header.js"></script>
+  <script src="js/footer.js"></script>
   <script>
-    // Selected UI elements
-    const btn = document.querySelector("button"); 
-    const post = document.querySelector(".post"); 
-    const widget = document.querySelector(".star-widget"); 
-    const editBtn = document.querySelector(".edit"); 
-
-    // Function to validate the Rating selection
+<!-- Selected UI elements -->
+    const btn = document.querySelector("button");
+    const post = document.querySelector(".post");
+    const widget = document.querySelector(".star-widget");
+    const editBtn = document.querySelector(".edit");
+<!-- Function to validate the Rating selection -->
     function validateRating() {
-      const ratingInputs = document.querySelectorAll('input[name="rating"]'); 
-      let ratingValue = ""; 
-      ratingInputs.forEach(input => { 
-        if (input.checked) { 
-          ratingValue = input.value; 
+      const ratingInputs = document.querySelectorAll('input[name="rating"]');
+      let ratingValue = "";
+      ratingInputs.forEach(input => {
+        if (input.checked) {
+          ratingValue = input.value;
         }
       });
       if (ratingValue === "") {
         alert("Please select a star rating before posting.");
         return false;
       }
-      document.getElementById('rating-value').value = ratingValue; // Update hidden input
+      document.getElementById('rating-value').value = ratingValue; 
       return true;
     }
-
-    // Function to validate that a Bus ID is entered and is numeric
+<!-- Function to validate that a Bus ID is entered and is numeric -->
     function validateBusId() {
       const busId = document.getElementById("bus_id").value.trim();
       if (busId === "" || isNaN(busId)) {
@@ -116,8 +79,7 @@
       }
       return true;
     }
-
-    // Function to validate the comment text
+<!-- Function to validate the comment text -->
     function validateComment() {
       const comment = document.getElementById("comment").value.trim();
       if (comment.length < 5) {
@@ -127,27 +89,21 @@
       }
       return true;
     }
-
-    // Main validation caller for form submission
+<!-- Main validation caller for form submission -->
     function validateForm() {
-      // Run all validations sequentially
+<!-- Run all validations sequentially -->
       if (!validateRating()) return false;
       if (!validateBusId()) return false;
       if (!validateComment()) return false;
-
-      // Successful validation: Update UI to show 'Thank you'
-      widget.style.display = "none"; 
-      post.style.display = "block"; 
-
-      editBtn.onclick = () => { 
-        widget.style.display = "block"; 
-        post.style.display = "none"; 
+<!-- Successful validation: Update UI to show 'Thank you' -->
+      widget.style.display = "none";
+      post.style.display = "block";
+      editBtn.onclick = () => {
+        widget.style.display = "block";
+        post.style.display = "none";
       };
-
-      return true; // Allow form submission to proceed to PHP script
+      return true; 
     }
   </script>
-
-</body> <!-- Closes the document body. -->
-
-</html> <!-- Finishes the HTML source. -->
+</body>
+</html>

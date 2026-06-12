@@ -1,65 +1,28 @@
 <?php
-// <?php (opening tag) tells the server to start interpreting the code as PHP.
-
-/**
- * CORE BOOKING ENGINE (book.php)
- * Purpose: This is the flagship interface of the IBBS Prototype.
- */
-
-// require_once (require once) includes the database connection.
 require_once 'db_connection.php';
-// session_start (session start) starts the user session.
 session_start();
-
-// if (if) check for login.
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit();
 }
-
-// $ (dollar sign) variable marker.
-// user_id (user i d) label.
-// = (equals sign) assignment.
-// $_SESSION['user_id'] (session data).
 $user_id = $_SESSION['user_id'];
 $role    = $_SESSION['role'];
 $is_staff = ($role === 'ADMIN' || $role === 'AGENT');
-
-// --- QUERY: AVAILABLE TRIPS ---
-// $ (dollar sign) variable marker.
-// sql_available (s q l underscore available) label.
-// = (equals sign) assignment.
-// "SELECT ..." (Long SQL query string).
-$sql_available = "SELECT r.*, b.bus_name, b.max_passengers, 
-    (SELECT COUNT(*) FROM bookings WHERE route_id = r.route_id AND booking_status != 'CANCELLED') as booked_seats 
-    FROM routes r JOIN buses b ON r.bus_id = b.bus_id 
-    WHERE r.departure_date >= CURDATE() 
-    AND r.route_id NOT IN (SELECT route_id FROM bookings WHERE user_id = $user_id AND booking_status != 'CANCELLED') 
+$sql_available = "SELECT r.*, b.bus_name, b.max_passengers,
+    (SELECT COUNT(*) FROM bookings WHERE route_id = r.route_id AND booking_status != 'CANCELLED') as booked_seats
+    FROM routes r JOIN buses b ON r.bus_id = b.bus_id
+    WHERE r.departure_date >= CURDATE()
+    AND r.route_id NOT IN (SELECT route_id FROM bookings WHERE user_id = $user_id AND booking_status != 'CANCELLED')
     ORDER BY r.departure_date ASC";
-
-// $ (dollar sign) variable marker.
-// result_available (result underscore available) label.
-// = (equals sign) assignment.
-// mysqli_query (MySQL Improved query) runs the SQL.
-// ( $conn , $sql_available ) (connection variable , SQL variable).
 $result_available = mysqli_query($conn, $sql_available);
-
 $passengers = [];
-// if (if) check if user is staff.
 if ($is_staff) {
-    // $ (dollar sign) variable marker.
-    // pass_res (pass underscore res) label.
-    // mysqli_query (MySQL Improved query) fetches passengers.
     $pass_res = mysqli_query($conn, "SELECT user_id, first_name, last_name, email FROM users WHERE role = 'PASSENGER' ORDER BY first_name");
-    
-    // while (while) loop through results.
-    // $p (variable) = mysqli_fetch_assoc (fetch associative array).
     while($p = mysqli_fetch_assoc($pass_res)) {
         $passengers[] = $p;
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -74,7 +37,6 @@ if ($is_staff) {
         .crud-table { width: 100%; border-collapse: collapse; }
         .crud-table th, .crud-table td { padding: 18px; border-bottom: 1px solid #f1f5f9; text-align: left; }
         .crud-table th { background-color: #f8fafc; color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
-        #seat-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); overflow-y: auto; }
         .seat-content { background-color: #ffffff; margin: 3% auto; padding: 40px; border-radius: 20px; width: 90%; max-width: 850px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         .bus-layout { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; background: #f1f5f9; padding: 25px; border-radius: 18px; border: 1px solid #e2e8f0; margin: 30px auto; max-width: 450px; }
         .seat { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 0.85em; font-weight: 700; cursor: pointer; transition: all 0.2s ease; border: 1px solid #cbd5e1; background: white; color: #475569; }
@@ -92,14 +54,11 @@ if ($is_staff) {
         .aisle-spacer { grid-column: span 1; visibility: hidden; }
     </style>
 </head>
-
 <body class="<?= strtolower($_SESSION['role'] ?? 'passenger') ?>-role">
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
-
     <div class="booking-container">
         <h2 style="color: var(--purple); margin-bottom: 30px; font-weight: 800;">🎫 Trip Reservation Engine</h2>
-
         <?php if ($is_staff): ?>
         <div class="staff-panel">
             <label for="target_user_id">Representative Control (Agent/Admin)</label>
@@ -116,32 +75,22 @@ if ($is_staff) {
         <?php else: ?>
             <input type="hidden" id="target_user_id" value="<?= $user_id ?>">
         <?php endif; ?>
-
         <div class="table-container">
             <table class="crud-table">
                 <thead>
                     <tr><th>Destination</th><th>Departure</th><th>Vehicle</th><th>Cost (KES)</th><th>Availability</th><th>Action</th></tr>
                 </thead>
                 <tbody>
-                    <?php 
-                    // mysqli_data_seek (MySQL Improved data seek) resets the cursor.
+                    <?php
                     mysqli_data_seek($result_available, 0);
-                    // while (while) loop.
-                    while ($row = mysqli_fetch_assoc($result_available)): 
-                        /* while (while) starts a loop. $row (row container) pulls data. 
-                           mysqli_fetch_assoc (fetch associative) converts raw data into labeled pieces. 
-                           ( starts. $result_available (result source). ) ends. : (colon) starts the loop block. */
+                    while ($row = mysqli_fetch_assoc($result_available)):
                         $remaining = $row['max_passengers'] - $row['booked_seats'];
                         $is_full = ($remaining <= 0);
                     ?>
                     <tr>
                         <td><div style="font-weight:700; color:#1e293b;"><?= htmlspecialchars($row['from_location']) ?></div><div style="font-size:0.85em; color:#64748b;">to <?= htmlspecialchars($row['to_location']) ?></div></td>
-                        <!-- html (HyperText) special (special) chars (characters) is a security tool 
-                             that encodes text for safety. ( starts the tool. $row (data row) 
-                             ['from_location'] (origin label) ) ends. -->
                         <td><div style="font-weight:600;"><?= $row['departure_date'] ?></div><div style="font-size:0.85em; font-family:monospace; color:var(--purple);"><?= $row['departure_time'] ?></div></td>
                         <td><?= htmlspecialchars($row['bus_name']) ?></td>
-                        <!-- htmlspecialchars (security tool) ( $row ['bus_name'] (vehicle label) ) -->
                         <td style="font-weight:700; color:#1e293b;"><?= number_format($row['cost'], 2) ?></td>
                         <td><?= $is_full ? '<span style="color:#ef4444; font-weight:800;">FULL</span>' : '<span style="color:#10b981; font-weight:800;">' . $remaining . ' OPEN</span>' ?></td>
                         <td><?= !$is_full ? '<button type="button" class="button regular-button pink-background" onclick="openSeatMap(' . $row['route_id'] . ',' . $row['max_passengers'] . ')">Reserve</button>' : '<button disabled class="button regular-button" style="opacity:0.3;">Sold Out</button>' ?></td>
@@ -151,7 +100,6 @@ if ($is_staff) {
             </table>
         </div>
     </div>
-
     <div id="seat-modal">
         <div class="seat-content">
             <h3 style="margin-top:0;">Virtual Seating Deck</h3>
@@ -171,10 +119,8 @@ if ($is_staff) {
             </div>
         </div>
     </div>
-
     <script src="js/footer.js"></script>
     <script>
-    // Front-end validation (No Regex)
     function validatePaxName(input) {
         if (input.value.trim().length == 0) {
             alert("Passenger Name is required");
@@ -183,7 +129,6 @@ if ($is_staff) {
         }
         return true;
     }
-
     function validatePaxAge(input) {
         var age = input.value.trim();
         if (age.length == 0 || isNaN(age) || parseInt(age) < 0 || parseInt(age) > 120) {
@@ -193,7 +138,6 @@ if ($is_staff) {
         }
         return true;
     }
-
     function validatePaxId(input) {
         if (input.value.trim().length == 0) {
             alert("ID/Passport/Birth Cert Number is required");
@@ -202,25 +146,22 @@ if ($is_staff) {
         }
         return true;
     }
-
     let currentRouteId = null;
     let selectedSeats = [];
-
     function openSeatMap(route_id, max_passengers) {
         currentRouteId = route_id;
         selectedSeats = [];
         updateBookingButton();
         document.body.style.overflow = 'hidden';
-        
         fetch(`op_get_occupied_seats.php?route_id=${route_id}`)
             .then(res => {
                 if (!res.ok) throw new Error('Network response was not ok');
                 return res.json();
             })
             .then(data => {
-                const occupiedList = data.occupied || []; 
+                const occupiedList = data.occupied || [];
                 const totalSeats = parseInt(max_passengers) || 0;
-                generateLayout(totalSeats, occupiedList); 
+                generateLayout(totalSeats, occupiedList);
                 document.getElementById('seat-modal').style.display = 'block';
             })
             .catch(err => {
@@ -229,21 +170,17 @@ if ($is_staff) {
                 document.body.style.overflow = 'auto';
             });
     }
-
     function generateLayout(total, occupied) {
         const container = document.getElementById('bus-layout');
         container.innerHTML = '';
         for (let i = 1; i <= total; i++) {
             const seatNo = `S${i}`;
             const currentGridIndex = container.children.length + 1;
-            
-            // Aisle logic
             if (currentGridIndex % 5 === 3) {
                 const spacer = document.createElement('div');
                 spacer.className = 'aisle-spacer';
                 container.appendChild(spacer);
             }
-
             const seatNode = document.createElement('div');
             if (occupied.includes(seatNo)) {
                 seatNode.className = 'seat occupied';
@@ -256,7 +193,6 @@ if ($is_staff) {
             container.appendChild(seatNode);
         }
     }
-
     function toggleSeatSelection(element, seatNo) {
         if (selectedSeats.includes(seatNo)) {
             selectedSeats = selectedSeats.filter(s => s !== seatNo);
@@ -268,7 +204,6 @@ if ($is_staff) {
         updatePassengerDataForms();
         updateBookingButton();
     }
-
     function updatePassengerDataForms() {
         const container = document.getElementById('passenger-info-container');
         const section = document.getElementById('passenger-details-section');
@@ -307,18 +242,14 @@ if ($is_staff) {
             container.appendChild(card);
         });
     }
-
-
     function updateBookingButton() {
         const btn = document.getElementById('confirm-booking-btn');
         btn.disabled = (selectedSeats.length === 0);
     }
-
     function closeSeatMap() {
         document.getElementById('seat-modal').style.display = 'none';
         document.body.style.overflow = 'auto';
     }
-
     function submitBooking() {
         const system_user_id = document.getElementById('target_user_id').value;
         const payloadArray = [];
@@ -328,16 +259,12 @@ if ($is_staff) {
             const nameInput = card.querySelector('.p-name');
             const ageInput = card.querySelector('.p-age');
             const idInput = card.querySelector('.p-id');
-
-            if (!validatePaxName(nameInput)) return; 
+            if (!validatePaxName(nameInput)) return;
             if (!validatePaxAge(ageInput)) return;
             if (!validatePaxId(idInput)) return;
-
             payloadArray.push({ seat_id: card.dataset.seat, name: nameInput.value.trim(), age: ageInput.value.trim(), id: idInput.value.trim() });
         }
-
         if (!confirm(`Confirm booking for ${selectedSeats.length} seats?`)) return;
-        
         fetch('process_booking.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ route_id: currentRouteId, user_id: system_user_id, passengers: payloadArray }) })
         .then(res => res.json())
         .then(result => {
@@ -349,7 +276,6 @@ if ($is_staff) {
     </script>
 </body>
 </html>
-<?php 
-// mysqli_close (MySQL Improved close).
-mysqli_close($conn); 
+<?php
+mysqli_close($conn);
 ?>

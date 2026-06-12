@@ -119,20 +119,20 @@ write_sql($handle, "-- =========================================================
 
 // --- INSERT USERS ---
 $admins = [
-    ['Alice', 'Kamau'], ['Bob', 'Ochieng'], ['Charlie', 'Kipkorir'], 
-    ['David', 'Maina'], ['Eve', 'Wanjiku'], ['Frank', 'Otieno'], 
+    ['Alice', 'Kamau'], ['Bob', 'Ochieng'], ['Charlie', 'Kipkorir'],
+    ['David', 'Maina'], ['Eve', 'Wanjiku'], ['Frank', 'Otieno'],
     ['Grace', 'Achieng'], ['Hank', 'Musyoka'], ['Ivy', 'Njeri'], ['Jack', 'Mutua']
 ];
 
 $agents = [
-    ['Karen', 'Njoroge'], ['Leo', 'Mwangi'], ['Mia', 'Odhiambo'], 
-    ['Noah', 'Kimani'], ['Olivia', 'Chebet'], ['Paul', 'Kariuki'], 
+    ['Karen', 'Njoroge'], ['Leo', 'Mwangi'], ['Mia', 'Odhiambo'],
+    ['Noah', 'Kimani'], ['Olivia', 'Chebet'], ['Paul', 'Kariuki'],
     ['Quinn', 'Awere'], ['Ryan', 'Omondi'], ['Sarah', 'Wambui'], ['Tom', 'Ndegwa']
 ];
 
 $passengers = [
-    ['Uma', 'Abdi'], ['Vin', 'Ndlovu'], ['Will', 'Chamele'], 
-    ['Xena', 'Tesfaye'], ['Yara', 'Mensah'], ['Zac', 'Diallo'], 
+    ['Uma', 'Abdi'], ['Vin', 'Ndlovu'], ['Will', 'Chamele'],
+    ['Xena', 'Tesfaye'], ['Yara', 'Mensah'], ['Zac', 'Diallo'],
     ['Adam', 'Keita'], ['Bella', 'Sow'], ['Chris', 'Traore'], ['Drake', 'Kone']
 ];
 
@@ -143,20 +143,20 @@ function print_inserts($handle, $users, $role) {
         $first = $u[0];
         $last = $u[1];
         // Requirement: firstname@gmail.com
-        $email = strtolower($first) . ($i + 1) . "@gmail.com"; 
-        
-        $phone = "07" . rand(10, 99) . rand(100000, 999999); 
-        
+        $email = strtolower($first) . ($i + 1) . "@gmail.com";
+
+        $phone = "07" . rand(10, 99) . rand(100000, 999999);
+
         if ($role == 'ADMIN') $phone = "07000000"  . str_pad($i, 2, '0', STR_PAD_LEFT);
         if ($role == 'AGENT') $phone = "07110000"  . str_pad($i, 2, '0', STR_PAD_LEFT);
         if ($role == 'PASSENGER') $phone = "07220000"  . str_pad($i, 2, '0', STR_PAD_LEFT);
 
-        $pass_plain = ucfirst($first) . "@2025$"; 
+        $pass_plain = ucfirst($first) . "@2025$";
         $pass_hash = password_hash($pass_plain, PASSWORD_DEFAULT);
-        
+
         $values[] = "('$first', '$last', '$email', '$phone', '$pass_hash', '$role')";
     }
-    
+
     if (!empty($values)) {
         write_sql($handle, "INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES \n" . implode(",\n", $values) . ";\n");
     }
@@ -166,7 +166,6 @@ function print_inserts($handle, $users, $role) {
 print_inserts($handle, $admins, 'ADMIN');
 print_inserts($handle, $agents, 'AGENT');
 print_inserts($handle, $passengers, 'PASSENGER');
-
 
 write_sql($handle, "-- --- INSERT DRIVERS ---\n");
 $driver_names = [
@@ -212,7 +211,7 @@ for ($i = 1; $i <= 30; $i++) {
     $bus_name = "Wema Executive " . $i;
     $capacity = 40;
     $layout = "2x2";
-    $driver_id = $i; 
+    $driver_id = $i;
     $values[] = "('$reg', '$bus_name', $capacity, '$layout', $driver_id)";
 }
 if (!empty($values)) {
@@ -241,12 +240,12 @@ for ($i = 0; $i < 30; $i++) {
     $from = $loc[0];
     $to = $loc[1];
     $cost = $loc[2];
-    
+
     // Random date in 2026
     $month = rand(1, 12);
     $day = rand(1, 28);
     $date = sprintf("2026-%02d-%02d", $month, $day);
-    
+
     // Random time
     $hour = rand(6, 20); // 6 AM to 8 PM
     $minute = rand(0, 5) * 10;
@@ -254,7 +253,7 @@ for ($i = 0; $i < 30; $i++) {
 
     $bus_id = ($i % 30) + 1;
     $route_ids[] = $i + 1;
-    
+
     $values[] = "('$from', '$to', '$date', '$time', $cost, $bus_id)";
 }
 if (!empty($values)) {
@@ -265,14 +264,14 @@ write_sql($handle, "\n");
 write_sql($handle, "-- --- INSERT BOOKINGS ---\n");
 $values = [];
 for ($i = 1; $i <= 30; $i++) {
-    $user_id = 20 + ($i % 10) + 1; 
-    $route_id = $route_ids[$i % 30]; 
+    $user_id = 20 + ($i % 10) + 1;
+    $route_id = $route_ids[$i % 30];
     $bus_id = ($i % 30) + 1;
-    $seat = ($i % 40) + 1; 
+    $seat = ($i % 40) + 1;
     $seat_str = (string)$seat . "A";
     $status = 'PAID';
     $token = bin2hex(random_bytes(16));
-    
+
     // Random booking time in 2026 (before departure technically, but random 2026 is fine)
     $month = rand(1, 12);
     $day = rand(1, 28);
@@ -328,7 +327,7 @@ for ($i = 1; $i <= 30; $i++) {
     $user_id = 20 + ($i % 10) + 1;
     $bus_id = ($i % 30) + 1;
     $route_id = $route_ids[$i % 30];
-    
+
     $values[] = "($rating, $comments, '$date', $user_id, $bus_id, $route_id)";
 }
 if (!empty($values)) {

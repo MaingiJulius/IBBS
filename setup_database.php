@@ -1,25 +1,18 @@
 <?php
-// =================================================================
 // DATABASE SETUP & SEEDING SCRIPT
-// =================================================================
 // This script resets the database `IBBS_PROTOTYPE` and populates it
 // with initial sample data for demonstration/defense purposes.
-// =================================================================
-
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
-
 $server_name = "localhost";
 $username = "root";
 $password = "";
 $port = 3306;
-
 // Create connection
 $conn = new mysqli($server_name, $username, $password, "", $port);
 if ($conn->connect_error) {
     die("Connection Failed: " . $conn->connect_error);
 }
-
 // 1. DROP & CREATE DATABASE
 echo "Dropping database if exists...<br>";
 $conn->query("DROP DATABASE IF EXISTS IBBS_PROTOTYPE");
@@ -29,14 +22,9 @@ if ($conn->query("CREATE DATABASE IBBS_PROTOTYPE") === TRUE) {
 } else {
     die("Error creating database: " . $conn->error);
 }
-
 // Select Database
 $conn->select_db("IBBS_PROTOTYPE");
-
-// =================================================================
 // 2. CREATE TABLES
-// =================================================================
-
 // USERS
 $sql_users = "CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,7 +35,6 @@ $sql_users = "CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     role ENUM('PASSENGER','ADMIN','AGENT') NOT NULL DEFAULT 'PASSENGER'
 )";
-
 // DRIVERS
 $sql_drivers = "CREATE TABLE drivers (
     driver_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -56,7 +43,6 @@ $sql_drivers = "CREATE TABLE drivers (
     phone VARCHAR(15) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL
 )";
-
 // BUSES
 // Added ON DELETE SET NULL to driver_id foreign key as per user schema request
 $sql_buses = "CREATE TABLE buses (
@@ -68,7 +54,6 @@ $sql_buses = "CREATE TABLE buses (
     driver_id INT,
     FOREIGN KEY (driver_id) REFERENCES drivers(driver_id) ON DELETE SET NULL
 )";
-
 // ROUTES
 // removed arrival_time as per user schema provided in step 26
 $sql_routes = "CREATE TABLE routes (
@@ -81,7 +66,6 @@ $sql_routes = "CREATE TABLE routes (
     bus_id INT NOT NULL,
     FOREIGN KEY (bus_id) REFERENCES buses(bus_id)
 )";
-
 // BOOKINGS
 // removed passenger info columns as per user schema provided in step 26
 $sql_bookings = "CREATE TABLE bookings (
@@ -102,7 +86,6 @@ $sql_bookings = "CREATE TABLE bookings (
     passenger_id_number VARCHAR(50) NOT NULL DEFAULT '',
     UNIQUE (route_id, seat_number)
 )";
-
 // FEEDBACK
 $sql_feedback = "CREATE TABLE feedback (
     feedback_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -116,7 +99,6 @@ $sql_feedback = "CREATE TABLE feedback (
     FOREIGN KEY (bus_id) REFERENCES buses(bus_id),
     FOREIGN KEY (route_id) REFERENCES routes(route_id) ON DELETE CASCADE
 )";
-
 $tables = [
     "Users" => $sql_users,
     "Drivers" => $sql_drivers,
@@ -125,7 +107,6 @@ $tables = [
     "Bookings" => $sql_bookings,
     "Feedback" => $sql_feedback
 ];
-
 foreach ($tables as $name => $sql) {
     if ($conn->query($sql) === TRUE) {
         echo "Table '$name' created successfully.<br>";
@@ -133,15 +114,9 @@ foreach ($tables as $name => $sql) {
         die("Error creating table '$name': " . $conn->error);
     }
 }
-
-// =================================================================
 // 3. SEED DATA
-// =================================================================
 echo "Seeding data...<br>";
-
-// --- Seed Users ---
 // 10 Admins, 10 Agents, 10 Passengers
-// Password format: Firstname@2025$
 $admins = [
     ['Alice', 'Admin', 'alice@wema.com', '0700000001'],
     ['Bob', 'Builder', 'bob@wema.com', '0700000002'],
@@ -154,7 +129,6 @@ $admins = [
     ['Ivy', 'League', 'ivy@wema.com', '0700000009'],
     ['Jack', 'Sparrow', 'jack@wema.com', '0700000010']
 ];
-
 $agents = [
     ['Karen', 'Gillan', 'karen@wema.com', '0700000011'],
     ['Leo', 'DiCaprio', 'leo@wema.com', '0700000012'],
@@ -167,7 +141,6 @@ $agents = [
     ['Sarah', 'Connor', 'sarah@wema.com', '0700000019'],
     ['Tom', 'Hanks', 'tom@wema.com', '0700000020']
 ];
-
 $passengers = [
     ['Uma', 'Thurman', 'uma@gmail.com', '0711111111'],
     ['Vin', 'Diesel', 'vin@yahoo.com', '0711111112'],
@@ -180,38 +153,22 @@ $passengers = [
     ['Chris', 'Evans', 'chris@gmail.com', '0711111119'],
     ['Drake', 'Graham', 'drake@gmail.com', '0711111120']
 ];
-
 function seed_users($conn, $users, $role) {
-    $stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES (?, ?, ?, ?, ?, ?)");
     foreach ($users as $u) {
         $first = $u[0];
         $last = $u[1];
         $email = $u[2];
         $phone = $u[3];
-        $pass_plain = ucfirst($first) . "@2025$"; // Format: Firstname@2025$
-        
-        // --- PASSWORD HASHING EXPLANATION ---
-        // We use the PHP built-in function 'password_hash()'.
-        // This function uses the BCRYPT algorithm (a strong cryptographic hash).
-        // It automatically generates a "salt" for each password, meaning even if 
-        // two users have the same password, their hashes in the database will look different.
-        // It is a "one-way" function, meaning it's mathematically impossible to 
-        // reverse the hash back to the original password.
-        // -------------------------------------
+        $pass_plain = ucfirst($first) . "@2025$";
         $pass_hash = password_hash($pass_plain, PASSWORD_DEFAULT);
-        
-        $stmt->bind_param("ssssss", $first, $last, $email, $phone, $pass_hash, $role);
-        $stmt->execute();
+        $sql = "INSERT INTO users (first_name, last_name, email, phone_number, password, role) VALUES ('$first', '$last', '$email', '$phone', '$pass_hash', '$role')";
+        mysqli_query($conn, $sql);
     }
-    $stmt->close();
 }
-
 seed_users($conn, $admins, 'ADMIN');
 seed_users($conn, $agents, 'AGENT');
 seed_users($conn, $passengers, 'PASSENGER');
 echo "Users seeded.<br>";
-
-// --- Seed Drivers ---
 $drivers = [];
 for ($i = 1; $i <= 30; $i++) {
     $drivers[] = [
@@ -221,32 +178,23 @@ for ($i = 1; $i <= 30; $i++) {
         "driver$i@wema.com"
     ];
 }
-$stmt = $conn->prepare("INSERT INTO drivers (national_id, full_name, phone, email) VALUES (?, ?, ?, ?)");
 foreach ($drivers as $d) {
-    $stmt->bind_param("ssss", $d[0], $d[1], $d[2], $d[3]);
-    $stmt->execute();
+    $sql = "INSERT INTO drivers (national_id, full_name, phone, email) VALUES ('$d[0]', '$d[1]', '$d[2]', '$d[3]')";
+    mysqli_query($conn, $sql);
 }
-$stmt->close();
 echo "Drivers seeded.<br>";
-
-// --- Seed Buses ---
 $buses = [];
 for ($i = 1; $i <= 30; $i++) {
-    // pattern: KBA 123A
     $reg = "K" . chr(65 + ($i%26)) . chr(65 + (($i+1)%26)) . " " . (100 + $i) . chr(65 + (($i+2)%26));
     $bus_name = "Wema Executive " . $i;
     $capacity = 40;
     $layout = "2x2";
     $driver_id = $i; // One driver per bus roughly
-    
-    $stmt = $conn->prepare("INSERT INTO buses (reg_no, bus_name, max_passengers, seat_layout, driver_id) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssisi", $reg, $bus_name, $capacity, $layout, $driver_id);
-    $stmt->execute();
+    $sql = "INSERT INTO buses (reg_no, bus_name, max_passengers, seat_layout, driver_id) VALUES ('$reg', '$bus_name', $capacity, '$layout', " . ($driver_id ? $driver_id : "NULL") . ")";
+    mysqli_query($conn, $sql);
 }
 echo "Buses seeded.<br>";
-
-// --- Seed Routes (International) ---
-// Nairobi-Kampala, Johannesburg-Eritrea, etc. 
+// Nairobi-Kampala, Johannesburg-Eritrea, etc.
 $locations = [
     ["Nairobi, Kenya", "Kampala, Uganda", 3500],
     ["Kampala, Uganda", "Nairobi, Kenya", 3500],
@@ -259,56 +207,34 @@ $locations = [
     ["Addis Ababa, Ethiopia", "Nairobi, Kenya", 6000],
     ["Lusaka, Zambia", "Dar es Salaam, Tanzania", 8000]
 ];
-
-$stmt = $conn->prepare("INSERT INTO routes (from_location, to_location, departure_date, departure_time, cost, bus_id) VALUES (?, ?, ?, ?, ?, ?)");
 $route_ids = [];
-
-// Create 30 routes (repeating locations)
 for ($i = 0; $i < 30; $i++) {
     $loc = $locations[$i % count($locations)];
     $from = $loc[0];
     $to = $loc[1];
     $cost = $loc[2];
-    
-    // Date: next 30 days
     $date = date('Y-m-d', strtotime("+$i days"));
-    $time = "08:00:00"; 
-    
+    $time = "08:00:00";
     $bus_id = ($i % 30) + 1;
-    
-    $stmt->bind_param("ssssdi", $from, $to, $date, $time, $cost, $bus_id);
-    $stmt->execute();
-    $route_ids[] = $stmt->insert_id;
+    $sql = "INSERT INTO routes (from_location, to_location, departure_date, departure_time, cost, bus_id) VALUES ('$from', '$to', '$date', '$time', $cost, $bus_id)";
+    mysqli_query($conn, $sql);
+    $route_ids[] = mysqli_insert_id($conn);
 }
-$stmt->close();
 echo "Routes seeded.<br>";
-
-// --- Seed Bookings ---
 // Random passengers booking random routes
-$stmt = $conn->prepare("INSERT INTO bookings (booking_time, seat_number, booking_status, qr_token, user_id, route_id, bus_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
-
 for ($i = 1; $i <= 30; $i++) {
-    $user_id = 20 + ($i % 10) + 1; // Pick from passengers (IDs 21-30)
+    $user_id = 20 + ($i % 10) + 1;
     $route_id = $route_ids[$i % 30];
-    // Need bus_id for that route
-    // In our loop above: route i has bus_id (i%30)+1.
     $bus_id = ($i % 30) + 1;
-    
-    $seat = ($i % 40) + 1; 
+    $seat = ($i % 40) + 1;
     $seat_str = (string)$seat . "A";
-    
     $status = 'PAID';
     $token = bin2hex(random_bytes(16));
     $time = date('Y-m-d H:i:s');
-    
-    $stmt->bind_param("ssssiii", $time, $seat_str, $status, $token, $user_id, $route_id, $bus_id);
-    $stmt->execute();
+    $sql = "INSERT INTO bookings (booking_time, seat_number, booking_status, qr_token, user_id, route_id, bus_id) VALUES ('$time', '$seat_str', '$status', '$token', $user_id, $route_id, $bus_id)";
+    mysqli_query($conn, $sql);
 }
-$stmt->close();
 echo "Bookings seeded.<br>";
-
-// --- Seed Feedback ---
-$stmt = $conn->prepare("INSERT INTO feedback (rating, comments, feedback_date, user_id, bus_id, route_id) VALUES (?, ?, ?, ?, ?, ?)");
 for ($i = 1; $i <= 30; $i++) {
     $rating = rand(3, 5);
     $comments = "Feedback message number $i - Good service!";
@@ -316,14 +242,9 @@ for ($i = 1; $i <= 30; $i++) {
     $user_id = 20 + ($i % 10) + 1;
     $bus_id = ($i % 30) + 1;
     $route_id = $route_ids[$i % 30];
-    
-    $stmt->bind_param("issiii", $rating, $comments, $date, $user_id, $bus_id, $route_id);
-    $stmt->execute();
+    $sql = "INSERT INTO feedback (rating, comments, feedback_date, user_id, bus_id, route_id) VALUES ($rating, '$comments', '$date', $user_id, $bus_id, $route_id)";
+    mysqli_query($conn, $sql);
 }
-$stmt->close();
 echo "Feedback seeded.<br>";
-
-$conn->close();
-
 echo "<h3>Database Setup Complete!</h3>";
 ?>

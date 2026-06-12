@@ -1,27 +1,12 @@
 <?php
-// <?php (opening tag) tells the server to start interpreting the code as PHP.
-
-/**
- * AGENT OPERATIONAL HUB (agent_dashboard.php)
- */
-
-// require_once (require once) includes the database connection.
 require_once 'db_connection.php';
-// session_start (session start) starts the user session.
 session_start();
-
-// --- SECURITY CHECK ---
-// if (if) checks if the user is authorized as an AGENT or ADMIN.
 if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'AGENT' && $_SESSION['role'] !== 'ADMIN')) {
     header("Location: login.html");
     exit();
 }
-
-// $ (dollar sign) variable marker.
-// agent_name (agent name) label.
 $agent_name = $_SESSION['name'];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,23 +21,19 @@ $agent_name = $_SESSION['name'];
         .welcome-banner h1 { margin: 0; font-size: 2.8em; }
     </style>
 </head>
-
 <body class="<?= strtolower($_SESSION['role']) ?>-role">
     <script src="js/header2.js"></script>
     <div style="height: 100px;"></div>
-
     <div class="dashboard-container">
         <div class="welcome-banner">
             <h1>Agent Portal</h1>
-            <p>Ready for duty, <?= htmlspecialchars($agent_name) ?>. Access your control modules via the <strong>Operations</strong> menu above.</p> 
+            <p>Ready for duty, <?= htmlspecialchars($agent_name) ?>. Access your control modules via the <strong>Operations</strong> menu above.</p>
         </div>
-
         <div style="text-align: center; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee;">
             <h3 style="color: var(--purple);">Agent Operations Hub</h3>
             <p style="color: #666;">All your tasks, from booking to reporting, are now conveniently grouped in the navigation bar above.</p>
         </div>
     </div>
-
     <div style="height: 100px;"></div>
     <script src="js/footer.js"></script>
 </body>
